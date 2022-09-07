@@ -133,7 +133,7 @@ class SnakeGame:
                     self.board[self.snake.head[1]][self.snake.head[0]][SnakeGame.element["DIRECTION"]] = SnakeGame.direction["UP"]
                     self.board[self.snake.head[1]][self.snake.head[0]][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["HEAD"]
                     
-                    if (self.board[self.snake.head[0]][self.snake.head[1]][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["FOOD"]):
+                    if (self.board[self.snake.head[1]][self.snake.head[0]][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["FOOD"]):
                         self.snake.length += 1
                         food = 1
 
