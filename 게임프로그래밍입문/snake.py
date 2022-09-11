@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 from __future__ import print_function
 import random
 import os
@@ -124,9 +125,8 @@ class SnakeGame:
                 # up = 1 down = 1 right = 2 left = -2
                 
                 food = 0
-    
+                #헤드 변환 지정
                 if (current == 1):
-                    #헤드 변환 지정
                     self.snake.head[0] += 1
                     #새로 바뀐 헤드 위치에 대해서 보드값 변환
                     self.board[self.snake.head[1]][self.snake.head[0]][SnakeGame.element["DIRECTION"]] = SnakeGame.direction["UP"]
