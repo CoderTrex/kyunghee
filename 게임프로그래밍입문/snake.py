@@ -126,7 +126,6 @@ class SnakeGame:
                 food = 0
     
                 if (current == 1):
-                    
                     #헤드 변환 지정
                     self.snake.head[0] += 1
                     #새로 바뀐 헤드 위치에 대해서 보드값 변환
