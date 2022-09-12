@@ -26,7 +26,7 @@ class SnakeGame:
         self.board = [[[0]*2 for x in range(self.W)] for y in range(self.H)]
         #self.board[a][b][c]
 
-        #세로 / 가로 
+        #세로 / 가로
         self.snake.head = [self.H//2, self.snake.length-1]
         self.snake.tail = [self.H//2, 0]
 
@@ -117,73 +117,32 @@ class SnakeGame:
         while True:
             start = time.time()
             
-            while (time.time() - start) <= self.delay/10000000:
+            while (time.time() - start) <= self.delay/1000:
                 if msvcrt.kbhit():
                     current = SnakeGame.GetDirection()
-                
-                
                 
                 print("this is current : {}".format(current))
                 if ((ret == current) or (ret == (current * -1))):
                     current = ret
-                # up = 1 down = -1 right = 2 left = -2
+                # up = 1 down = 1 right = 2 left = -2
                 
                 food = 0
                 #헤드 변환 지정
                 if (current == 1):
-                    self.board[self.snake.head[1]][self.snake.head[0]][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["BODY"]
                     self.snake.head[0] += 1
                     #새로 바뀐 헤드 위치에 대해서 보드값 변환
-                    self.board[self.snake.head[1]][self.snake.head[0]][SnakeGame.element["DIRECTION"]] = SnakeGame.direction["UP"]
-                    self.board[self.snake.head[1]][self.snake.head[0]][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["HEAD"]
+                    self.board[self.snake.head[0]][self.snake.head[1]][SnakeGame.element["DIRECTION"]] = SnakeGame.direction["UP"]
+                    self.board[self.snake.head[0]][self.snake.head[1]][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["HEAD"]
                     
-                    if (self.board[self.snake.head[1]][self.snake.head[0]][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["FOOD"]):
+                    if (self.board[self.snake.head[0]][self.snake.head[1]][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["FOOD"]):
                         self.snake.length += 1
                         food = 1
-                        
-                elif (current == -1):
-                    self.board[self.snake.head[1]][self.snake.head[0]][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["BODY"]
-                    self.snake.head[0] -= 1
-                    #새로 바뀐 헤드 위치에 대해서 보드값 변환
-                    self.board[self.snake.head[1]][self.snake.head[0]][SnakeGame.element["DIRECTION"]] = SnakeGame.direction["UP"]
-                    self.board[self.snake.head[1]][self.snake.head[0]][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["HEAD"]
-                    
-                    if (self.board[self.snake.head[1]][self.snake.head[0]][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["FOOD"]):
-                        self.snake.length += 1
-                        food = 1
-                
-                elif (current == 2):
-                    self.board[self.snake.head[1]][self.snake.head[0]][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["BODY"]
-                    self.snake.head[1] += 1
-                    #새로 바뀐 헤드 위치에 대해서 보드값 변환
-                    self.board[self.snake.head[1]][self.snake.head[0]][SnakeGame.element["DIRECTION"]] = SnakeGame.direction["UP"]
-                    self.board[self.snake.head[1]][self.snake.head[0]][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["HEAD"]
-                    
-                    if (self.board[self.snake.head[1]][self.snake.head[0]][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["FOOD"]):
-                        self.snake.length += 1
-                        food = 1
-                
-                elif (current == -2):
-                    self.board[self.snake.head[1]][self.snake.head[0]][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["BODY"]
-                    self.snake.head[1] -= 1
-                    #새로 바뀐 헤드 위치에 대해서 보드값 변환
-                    self.board[self.snake.head[1]][self.snake.head[0]][SnakeGame.element["DIRECTION"]] = SnakeGame.direction["UP"]
-                    self.board[self.snake.head[1]][self.snake.head[0]][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["HEAD"]
-                    
-                    if (self.board[self.snake.head[1]][self.snake.head[0]][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["FOOD"]):
-                        self.snake.length += 1
-                        food = 1
-                        
-                
                 #지나간 꼬리의 테이블 정보를 바꾼다.
-                self.board[self.snake.tail[1]][self.snake.tail[0]][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["EMPTY"]
-                
-                
-                
+                self.board[self.snake.tail[0]][self.snake.tail[1]][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["EMPTY"]
                 
                 #꼬리가 움직여야 하는 위치를 변환해준다.
                 if (food == 0):
-                    direction = self.board[self.snake.tail[1]][self.snake.tail[0]][SnakeGame.element["DIRECTION"]]
+                    direction = self.board[self.snake.tail[0]][self.snake.tail[1]][SnakeGame.element["DIRECTION"]]
                     if (direction == 1) :
                         self.snake.tail[0] += 1 
                     elif (direction == -1) :
