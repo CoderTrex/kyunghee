@@ -117,7 +117,7 @@ class SnakeGame:
         while True:
             start = time.time()
             
-            while (time.time() - start) <= self.delay/10000000:
+            while (time.time() - start) <= self.delay/100000000000:
                 if msvcrt.kbhit():
                     current = SnakeGame.GetDirection()
                 
