@@ -128,8 +128,8 @@ class SnakeGame:
                     current = ret
                 # up = 1 down = -1 right = 2 left = -2
                 
-                food = 0
                 #헤드 변환 지정
+                food = 0
                 if (current == 1):
                     self.board[self.snake.head[1]][self.snake.head[0]][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["BODY"]
                     self.snake.head[0] += 1
