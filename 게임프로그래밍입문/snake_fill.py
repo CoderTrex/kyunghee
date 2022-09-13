@@ -1,5 +1,7 @@
+
 # -*- coding: utf8 -*-
 from __future__ import print_function
+from email import header
 import random
 import os
 import re
@@ -18,13 +20,14 @@ class SnakeGame:
     sprite = {"EMPTY":0, "BODY":1, "HEAD":2, "FOOD":3}
     element = {"SPRITE":0, "DIRECTION":1}
     
-    def __init__(self, w, h, length, delay):
+    def __init__(self, w, h, length, delay, level):
         self.W = w
         self.H = h
         self.initLen = length
         self.snake = Snake(length)
         self.delay = delay  
         self.board = [[[0]*2 for x in range(self.W)] for y in range(self.H)]
+        self.level = level
         #self.board[a][b][c]
 
         #세로 / 가로 
@@ -123,10 +126,9 @@ class SnakeGame:
         if (self.snake.head[0] < 0 or self.snake.head[0] >= self.H or self.snake.head[1] < 0 or self.snake.head[1] >= self.W):
             print("Game Over")
             exit()
-        if (self.snake.head[0] < self.H and self.snake.head[1] < self.W):
-            if (self.board[self.snake.head[0]][self.snake.head[1]][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["BODY"]):
-                print("Game Over")
-                exit()
+        if (self.board[self.snake.head[0]][self.snake.head[1]][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["BODY"]):
+            print("Game Over")
+            exit()
     
     def GameLoop(self):
         self.DrawScene()
@@ -214,12 +216,19 @@ class SnakeGame:
                     #새로 바뀐 헤드 위치에 대해서 보드값 변환
                     self.board[self.snake.head[0]][self.snake.head[1]][SnakeGame.element["DIRECTION"]] = SnakeGame.direction["LEFT"]
                     self.board[self.snake.head[0]][self.snake.head[1]][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["HEAD"]
-                time.sleep(0.2)
-            
+                if (level == 1):
+                    time.sleep(0.2)
+                elif (level == 2):
+                    time.sleep(0.08)
+                elif (level == 3):
+                    time.sleep(0.02)
             ret = current
             self.DrawScene()
             print("Score: {}".format(self.snake.length - self.initLen))
 
 if __name__ == '__main__' :
-    game = SnakeGame(60, 24, 4, 300)
+    print("원하는 난이도를 입력하시오")
+    level = int(input("1. 하    2. 중   3. 상\n"))
+    
+    game = SnakeGame(60, 24, 4, 300, level)
     game.GameLoop()
