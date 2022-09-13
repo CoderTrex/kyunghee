@@ -53,12 +53,17 @@ void UnsortedType::DeleteItem(ItemType item)
 {
   int location = 0;
 
-  while (item.ComparedTo(info[location]) != EQUAL)
-    location++;
-
-  info[location] = info[length - 1];
-  length--;
+  while (!item.ComparedTo(info[location])){
+    if (item.ComparedTo(info[location]) != EQUAL){
+      location++;
+    }
+    else{
+      info[location] = info[length - 1];
+      length--;
+    }
+  }  /* code */
 }
+
 void UnsortedType::ResetList()
 // Post: currentPos has been initialized.
 {

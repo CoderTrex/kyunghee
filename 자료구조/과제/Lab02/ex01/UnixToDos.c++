@@ -2,9 +2,14 @@
 #include <fstream>
 using namespace std;;
 
-int main(){
-    ifstream input_file("myln.txt");
-    ofstream output_file("myOut.txt");
+int main(int ar, char **av){
+    if (ar != 3){
+        cout << "입력 인자의 개수가 맞지 않습니다.";
+        return 0;
+    }
+
+    ifstream input_file(av[1]);
+    ofstream output_file(av[2]);
     char ch;
     while(!input_file.eof()){
         input_file.get(ch);
