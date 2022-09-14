@@ -1,4 +1,3 @@
-
 # -*- coding: utf8 -*-
 from __future__ import print_function
 from email import header
@@ -227,8 +226,9 @@ class SnakeGame:
             print("Score: {}".format(self.snake.length - self.initLen))
 
 if __name__ == '__main__' :
-    print("원하는 난이도를 입력하시오")
-    level = int(input("1. 하    2. 중   3. 상\n"))
+    
+    print("select speed level")
+    level = int(input("1. easy    2. medium   3. hard\n"))
     
     game = SnakeGame(60, 24, 4, 300, level)
     game.GameLoop()
