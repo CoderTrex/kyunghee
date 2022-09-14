@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 from __future__ import print_function
+from distutils import extension
 import random
 import os
 import re
@@ -15,7 +16,7 @@ class Snake:
 
 class SnakeGame:
     direction = {"LEFT":-2, "DOWN":-1, "NON_DIR":0, "UP":1, "RIGHT":2}
-    sprite = {"EMPTY":0, "BODY":1, "HEAD":2, "FOOD":3}
+    sprite = {"EMPTY":0, "BODY":1, "HEAD":2, "FOOD":3, "BLOCK" : 4}
     element = {"SPRITE":0, "DIRECTION":1}
     
     def __init__(self, w, h, length, delay):
@@ -47,6 +48,15 @@ class SnakeGame:
 
         self.board[y][x][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["FOOD"]
 
+        x = random.randint(0, self.W-1)
+        y = random.randint(0, self.H-1)
+
+        while self.board[y][x][SnakeGame.element["SPRITE"]] != SnakeGame.sprite["EMPTY"]:
+            x = random.randint(0, self.W-1)
+            y = random.randint(0, self.H-1)
+
+        self.board[y][x][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["BLOCK"]
+
 
 
     def DrawScene(self):
@@ -65,6 +75,8 @@ class SnakeGame:
                     print("@", end="")
                 elif  self.board[y][x][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["FOOD"]:
                     print("*", end="")
+                elif  self.board[y][x][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["BLOCK"]:
+                    print("N", end="")
                 else:
                     print(" ", end="")
             print("|")
@@ -103,6 +115,15 @@ class SnakeGame:
             y = random.randint(0, self.H-1)
 
         self.board[y][x][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["FOOD"]
+        
+        x = random.randint(0, self.W-1)
+        y = random.randint(0, self.H-1)
+
+        while self.board[y][x][SnakeGame.element["SPRITE"]] != SnakeGame.sprite["EMPTY"]:
+            x = random.randint(0, self.W-1)
+            y = random.randint(0, self.H-1)
+
+        self.board[y][x][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["BLOCK"]
     
     def didnt_eat(self):
         self.board[self.snake.tail[0]][self.snake.tail[1]][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["EMPTY"]
@@ -127,6 +148,10 @@ class SnakeGame:
             if (self.board[self.snake.head[0]][self.snake.head[1]][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["BODY"]):
                 print("Game Over")
                 exit()
+        if (self.board[self.snake.head[0]][self.snake.head[1]][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["BLOCK"]):
+            print("Game Over")
+            exit()
+        
     
     def GameLoop(self):
         self.DrawScene()
@@ -214,7 +239,7 @@ class SnakeGame:
                     #새로 바뀐 헤드 위치에 대해서 보드값 변환
                     self.board[self.snake.head[0]][self.snake.head[1]][SnakeGame.element["DIRECTION"]] = SnakeGame.direction["LEFT"]
                     self.board[self.snake.head[0]][self.snake.head[1]][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["HEAD"]
-                time.sleep(0.2)
+                time.sleep(0.1)
             
             ret = current
             self.DrawScene()

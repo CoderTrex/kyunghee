@@ -214,7 +214,7 @@ class SnakeGame:
                     #새로 바뀐 헤드 위치에 대해서 보드값 변환
                     self.board[self.snake.head[0]][self.snake.head[1]][SnakeGame.element["DIRECTION"]] = SnakeGame.direction["LEFT"]
                     self.board[self.snake.head[0]][self.snake.head[1]][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["HEAD"]
-                time.sleep(0.2)
+                time.sleep(0.1)
             
             ret = current
             self.DrawScene()
