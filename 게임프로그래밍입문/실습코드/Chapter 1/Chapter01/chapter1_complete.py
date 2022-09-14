@@ -1,6 +1,5 @@
 import tkinter as tk
 
-
 class GameObject(object):
     def __init__(self, canvas, item):
         self.canvas = canvas
@@ -22,8 +21,8 @@ class Ball(GameObject):
         self.direction = [1, -1]
         self.speed = 10
         item = canvas.create_oval(x-self.radius, y-self.radius,
-                                  x+self.radius, y+self.radius,
-                                  fill='white')
+                                    x+self.radius, y+self.radius,
+                                    fill='white')
         super(Ball, self).__init__(canvas, item)
 
     def update(self):
@@ -63,10 +62,10 @@ class Paddle(GameObject):
         self.height = 10
         self.ball = None
         item = canvas.create_rectangle(x - self.width / 2,
-                                       y - self.height / 2,
-                                       x + self.width / 2,
-                                       y + self.height / 2,
-                                       fill='blue')
+                                        y - self.height / 2,
+                                        x + self.width / 2,
+                                        y + self.height / 2,
+                                        fill='blue')
         super(Paddle, self).__init__(canvas, item)
 
     def set_ball(self, ball):
@@ -90,10 +89,10 @@ class Brick(GameObject):
         self.hits = hits
         color = Brick.COLORS[hits]
         item = canvas.create_rectangle(x - self.width / 2,
-                                       y - self.height / 2,
-                                       x + self.width / 2,
-                                       y + self.height / 2,
-                                       fill=color, tags='brick')
+                                        y - self.height / 2,
+                                        x + self.width / 2,
+                                        y + self.height / 2,
+                                        fill=color, tags='brick')
         super(Brick, self).__init__(canvas, item)
 
     def hit(self):
@@ -102,7 +101,7 @@ class Brick(GameObject):
             self.delete()
         else:
             self.canvas.itemconfig(self.item,
-                                   fill=Brick.COLORS[self.hits])
+                                    fill=Brick.COLORS[self.hits])
 
 
 class Game(tk.Frame):
@@ -130,16 +129,16 @@ class Game(tk.Frame):
         self.setup_game()
         self.canvas.focus_set()
         self.canvas.bind('<Left>',
-                         lambda _: self.paddle.move(-10))
+                        lambda _: self.paddle.move(-10))
         self.canvas.bind('<Right>',
-                         lambda _: self.paddle.move(10))
+                        lambda _: self.paddle.move(10))
 
     def setup_game(self):
-           self.add_ball()
-           self.update_lives_text()
-           self.text = self.draw_text(300, 200,
-                                      'Press Space to start')
-           self.canvas.bind('<space>', lambda _: self.start_game())
+        self.add_ball()
+        self.update_lives_text()
+        self.text = self.draw_text(300, 200,
+                                    'Press Space to start')
+        self.canvas.bind('<space>', lambda _: self.start_game())
 
     def add_ball(self):
         if self.ball is not None:
@@ -156,7 +155,7 @@ class Game(tk.Frame):
     def draw_text(self, x, y, text, size='40'):
         font = ('Helvetica', size)
         return self.canvas.create_text(x, y, text=text,
-                                       font=font)
+                                        font=font)
 
     def update_lives_text(self):
         text = 'Lives: %s' % self.lives
