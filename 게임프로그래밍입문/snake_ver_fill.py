@@ -30,26 +30,14 @@ class SnakeGame:
         #self.board[a][b][c]
 
         #세로 / 가로 
-        self.snake.head = [self.H//2, self.snake.length-1]
+        self.snake.head = [self.H//2, 0]
         self.snake.tail = [self.H//2, 0]
 
-        for i in range(0, self.snake.length):
-            self.board[self.H//2][i][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["BODY"]
-            self.board[self.H//2][i][SnakeGame.element["DIRECTION"]] = SnakeGame.direction["RIGHT"]
-
-        self.board[self.H//2][self.snake.length-1][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["HEAD"]
-        self.board[self.H//2][self.snake.length-1][SnakeGame.element["DIRECTION"]] = SnakeGame.direction["RIGHT"]
-
-        x = random.randint(0, self.W-1)
-        y = random.randint(0, self.H-1)
-
-        while self.board[y][x][SnakeGame.element["SPRITE"]] != SnakeGame.sprite["EMPTY"]:
-            x = random.randint(0, self.W-1)
-            y = random.randint(0, self.H-1)
-
-        self.board[y][x][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["FOOD"]
-
-
+        for y in range(0, self.H):
+            for x in range(0, self.W):
+                if self.board[y][x][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["EMPTY"]:
+                    self.board[y][x][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["FOOD"]
+        
 
     def DrawScene(self):
         os.system('cls||clear')
@@ -62,7 +50,7 @@ class SnakeGame:
             print("|", end="")
             for x in range(0, self.W):
                 if self.board[y][x][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["BODY"]:
-                    print("+", end="")
+                    print(" ", end="")
                 elif  self.board[y][x][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["HEAD"]:
                     print("@", end="")
                 elif  self.board[y][x][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["FOOD"]:
@@ -96,16 +84,6 @@ class SnakeGame:
             rtn = SnakeGame.direction["DOWN"]
         return rtn
 
-    def did_eat(self):
-        x = random.randint(0, self.W-1)
-        y = random.randint(0, self.H-1)
-
-        while (self.board[y][x][SnakeGame.element["SPRITE"]] != SnakeGame.sprite["EMPTY"]):
-            x = random.randint(0, self.W-1)
-            y = random.randint(0, self.H-1)
-
-        self.board[y][x][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["FOOD"]
-    
     def didnt_eat(self):
         self.board[self.snake.tail[0]][self.snake.tail[1]][SnakeGame.element["SPRITE"]] = SnakeGame.sprite["EMPTY"]
         
@@ -123,9 +101,6 @@ class SnakeGame:
     
     def check_crash(self):
         if (self.snake.head[0] < 0 or self.snake.head[0] >= self.H or self.snake.head[1] < 0 or self.snake.head[1] >= self.W):
-            print("Game Over")
-            exit()
-        if (self.board[self.snake.head[0]][self.snake.head[1]][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["BODY"]):
             print("Game Over")
             exit()
     
@@ -157,7 +132,6 @@ class SnakeGame:
                     # 2. 음식을 먹지 않으면 전 단계의 꼬리의 물체는 빈 공간으로 채워야한다.
                     if (self.board[self.snake.head[0]][self.snake.head[1]][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["FOOD"]):
                         self.snake.length += 1
-                        self.did_eat()
                     else:
                         self.didnt_eat()
 
@@ -174,7 +148,6 @@ class SnakeGame:
                     
                     if (self.board[self.snake.head[0]][self.snake.head[1]][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["FOOD"]):
                         self.snake.length += 1
-                        self.did_eat()
                     else:
                         self.didnt_eat()
                     
@@ -191,7 +164,6 @@ class SnakeGame:
                     
                     if (self.board[self.snake.head[0]][self.snake.head[1]][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["FOOD"]):
                         self.snake.length += 1
-                        self.did_eat()
                     else:
                         self.didnt_eat()
                     
@@ -208,7 +180,6 @@ class SnakeGame:
                     
                     if (self.board[self.snake.head[0]][self.snake.head[1]][SnakeGame.element["SPRITE"]] == SnakeGame.sprite["FOOD"]):
                         self.snake.length += 1
-                        self.did_eat()
                     else:
                         self.didnt_eat()
                     
@@ -221,14 +192,35 @@ class SnakeGame:
                     time.sleep(0.08)
                 elif (level == 3):
                     time.sleep(0.02)
+            
+            if (self.W == 25):
+                if (self.snake.length -self.initLen == 25 * 10 - 1):
+                    print("you win!")
+                    exit()
+            if (self.W == 35):
+                if (self.snake.length -self.initLen == 35 * 14 - 1):
+                    print("you win!")
+                    exit()
+            if (self.W == 45):
+                if (self.snake.length -self.initLen == 45 * 18 - 1):
+                    print("you win!")
+                    exit()
+                    
             ret = current
             self.DrawScene()
             print("Score: {}".format(self.snake.length - self.initLen))
 
 if __name__ == '__main__' :
-    
-    print("select speed level")
+    print("select size of map : ")
+    print("win conditions : eat all food")
+    map_size = int(input("1. 25X10     2. 35X14     3. 45X18\n"))
+    print("select speed level: ")
     level = int(input("1. easy    2. medium   3. hard\n"))
     
-    game = SnakeGame(60, 24, 4, 300, level)
+    if map_size == 1:
+        game = SnakeGame(25, 10, 4, 300, level)
+    elif map_size == 2:
+        game = SnakeGame(35, 14, 4, 300, level)
+    elif map_size == 3:
+        game = SnakeGame(45, 18, 4, 300, level)
     game.GameLoop()
