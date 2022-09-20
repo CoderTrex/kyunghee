@@ -100,8 +100,7 @@ class Brick(GameObject):
         if self.hits == 0:
             self.delete()
         else:
-            self.canvas.itemconfig(self.item,
-                                    fill=Brick.COLORS[self.hits])
+            self.canvas.itemconfig(self.item, fill=Brick.COLORS[self.hits])
 
 
 class Game(tk.Frame):
@@ -128,16 +127,15 @@ class Game(tk.Frame):
         self.hud = None
         self.setup_game()
         self.canvas.focus_set()
-        self.canvas.bind('<Left>',
-                        lambda _: self.paddle.move(-10))
-        self.canvas.bind('<Right>',
-                        lambda _: self.paddle.move(10))
+                        # 이벤트 키 , handler
+                        # 바인드는 어떤 사건일 발생했을 때 2번째 인자를 실행하는 함수이다.
+        self.canvas.bind('<Left>', lambda _: self.paddle.move(-10))
+        self.canvas.bind('<Right>', lambda _: self.paddle.move(10))
 
     def setup_game(self):
         self.add_ball()
         self.update_lives_text()
-        self.text = self.draw_text(300, 200,
-                                    'Press Space to start')
+        self.text = self.draw_text(300, 200, 'Press Space to start')
         self.canvas.bind('<space>', lambda _: self.start_game())
 
     def add_ball(self):
