@@ -17,6 +17,8 @@ public:
   void GetNameFromUser(); 
   void PrintNameToScreen(); 
   RelationType ComparedTo(HouseType); 
+  bool operator==(const HouseType& house);
+  bool operator<(const HouseType& house);
 
 private:
   StrType lastName; 

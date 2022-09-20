@@ -90,19 +90,20 @@ int main()
 }
 
 void MergeList(SortedType list1, SortedType list2, SortedType &result){
-  int current_pos = 0;
+  ItemType item1, item2;
+  result.ResetList();
+  list1.ResetList();
+  list2.ResetList();
+
   int len_1 = list1.LengthIs();
   int len_2 = list2.LengthIs();
-  ItemType item;
-  while (len_1 > 0){
-    result.InsertItem(item);
-    len_1--;
-    list1.GetNextItem(item);
+  for (int i = 0; i < len_1; i++){
+    list1.GetNextItem(item1);
+    result.InsertItem(item1);
   }
-  while (len_2 > 0){
-    result.InsertItem(item);
-    len_2--;
-    list1.GetNextItem(item);
+  for (int i = 0; i < len_2; i++){
+    list2.GetNextItem(item2);
+    result.InsertItem(item2);
   }
 }
 
