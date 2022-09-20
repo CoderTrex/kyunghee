@@ -7,7 +7,7 @@
 #include "sorted.h"
 
 using namespace std;
-void MergeList(SortedType list1, SortedType list2, SortedType &result){
+void MergeList(SortedType list1, SortedType list2, SortedType &result);
 void PrintList(ofstream& outFile, SortedType list);
 
 
@@ -26,7 +26,6 @@ int main()
   SortedType list;
   bool found;
   int numCommands;
-
 
   // Prompt for file names, read file names, and prepare files
   cout << "Enter name of input command file; press return." << endl;

@@ -1,8 +1,8 @@
 // CLIENT PROGRAM 
 // This program manipulates real estate property listings. 
 #include <iostream> 
-#include "sorted.h"       // Gain access to Sorted List ADT. 
-#include <fstream> 
+#include <fstream>
+#include "sorted.h" 
 #include <string>
 
 
@@ -43,13 +43,13 @@ int main()
     switch (command) 
     {
       case ADD       : AddHouse(houseList);
-                       break; 
+                      break; 
       case DELETE    : DeleteHouse(houseList);
-                       break; 
+                      break; 
       case PRINT_ONE : PrintHouse(houseList);
-                       break;
+                      break;
       case PRINT_ALL : PrintOwners(houseList);
-                       break; 
+                      break; 
     } 
     GetCommand(command); 
   }
@@ -156,7 +156,7 @@ void PrintHouse(SortedType houseList)
   
   item.GetNameFromUser(); 
   houseList.RetrieveItem(item, found); 
-  if ( found)
+  if (found)
     item.PrintHouseToScreen(); 
   else
     cout << "Owner not in list." << endl; 
@@ -207,21 +207,21 @@ void GetCommand(CommandType& command)
     switch (letter) 
     {
       case 'A' : command = ADD;
-                 break;
+                break;
       case 'D' : command = DELETE;
-                 break;
+                break;
       case 'P' : command = PRINT_ONE;
-                 break;
+                break;
       case 'L' : command = PRINT_ALL;
-                 break;
+                break;
       case 'Q' : command = QUIT;
-                 break;
+                break;
       default  : cout << "Letter entered is not one of the "
                         << "specified uppercase commands. " 
                         << "Reenter and press return."
                         << endl;
-                   cin >> letter; 
-                   ok = false; break;
+                    cin >> letter; 
+                    ok = false; break;
     }
   }
 }
