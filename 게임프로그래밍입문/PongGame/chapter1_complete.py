@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import *
 
 class GameObject(object):
     def __init__(self, canvas, item):
@@ -6,6 +7,7 @@ class GameObject(object):
         self.item = item
 
     def get_position(self):
+        # coords 위치를 반환하는 함수 -> 이는 중심 좌표를 의미함.
         return self.canvas.coords(self.item)
 
     def move(self, x, y):
@@ -13,7 +15,6 @@ class GameObject(object):
 
     def delete(self):
         self.canvas.delete(self.item)
-
 
 class Ball(GameObject):
     def __init__(self, canvas, x, y):
@@ -61,11 +62,9 @@ class Paddle(GameObject):
         self.width = 80
         self.height = 10
         self.ball = None
-        item = canvas.create_rectangle(x - self.width / 2,
-                                        y - self.height / 2,
-                                        x + self.width / 2,
-                                        y + self.height / 2,
-                                        fill='blue')
+        item = canvas.create_rectangle(x - self.width / 2, y - self.height / 2,
+                                    x + self.width / 2, y + self.height / 2,
+                                    fill='blue')
         super(Paddle, self).__init__(canvas, item)
 
     def set_ball(self, ball):
@@ -109,9 +108,7 @@ class Game(tk.Frame):
         self.lives = 3
         self.width = 610
         self.height = 400
-        self.canvas = tk.Canvas(self, bg='#aaaaff',
-                                width=self.width,
-                                height=self.height,)
+        self.canvas = tk.Canvas(self, bg='#aaaaff', width=self.width, height=self.height,)
         self.canvas.pack()
         self.pack()
 
@@ -190,8 +187,6 @@ class Game(tk.Frame):
         items = self.canvas.find_overlapping(*ball_coords)
         objects = [self.items[x] for x in items if x in self.items]
         self.ball.collide(objects)
-
-
 
 if __name__ == '__main__':
     root = tk.Tk()
