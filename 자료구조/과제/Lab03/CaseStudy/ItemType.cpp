@@ -78,3 +78,24 @@ RelationType HouseType::ComparedTo(HouseType house)
     return GREATER;
   else return EQUAL;
 }
+
+bool HouseType::operator==(const HouseType& house)
+{
+	if (lastName == house.lastName && firstName == house.firstName) {
+		return true;
+	}
+	return false;
+}
+
+bool HouseType::operator<(const HouseType& house)
+{
+	if (lastName < house.lastName)
+    	return true;
+  	else if (house.lastName < lastName)
+    	return false;
+  	else if (firstName < house.firstName)
+    	return true;
+  	else if (house.firstName < firstName)
+   		return false;
+	else return false;
+}
