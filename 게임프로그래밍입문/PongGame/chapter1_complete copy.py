@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import *
+from PIL import image, ImageTk
 
 class GameObject(object):
     def __init__(self, canvas, item):
@@ -7,12 +7,10 @@ class GameObject(object):
         self.item = item
 
     def get_position(self):
-        # self.coord = self.get_position()
-        # coord_set = [self.coord[0] - 10, self.coord[1] - 10, \
-        #             self.coord[0] + 10, self.coord[1] + 10]
-        # return coord_set
-        return self.canvas.coords(self.item)
-        # return self.get_position()
+        self.coords = self.canvas.coords(self.item)
+        self.result = [self.coords[0] - 10, self.coords[1] - 10, \
+                        self.coords[0] + 10, self.coords[1] + 10]
+        return self.result
 
     def move(self, x, y):
         self.canvas.move(self.item, x, y)
@@ -20,18 +18,16 @@ class GameObject(object):
     def delete(self):
         self.canvas.delete(self.item)
 
+
 class Ball(GameObject):
     def __init__(self, canvas, x, y):
         self.radius = 10
         self.direction = [1, -1]
         self.speed = 10
-        # ball_path = "C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\PongGame\\ball.png"
-        # self.ball_img = tk.PhotoImage(file = ball_path)
-        # item = canvas.create_image(x, y, image = self.ball_img)
-        item = canvas.create_oval(x-self.radius, y-self.radius,
-                                    x+self.radius, y+self.radius,
-                                    fill='white')
-        super(game, self).__init__(canvas, item)
+        ball_path = "C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\PongGame\\ball.png"
+        self.ball_img = tk.PhotoImage(file = ball_path)
+        item = canvas.create_image(x, y, image = self.ball_img)
+        super(Ball, self).__init__(canvas, item)
 
     def update(self):
         coords = self.get_position()
@@ -69,9 +65,11 @@ class Paddle(GameObject):
         self.width = 80
         self.height = 10
         self.ball = None
-        item = canvas.create_rectangle(x - self.width / 2, y - self.height / 2,
-                                    x + self.width / 2, y + self.height / 2,
-                                    fill='blue')
+        item = canvas.create_rectangle(x - self.width / 2,
+                                        y - self.height / 2,
+                                        x + self.width / 2,
+                                        y + self.height / 2,
+                                        fill='blue')
         super(Paddle, self).__init__(canvas, item)
 
     def set_ball(self, ball):
@@ -106,7 +104,8 @@ class Brick(GameObject):
         if self.hits == 0:
             self.delete()
         else:
-            self.canvas.itemconfig(self.item, fill=Brick.COLORS[self.hits])
+            self.canvas.itemconfig(self.item,
+                                    fill=Brick.COLORS[self.hits])
 
 
 class Game(tk.Frame):
@@ -115,7 +114,9 @@ class Game(tk.Frame):
         self.lives = 3
         self.width = 610
         self.height = 400
-        self.canvas = tk.Canvas(self, bg='#aaaaff', width=self.width, height=self.height,)
+        self.canvas = tk.Canvas(self, bg='#aaaaff',
+                                width=self.width,
+                                height=self.height,)
         self.canvas.pack()
         self.pack()
 
@@ -131,15 +132,16 @@ class Game(tk.Frame):
         self.hud = None
         self.setup_game()
         self.canvas.focus_set()
-                        # 이벤트 키 , handler
-                        # 바인드는 어떤 사건일 발생했을 때 2번째 인자를 실행하는 함수이다.
-        self.canvas.bind('<Left>', lambda _: self.paddle.move(-10))
-        self.canvas.bind('<Right>', lambda _: self.paddle.move(10))
+        self.canvas.bind('<Left>',
+                        lambda _: self.paddle.move(-10))
+        self.canvas.bind('<Right>',
+                        lambda _: self.paddle.move(10))
 
     def setup_game(self):
         self.add_ball()
         self.update_lives_text()
-        self.text = self.draw_text(300, 200, 'Press Space to start')
+        self.text = self.draw_text(300, 200,
+                                    'Press Space to start')
         self.canvas.bind('<space>', lambda _: self.start_game())
 
     def add_ball(self):
@@ -194,6 +196,8 @@ class Game(tk.Frame):
         items = self.canvas.find_overlapping(*ball_coords)
         objects = [self.items[x] for x in items if x in self.items]
         self.ball.collide(objects)
+
+
 
 if __name__ == '__main__':
     root = tk.Tk()
