@@ -1,16 +1,14 @@
 import tkinter as tk
-from PIL import image, ImageTk
+from PIL import Image, ImageTk
 
 class GameObject(object):
     def __init__(self, canvas, item):
         self.canvas = canvas
         self.item = item
+        super().__init__()
 
     def get_position(self):
-        self.coords = self.canvas.coords(self.item)
-        self.result = [self.coords[0] - 10, self.coords[1] - 10, \
-                        self.coords[0] + 10, self.coords[1] + 10]
-        return self.result
+        return self.canvas.coords(self.item)
 
     def move(self, x, y):
         self.canvas.move(self.item, x, y)
@@ -24,8 +22,10 @@ class Ball(GameObject):
         self.radius = 10
         self.direction = [1, -1]
         self.speed = 10
-        ball_path = "C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\PongGame\\ball.png"
-        self.ball_img = tk.PhotoImage(file = ball_path)
+        
+        image = Image.open("C:\\KyungHee\\kyunghee\\게임프로그래밍입문\\PongGame\\ball.png")
+        image = image.resize((20, 20), Image.ANTIALIAS)
+        self.ball_img = ImageTk.PhotoImage(image)
         item = canvas.create_image(x, y, image = self.ball_img)
         super(Ball, self).__init__(canvas, item)
 
@@ -39,6 +39,7 @@ class Ball(GameObject):
         x = self.direction[0] * self.speed
         y = self.direction[1] * self.speed
         self.move(x, y)
+        # super(Ball, self).__init__(self)
 
     def collide(self, game_objects):
         coords = self.get_position()
@@ -58,6 +59,7 @@ class Ball(GameObject):
         for game_object in game_objects:
             if isinstance(game_object, Brick):
                 game_object.hit()
+        # super(Ball, self).__init__(self)
 
 
 class Paddle(GameObject):
@@ -108,7 +110,7 @@ class Brick(GameObject):
                                     fill=Brick.COLORS[self.hits])
 
 
-class Game(tk.Frame):
+class Game(tk.Frame, Ball, GameObject):
     def __init__(self, master):
         super(Game, self).__init__(master)
         self.lives = 3
@@ -193,9 +195,11 @@ class Game(tk.Frame):
 
     def check_collisions(self):
         ball_coords = self.ball.get_position()
+        print(ball_coords)
         items = self.canvas.find_overlapping(*ball_coords)
         objects = [self.items[x] for x in items if x in self.items]
         self.ball.collide(objects)
+        super(Ball, self).__init__(items)
 
 
 
