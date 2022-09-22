@@ -89,23 +89,6 @@ int main()
   return 0;
 }
 
-void MergeList(SortedType list1, SortedType list2, SortedType &result){
-  ItemType item1, item2;
-  result.ResetList();
-  list1.ResetList();
-  list2.ResetList();
-
-  int len_1 = list1.LengthIs();
-  int len_2 = list2.LengthIs();
-  for (int i = 0; i < len_1; i++){
-    list1.GetNextItem(item1);
-    result.InsertItem(item1);
-  }
-  for (int i = 0; i < len_2; i++){
-    list2.GetNextItem(item2);
-    result.InsertItem(item2);
-  }
-}
 
 void PrintList(ofstream& dataFile, SortedType list)
 // Pre:  list has been initialized.      
