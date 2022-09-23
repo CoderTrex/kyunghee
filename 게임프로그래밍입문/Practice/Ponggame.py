@@ -68,10 +68,8 @@ class Paddle(GameObject):
         self.width = 80
         self.height = 10
         self.ball = None
-        item = canvas.create_rectangle(x - self.width / 2,
-                                        y - self.height / 2,
-                                        x + self.width / 2,
-                                        y + self.height / 2,
+        item = canvas.create_rectangle(x - self.width / 2, y - self.height / 2,
+                                        x + self.width / 2, y + self.height / 2,
                                         fill='blue')
         super(Paddle, self).__init__(canvas, item)
 
@@ -107,14 +105,14 @@ class Brick(GameObject):
         if self.hits == 0:
             self.delete()
         else:
-            self.canvas.itemconfig(self.item,
-                                    fill=Brick.COLORS[self.hits])
+            self.canvas.itemconfig(self.item, fill=Brick.COLORS[self.hits])
 
 
 class Game(tk.Frame):
     def __init__(self, master):
         super(Game, self).__init__(master)
         self.lives = 3
+        self.level = 0
         self.width = 610
         self.height = 400
         self.canvas = tk.Canvas(self, bg='#aaaaff',
@@ -127,11 +125,11 @@ class Game(tk.Frame):
         self.ball = None
         self.paddle = Paddle(self.canvas, self.width/2, 326)
         self.items[self.paddle.item] = self.paddle
-        for x in range(5, self.width - 5, 75):
-            self.add_brick(x + 37.5, 50, 2)
-            self.add_brick(x + 37.5, 70, 1)
-            self.add_brick(x + 37.5, 90, 1)
 
+        # for x in range(5, self.width - 5, 75):
+        #     self.add_brick(x + 37.5, 50, 2)
+        #     self.add_brick(x + 37.5, 70, 1)
+        #     self.add_brick(x + 37.5, 90, 1)
         self.hud = None
         self.setup_game()
         self.canvas.focus_set()
@@ -140,11 +138,17 @@ class Game(tk.Frame):
         self.canvas.bind('<Right>',
                         lambda _: self.paddle.move(10))
 
+
+    def make_brick(self, level):
+        for x in range(5, self.width - 5, 75):
+            self.add_brick(x + 37.5, 50, 2)
+            self.add_brick(x + 37.5, 70, 1)
+            self.add_brick(x + 37.5, 90, 1)
+
     def setup_game(self):
         self.add_ball()
         self.update_lives_text()
-        self.text = self.draw_text(300, 200,
-                                    'Press Space to start')
+        self.text = self.draw_text(300, 200, 'Press Space to start')
         self.canvas.bind('<space>', lambda _: self.start_game())
 
     def add_ball(self):
@@ -181,8 +185,14 @@ class Game(tk.Frame):
         self.check_collisions()
         num_bricks = len(self.canvas.find_withtag('brick'))
         if num_bricks == 0: 
+            self.level += 1
             self.ball.speed = None
-            self.draw_text(300, 200, 'You win!')
+            
+            # 코드 수정부
+            self.draw_text(300, 200, 'You clear {0}level'.format(self.level))
+            self.ball.update()
+            self.after(1000, self.setup_game)
+        
         elif self.ball.get_position()[3] >= self.height: 
             self.ball.speed = None
             self.lives -= 1
