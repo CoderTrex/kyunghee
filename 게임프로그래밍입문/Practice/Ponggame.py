@@ -1,5 +1,5 @@
 import tkinter as tk
-from PIL import image, ImageTk
+from PIL import ImageTk, Image
 
 class GameObject(object):
     def __init__(self, canvas, item):
@@ -21,10 +21,17 @@ class Ball(GameObject):
         self.radius = 10
         self.direction = [1, -1]
         self.speed = 10
-        ball_path = "C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\PongGame\\ball.png"
-        self.ball_img = tk.PhotoImage(file = ball_path)
+        self.img = Image.open( "C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\Practice\\ball.png")
+        self.img = self.img.resize((20, 20), Image.ANTIALIAS)  
+        self.ball_img = ImageTk.PhotoImage(self.img)
         item = canvas.create_image(x, y, image = self.ball_img)
         super(Ball, self).__init__(canvas, item)
+    
+    def get_position(self):
+        self.coords_xy = self.canvas.coords(self.item)
+        self.coords = [self.coords_xy[0] - self.radius, self.coords_xy[1] - self.radius,\
+                        self.coords_xy[0] + self.radius, self.coords_xy[1] + self.radius]
+        return self.coords
 
     def update(self):
         coords = self.get_position()
@@ -55,7 +62,6 @@ class Ball(GameObject):
         for game_object in game_objects:
             if isinstance(game_object, Brick):
                 game_object.hit()
-
 
 class Paddle(GameObject):
     def __init__(self, canvas, x, y):
