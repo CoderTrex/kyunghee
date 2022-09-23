@@ -1,3 +1,4 @@
+import random
 import tkinter as tk
 from PIL import ImageTk, Image
 
@@ -93,10 +94,8 @@ class Brick(GameObject):
         self.height = 20
         self.hits = hits
         color = Brick.COLORS[hits]
-        item = canvas.create_rectangle(x - self.width / 2,
-                                        y - self.height / 2,
-                                        x + self.width / 2,
-                                        y + self.height / 2,
+        item = canvas.create_rectangle(x - self.width / 2, y - self.height / 2,
+                                        x + self.width / 2, y + self.height / 2,
                                         fill=color, tags='brick')
         super(Brick, self).__init__(canvas, item)
 
@@ -113,11 +112,10 @@ class Game(tk.Frame):
         super(Game, self).__init__(master)
         self.lives = 3
         self.level = 0
+        self.reset = 1
         self.width = 610
         self.height = 400
-        self.canvas = tk.Canvas(self, bg='#aaaaff',
-                                width=self.width,
-                                height=self.height,)
+        self.canvas = tk.Canvas(self, bg='#aaaaff', width=self.width, height=self.height)
         self.canvas.pack()
         self.pack()
 
@@ -126,27 +124,32 @@ class Game(tk.Frame):
         self.paddle = Paddle(self.canvas, self.width/2, 326)
         self.items[self.paddle.item] = self.paddle
 
-        # for x in range(5, self.width - 5, 75):
-        #     self.add_brick(x + 37.5, 50, 2)
-        #     self.add_brick(x + 37.5, 70, 1)
-        #     self.add_brick(x + 37.5, 90, 1)
         self.hud = None
-        self.setup_game()
+        self.setup_game(self.level, self.reset)
         self.canvas.focus_set()
-        self.canvas.bind('<Left>',
-                        lambda _: self.paddle.move(-10))
-        self.canvas.bind('<Right>',
-                        lambda _: self.paddle.move(10))
-
+        self.canvas.bind('<Left>',lambda _: self.paddle.move(-10))
+        self.canvas.bind('<Right>',lambda _: self.paddle.move(10))
 
     def make_brick(self, level):
-        for x in range(5, self.width - 5, 75):
-            self.add_brick(x + 37.5, 50, 2)
-            self.add_brick(x + 37.5, 70, 1)
-            self.add_brick(x + 37.5, 90, 1)
+        if (level == 0):
+            for x in range(5, self.width - 5, 75):
+                rand_num = random.randint(0, 9)
+                if (rand_num % 2 == 0):
+                    pass
+                else:
+                    self.add_brick(x + 37.5, 50, 1)
+        else:
+            for x in range(5, self.width - 5, 75):
+                rand_num = random.randint(0, 9)
+                if (rand_num % 3 == 0):
+                    pass
+                else:
+                    self.add_brick(x + 37.5, 50, 2)
 
-    def setup_game(self):
+    def setup_game(self, level, reset):
         self.add_ball()
+        if (reset == 1):
+            self.make_brick(level)
         self.update_lives_text()
         self.text = self.draw_text(300, 200, 'Press Space to start')
         self.canvas.bind('<space>', lambda _: self.start_game())
@@ -165,13 +168,12 @@ class Game(tk.Frame):
 
     def draw_text(self, x, y, text, size='40'):
         font = ('Helvetica', size)
-        return self.canvas.create_text(x, y, text=text,
-                                        font=font)
+        return self.canvas.create_text(x, y, text=text, font=font)
 
     def update_lives_text(self):
-        text = 'Lives: %s' % self.lives
+        text = "Lives: %s Level : %s" % (self.lives, self.level)
         if self.hud is None:
-            self.hud = self.draw_text(50, 20, text, 15)
+            self.hud = self.draw_text(80, 20, text, 15)
         else:
             self.canvas.itemconfig(self.hud, text=text)
 
@@ -189,17 +191,19 @@ class Game(tk.Frame):
             self.ball.speed = None
             
             # 코드 수정부
-            self.draw_text(300, 200, 'You clear {0}level'.format(self.level))
+            self.draw_text(300, 200, 'You clear level {0}'.format(self.level))
             self.ball.update()
-            self.after(1000, self.setup_game)
+            self.reset = 1
+            self.after(1000, self.setup_game(self.level, self.reset))
         
         elif self.ball.get_position()[3] >= self.height: 
             self.ball.speed = None
+            self.reset = 0
             self.lives -= 1
             if self.lives < 0:
                 self.draw_text(300, 200, 'Game Over')
             else:
-                self.after(1000, self.setup_game)
+                self.after(1000, self.setup_game(self.level, self.reset))
         else:
             self.ball.update()
             self.after(50, self.game_loop)
