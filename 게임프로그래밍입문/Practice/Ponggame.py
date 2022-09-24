@@ -14,7 +14,7 @@ class GameObject(object):
         self.canvas.move(self.item, x, y)
 
     def delete(self):
-        self.canvas.delete(self.item)
+        self.canvas.delete(self.item)   
 
 
 class Ball(GameObject):
@@ -35,12 +35,14 @@ class Ball(GameObject):
         return self.coords
 
     def update(self):
+        self.speed = 10
         coords = self.get_position()
         width = self.canvas.winfo_width()
         if coords[0] <= 0 or coords[2] >= width:
             self.direction[0] *= -1
         if coords[1] <= 0:
             self.direction[1] *= -1
+
         x = self.direction[0] * self.speed
         y = self.direction[1] * self.speed
         self.move(x, y)
@@ -189,9 +191,7 @@ class Game(tk.Frame):
         if num_bricks == 0: 
             self.level += 1
             self.ball.speed = None
-            
             # 코드 수정부
-            self.draw_text(300, 200, 'You clear level {0}'.format(self.level))
             self.ball.update()
             self.reset = 1
             self.after(1000, self.setup_game(self.level, self.reset))
