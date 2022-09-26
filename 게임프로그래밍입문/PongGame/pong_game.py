@@ -8,7 +8,9 @@ class GameObject(object):
         super().__init__()
 
     def get_position(self):
-        return self.canvas.coords(self.item)
+        self.coord_all = [self.canvas.coords(self.item)[0], self.canvas.coords(self.item)[1], \
+                            self.canvas.coords(self.item)[2], self.canvas.coords(self.item)[3]]
+        return self.coord_all
 
     def move(self, x, y):
         self.canvas.move(self.item, x, y)
