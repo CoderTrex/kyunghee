@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import *
+from PIL import ImageTk, Image
 
 class GameObject(object):
     def __init__(self, canvas, item):
@@ -15,18 +15,23 @@ class GameObject(object):
     def delete(self):
         self.canvas.delete(self.item)
 
+
 class Ball(GameObject):
     def __init__(self, canvas, x, y):
         self.radius = 10
         self.direction = [1, -1]
         self.speed = 10
-        ball_path = "C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\PongGame\\ball.png"
-        self.ball_img = tk.PhotoImage(file = ball_path)
+        self.img = Image.open( "C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\Practice\\ball.png")
+        self.img = self.img.resize((20, 20), Image.ANTIALIAS)  
+        self.ball_img = ImageTk.PhotoImage(self.img)
         item = canvas.create_image(x, y, image = self.ball_img)
-        item = canvas.create_oval(x-self.radius, y-self.radius,
-                                    x+self.radius, y+self.radius,
-                                    fill='white')
-        super(game, self).__init__(canvas, item)
+        super(Ball, self).__init__(canvas, item)
+    
+    def get_position(self):
+        self.coords_xy = self.canvas.coords(self.item)
+        self.coords = [self.coords_xy[0] - self.radius, self.coords_xy[1] - self.radius,\
+                        self.coords_xy[0] + self.radius, self.coords_xy[1] + self.radius]
+        return self.coords
 
     def update(self):
         coords = self.get_position()
@@ -58,15 +63,14 @@ class Ball(GameObject):
             if isinstance(game_object, Brick):
                 game_object.hit()
 
-
 class Paddle(GameObject):
     def __init__(self, canvas, x, y):
         self.width = 80
         self.height = 10
         self.ball = None
         item = canvas.create_rectangle(x - self.width / 2, y - self.height / 2,
-                                    x + self.width / 2, y + self.height / 2,
-                                    fill='blue')
+                                        x + self.width / 2, y + self.height / 2,
+                                        fill='blue')
         super(Paddle, self).__init__(canvas, item)
 
     def set_ball(self, ball):
@@ -108,9 +112,12 @@ class Game(tk.Frame):
     def __init__(self, master):
         super(Game, self).__init__(master)
         self.lives = 3
+        self.level = 0
         self.width = 610
         self.height = 400
-        self.canvas = tk.Canvas(self, bg='#aaaaff', width=self.width, height=self.height,)
+        self.canvas = tk.Canvas(self, bg='#aaaaff',
+                                width=self.width,
+                                height=self.height,)
         self.canvas.pack()
         self.pack()
 
@@ -118,22 +125,21 @@ class Game(tk.Frame):
         self.ball = None
         self.paddle = Paddle(self.canvas, self.width/2, 326)
         self.items[self.paddle.item] = self.paddle
+
         for x in range(5, self.width - 5, 75):
             self.add_brick(x + 37.5, 50, 2)
             self.add_brick(x + 37.5, 70, 1)
             self.add_brick(x + 37.5, 90, 1)
-
         self.hud = None
-        self.setup_game()
+        self.setup_game(self.level)
         self.canvas.focus_set()
-                        # 이벤트 키 , handler
-                        # 바인드는 어떤 사건일 발생했을 때 2번째 인자를 실행하는 함수이다.
-        self.canvas.bind('<Left>', lambda _: self.paddle.move(-10))
-        self.canvas.bind('<Right>', lambda _: self.paddle.move(10))
+        self.canvas.bind('<Left>',lambda _: self.paddle.move(-10))
+        self.canvas.bind('<Right>',lambda _: self.paddle.move(10))
 
-    def setup_game(self):
+    def setup_game(self, level,):
         self.add_ball()
         self.update_lives_text()
+        
         self.text = self.draw_text(300, 200, 'Press Space to start')
         self.canvas.bind('<space>', lambda _: self.start_game())
 
@@ -151,8 +157,7 @@ class Game(tk.Frame):
 
     def draw_text(self, x, y, text, size='40'):
         font = ('Helvetica', size)
-        return self.canvas.create_text(x, y, text=text,
-                                        font=font)
+        return self.canvas.create_text(x, y, text=text, font=font)
 
     def update_lives_text(self):
         text = 'Lives: %s' % self.lives
@@ -171,8 +176,14 @@ class Game(tk.Frame):
         self.check_collisions()
         num_bricks = len(self.canvas.find_withtag('brick'))
         if num_bricks == 0: 
+            self.level += 1
             self.ball.speed = None
-            self.draw_text(300, 200, 'You win!')
+            
+            # 코드 수정부
+            self.draw_text(300, 200, 'You clear {0}level'.format(self.level))
+            self.ball.update()
+            self.after(1000, self.setup_game)
+        
         elif self.ball.get_position()[3] >= self.height: 
             self.ball.speed = None
             self.lives -= 1
@@ -189,6 +200,8 @@ class Game(tk.Frame):
         items = self.canvas.find_overlapping(*ball_coords)
         objects = [self.items[x] for x in items if x in self.items]
         self.ball.collide(objects)
+
+
 
 if __name__ == '__main__':
     root = tk.Tk()
