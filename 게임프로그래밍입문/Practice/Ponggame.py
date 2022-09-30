@@ -42,7 +42,6 @@ class Ball(GameObject):
             self.direction[0] *= -1
         if coords[1] <= 0:
             self.direction[1] *= -1
-
         x = self.direction[0] * self.speed
         y = self.direction[1] * self.speed
         self.move(x, y)
