@@ -1,4 +1,6 @@
-from cgi import print_arguments
+from asyncio.windows_events import NULL
+import pygame
+import math
 import random
 import tkinter as tk
 from PIL import ImageTk, Image
@@ -23,7 +25,7 @@ class Ball(GameObject):
         self.radius = 10
         self.direction = [0.707, 0.707]
         self.speed = 10
-        self.img = Image.open( "C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\Practice\\ball.png")
+        self.img = Image.open("C:\\KyungHee\\kyunghee\\게임프로그래밍입문\\Practice\\ball.png")
         self.img = self.img.resize((20, 20), Image.ANTIALIAS)  
         self.ball_img = ImageTk.PhotoImage(self.img)
         item = canvas.create_image(x, y, image = self.ball_img)
@@ -51,42 +53,141 @@ class Ball(GameObject):
         y = self.direction[1] * self.speed
         self.move(x, y)
 
+
+    # 근의 공식 값 출력
+    def solution(self, b, c, range_one, range_two):
+        D = (b**2) - (4*c)
+        if D>0:
+            r1= (-b + (b**2-4*c)**0.5)/(2)
+            r2 = (-b - (b**2-4*c)**0.5)/(2)
+            # 값이 출동 되는 위치에 있는 지 여부를 확인하고 return 값을 전달해줌
+            if (r1 >= range_one and r1 <= range_two):
+                return r1
+            else:
+                return r2
+        elif D==0:
+            x = -b / 2
+            return x
+        else:
+            pass
+
+
+    # 충돌을 어디에서 발생했는지 리턴하는 함수
+    def collide_where(self, rectangle, circle):
+        rectangle_xy = rectangle
+        
+        # 충돌 처리 영역을 확장하면 바깥으로 직선을 그린 것 같이 됨
+        rectangle_xy[0] -= 0.5
+        rectangle_xy[1] -= 0.5
+        rectangle_xy[2] += 0.5
+        rectangle_xy[3] += 0.5
+        
+        # 원의 x좌표와 y좌표를 구한다.
+        circle_x = circle[0]
+        circle_y = circle[1]
+        
+        # 구분이 되는 x와 y값을 구한다.
+        check_x = (rectangle_xy[0] + rectangle_xy[2])/2
+        check_y = (rectangle_xy[1] + rectangle_xy[3])/2
+        find_x = None
+        find_y = None
+        
+        # 기준에 따라 충돌된 x좌표와 y좌표를 구할 수 있다.
+        if (circle_y > check_y):
+            find_x = self.solution(-2*circle_x, circle_x**2-100+(rectangle_xy[3]-circle_y)**2, rectangle_xy[0], rectangle_xy[2])
+            and_y = rectangle_xy[3]
+        else:
+            find_x = self.solution(-2*circle_x, circle_x**2-100+(rectangle_xy[1]-circle_y)**2, rectangle_xy[0], rectangle_xy[2])
+            and_y = rectangle_xy[1]
+        if (circle_x < check_x):
+            find_y = self.solution(-2*circle_y, circle_y**2-100+(rectangle_xy[0]-circle_x)**2, rectangle_xy[1], rectangle_xy[3])
+            and_x = rectangle_xy[0]
+        else:
+            find_y = self.solution(-2*circle_y, circle_y**2-100+(rectangle_xy[2]-circle_x)**2, rectangle_xy[1], rectangle_xy[3])
+            and_x = rectangle_xy[2]
+        
+        # 만약 모서리 충돌이 발생했다면 if문 아래로 들어간다.
+        if (find_x != None and find_y != None):
+            coords = [find_x, and_y, and_x, find_y]
+            return coords
+        else:
+            return NULL
+
+    def cal_reflection(self, meet):
+        # x축과 교점의 좌표
+        x1 = meet[0]
+        y1 = meet[1]
+        # y축과 교점의 좌표
+        x2 = meet[2]
+        y2 = meet[3]
+
+        # 백터의 방향 설정
+        abs1 = 1
+        abs2 = 1
+        if (x1 > x2 and y1 > y2):
+            abs1 *= -1
+        elif (x1 > x2 and y1 < y2):
+            abs1 *= -1
+            abs2 *= -1
+        elif (x1 < x2 and y1 < y2):
+            abs2 *= -1
+        
+        # 새롭게 생성된 백터
+        new_vector_x = abs1*abs(y1 - y2)
+        new_vector_y = abs2*abs(x1 - x2)
+
+        #단위 백터로 치환
+        new_length = ((new_vector_x)**2 + (new_vector_y)**2)**(0.5)
+        new_vector_x = new_vector_x/new_length
+        new_vector_y = new_vector_y/new_length
+        
+        # 노말 벡터 구하기
+        normal_vector = pygame.math.Vector2(float(new_vector_x), float(new_vector_y))
+        # 들어오는 값
+        incident_vector = pygame.math.Vector2(self.direction[0], self.direction[1])
+        # 반사 벡터 값
+        reflection_vector = pygame.math.Vector2.reflect(incident_vector, normal_vector)
+        # 반사된 벡터 값으로 수정
+        self.direction = [reflection_vector[0], reflection_vector[1]]
+
+
     def collide(self, game_objects):
         coords = self.get_position()
         x = (coords[0] + coords[2]) * 0.5
-        
-        
-        # if (len(objects) == 1):
-        #     hello = objects[0]
-        #     coords = self.canvas.coords(hello)
-        #     print(coords)
-        # 겹치게 된 object의 좌표
-        # coord_overlapped = 
-        # print(coord_overlapped)
-        # 공의 중심 좌표
-        # ball_coords_c = self.ball.get_position_center()
-        
-        
-        
-        
-        
         
         if len(game_objects) > 1:
             self.direction[1] *= -1
         elif len(game_objects) == 1:
             game_object = game_objects[0]
+            
+            # 사각형의 꼭짓점 위치
             coords = game_object.get_position()
-            print(coords)
-            if x > coords[2]:
-                self.direction[0] = 1
-            elif x < coords[0]:
-                self.direction[0] = -1
+            # 원의 중심 좌표 구하기
+            ball_center = self.get_position_center()
+            meet = self.collide_where(coords, ball_center)
+            # 모서리 충돌이 발생함.
+            if (meet):
+                self.cal_reflection(meet)
+                print(self.direction)
+                if x > coords[2]:
+                    self.direction[0] = 0.707
+                elif x < coords[0]:
+                    self.direction[0] = -1
+                else:
+                    self.direction[1] *= -1
+            # 모서리 충돌이 발생하지 않음.
             else:
-                self.direction[1] *= -1
+                if x > coords[2]:
+                    self.direction[0] = 0.707
+                elif x < coords[0]:
+                    self.direction[0] = -1
+                else:
+                    self.direction[1] *= -1
 
         for game_object in game_objects:
             if isinstance(game_object, Brick):
                 game_object.hit()
+
 
 class Paddle(GameObject):
     def __init__(self, canvas, x, y):
@@ -234,16 +335,6 @@ class Game(tk.Frame):
         ball_coords = self.ball.get_position()
         items = self.canvas.find_overlapping(*ball_coords)
         objects = [self.items[x] for x in items if x in self.items]
-
-        # if (len(objects) == 1):
-        #     hello = objects[0]
-        #     coords = self.canvas.coords(hello)
-        #     print(coords)
-        # 겹치게 된 object의 좌표
-        # coord_overlapped = 
-        # print(coord_overlapped)
-        # 공의 중심 좌표
-        # ball_coords_c = self.ball.get_position_center()
         self.ball.collide(objects)
 
 

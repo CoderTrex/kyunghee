@@ -1,8 +1,7 @@
 from asyncio.windows_events import NULL
 import pygame
-from cmath import rect, sqrt
-import random
 import math
+import random
 import tkinter as tk
 from PIL import ImageTk, Image
 
@@ -114,8 +113,6 @@ class Ball(GameObject):
         else:
             return NULL
 
-
-
     def cal_reflection(self, meet):
         # x축과 교점의 좌표
         x1 = meet[0]
@@ -140,13 +137,20 @@ class Ball(GameObject):
         new_vector_y = abs2*abs(x1 - x2)
 
         #단위 백터로 치환
-        new_length = sqrt(new_vector_x**2 + new_vector_y**2)
+        new_length = ((new_vector_x)**2 + (new_vector_y)**2)**(0.5)
         new_vector_x = new_vector_x/new_length
         new_vector_y = new_vector_y/new_length
         
-
-
-
+        
+        # 반사 백터 구하기
+        vt_x = self.direction[0] + new_vector_x
+        vt_y = self.direction[1] + new_vector_y
+        
+        self.direction[0] = vt_x
+        self.direction[1] = vt_y
+        
+        
+        
     def collide(self, game_objects):
         coords = self.get_position()
         x = (coords[0] + coords[2]) * 0.5
@@ -164,44 +168,18 @@ class Ball(GameObject):
             # 모서리 충돌이 발생함.
             if (meet):
                 self.cal_reflection(meet)
-                print(self.direction)
-                if x > coords[2]:
-                    self.direction[0] = 0.707
-                elif x < coords[0]:
-                    self.direction[0] = -1
-                else:
-                    self.direction[1] *= -1
             # 모서리 충돌이 발생하지 않음.
             else:
                 if x > coords[2]:
-                    self.direction[0] = 0.707
+                    self.direction[0] *= 1
                 elif x < coords[0]:
-                    self.direction[0] = -1
+                    self.direction[0] *= -1
                 else:
                     self.direction[1] *= -1
 
         for game_object in game_objects:
             if isinstance(game_object, Brick):
                 game_object.hit()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 class Paddle(GameObject):
