@@ -1,8 +1,8 @@
 from asyncio.windows_events import NULL
-from cmath import rect
+import pygame
+from cmath import rect, sqrt
 import random
 import math
-from tabnanny import check
 import tkinter as tk
 from PIL import ImageTk, Image
 
@@ -54,11 +54,14 @@ class Ball(GameObject):
         y = self.direction[1] * self.speed
         self.move(x, y)
 
+
+    # 근의 공식 값 출력
     def solution(self, b, c, range_one, range_two):
         D = (b**2) - (4*c)
         if D>0:
             r1= (-b + (b**2-4*c)**0.5)/(2)
             r2 = (-b - (b**2-4*c)**0.5)/(2)
+            # 값이 출동 되는 위치에 있는 지 여부를 확인하고 return 값을 전달해줌
             if (r1 >= range_one and r1 <= range_two):
                 return r1
             else:
@@ -70,6 +73,7 @@ class Ball(GameObject):
             pass
 
 
+    # 충돌을 어디에서 발생했는지 리턴하는 함수
     def collide_where(self, rectangle, circle):
         rectangle_xy = rectangle
         
@@ -80,8 +84,8 @@ class Ball(GameObject):
         rectangle_xy[3] += 0.5
         
         # 원의 x좌표와 y좌표를 구한다.
-        circle_x = circle[0];
-        circle_y = circle[1];
+        circle_x = circle[0]
+        circle_y = circle[1]
         
         # 구분이 되는 x와 y값을 구한다.
         check_x = (rectangle_xy[0] + rectangle_xy[2])/2
@@ -92,18 +96,56 @@ class Ball(GameObject):
         # 기준에 따라 충돌된 x좌표와 y좌표를 구할 수 있다.
         if (circle_y > check_y):
             find_x = self.solution(-2*circle_x, circle_x**2-100+(rectangle_xy[3]-circle_y)**2, rectangle_xy[0], rectangle_xy[2])
+            and_y = rectangle_xy[3]
         else:
             find_x = self.solution(-2*circle_x, circle_x**2-100+(rectangle_xy[1]-circle_y)**2, rectangle_xy[0], rectangle_xy[2])
+            and_y = rectangle_xy[1]
         if (circle_x < check_x):
             find_y = self.solution(-2*circle_y, circle_y**2-100+(rectangle_xy[0]-circle_x)**2, rectangle_xy[1], rectangle_xy[3])
+            and_x = rectangle_xy[0]
         else:
             find_y = self.solution(-2*circle_y, circle_y**2-100+(rectangle_xy[2]-circle_x)**2, rectangle_xy[1], rectangle_xy[3])
+            and_x = rectangle_xy[2]
         
         # 만약 모서리 충돌이 발생했다면 if문 아래로 들어간다.
         if (find_x != None and find_y != None):
-            print(self.direction)
-            print("x: ", find_x)    
-            print("y: ", find_y)
+            coords = [find_x, and_y, and_x, find_y]
+            return coords
+        else:
+            return NULL
+
+
+
+    def cal_reflection(self, meet):
+        # x축과 교점의 좌표
+        x1 = meet[0]
+        y1 = meet[1]
+        # y축과 교점의 좌표
+        x2 = meet[2]
+        y2 = meet[3]
+
+        # 백터의 방향 설정
+        abs1 = 1
+        abs2 = 1
+        if (x1 > x2 and y1 > y2):
+            abs1 *= -1
+        elif (x1 > x2 and y1 < y2):
+            abs1 *= -1
+            abs2 *= -1
+        elif (x1 < x2 and y1 < y2):
+            abs2 *= -1
+        
+        # 새롭게 생성된 백터
+        new_vector_x = abs1*abs(y1 - y2)
+        new_vector_y = abs2*abs(x1 - x2)
+
+        #단위 백터로 치환
+        new_length = sqrt(new_vector_x**2 + new_vector_y**2)
+        new_vector_x = new_vector_x/new_length
+        new_vector_y = new_vector_y/new_length
+        
+
+
 
     def collide(self, game_objects):
         coords = self.get_position()
@@ -118,18 +160,49 @@ class Ball(GameObject):
             coords = game_object.get_position()
             # 원의 중심 좌표 구하기
             ball_center = self.get_position_center()
-            self.collide_where(coords, ball_center)
-            
-            if x > coords[2]:
-                self.direction[0] = 1
-            elif x < coords[0]:
-                self.direction[0] = -1
+            meet = self.collide_where(coords, ball_center)
+            # 모서리 충돌이 발생함.
+            if (meet):
+                self.cal_reflection(meet)
+                print(self.direction)
+                if x > coords[2]:
+                    self.direction[0] = 0.707
+                elif x < coords[0]:
+                    self.direction[0] = -1
+                else:
+                    self.direction[1] *= -1
+            # 모서리 충돌이 발생하지 않음.
             else:
-                self.direction[1] *= -1
+                if x > coords[2]:
+                    self.direction[0] = 0.707
+                elif x < coords[0]:
+                    self.direction[0] = -1
+                else:
+                    self.direction[1] *= -1
 
         for game_object in game_objects:
             if isinstance(game_object, Brick):
                 game_object.hit()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 class Paddle(GameObject):
     def __init__(self, canvas, x, y):
