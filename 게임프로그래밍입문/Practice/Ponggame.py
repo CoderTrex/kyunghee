@@ -57,30 +57,19 @@ class Ball(GameObject):
         if D>0:
             r1= (-b + (b**2-4*c)**0.5)/(2)
             r2 = (-b - (b**2-4*c)**0.5)/(2)
-            return r1, r2
-            # if (r1 <= range_one and r1 >= range_two):
-            #     return r1
-            # else:
-            #     return r2
+            if (r1 >= range_one and r1 <= range_two):
+                return r1
+            else:
+                return r2
         elif D==0:
             x = -b / 2
             return x
         else:
             pass
-        # if b**2 - 4*c > 0:
-        #     x1 = (-b + math.sqrt(b**2 - 4*c)) / 2
-        #     x2 = (-b - math.sqrt(b**2 - 4*c)) / 2
-        # # 해가 1개인 경우
-        # elif b**2 - 4*c == 0:
-        #     x1 = (-b + math.sqrt(b**2 - 4*c)) / 2
-        #     return x1        
-        # # 해가 없는 경우
-        # elif b**2 - 4*c < 0:
-        #     pass
+
 
     def collide_where(self, rectangle, circle):
         rectangle_xy = rectangle
-        print(rectangle_xy)
         circle_x = circle[0];
         circle_y = circle[1];
         check_x = (rectangle_xy[0] + rectangle_xy[2])/2
