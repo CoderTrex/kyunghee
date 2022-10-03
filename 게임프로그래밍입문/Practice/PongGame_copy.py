@@ -1,6 +1,5 @@
 from cgi import print_arguments
 import random
-from tabnanny import check
 import tkinter as tk
 from PIL import ImageTk, Image
 
@@ -52,38 +51,15 @@ class Ball(GameObject):
         y = self.direction[1] * self.speed
         self.move(x, y)
 
-
-    def collide_where(self, rectangle, circle):
-        rectangle_xy = rectangle
-        circle_xy = circle;
-        
-        check_x = rectangle_xy[0] + rectangle_xy[2]
-        check_y = rectangle_xy[1] + rectangle_xy[3]
-        if (circle_xy[0] > check_x):
-            print("왼쪽의 y축 직선과 충돌")
-        else:
-            print("오른쪽의 y축 직선과 충돌")
-        if (circle_xy[1] > check_y):
-            print("아래의 축의 x직선과 충돌")
-        else:
-            print("위의 축의 x직선과 충돌")
-
-
     def collide(self, game_objects):
         coords = self.get_position()
         x = (coords[0] + coords[2]) * 0.5
-        
         if len(game_objects) > 1:
             self.direction[1] *= -1
         elif len(game_objects) == 1:
             game_object = game_objects[0]
-            
-            # 사각형의 꼭짓점 위치
             coords = game_object.get_position()
-            # 원의 중심 좌표 구하기
-            ball_center = self.get_position_center()
-            self.collide_where(coords, ball_center)
-            
+            print(coords)
             if x > coords[2]:
                 self.direction[0] = 1
             elif x < coords[0]:
