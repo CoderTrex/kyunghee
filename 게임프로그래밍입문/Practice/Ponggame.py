@@ -22,7 +22,7 @@ class Ball(GameObject):
         self.radius = 10
         self.direction = [1, -1]
         self.speed = 10
-        self.img = Image.open( "C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\Practice\\ball.png")
+        self.img = Image.open("C:\\KyungHee\\kyunghee\\게임프로그래밍입문\\Practice\\ball.png")
         self.img = self.img.resize((20, 20), Image.ANTIALIAS)  
         self.ball_img = ImageTk.PhotoImage(self.img)
         item = canvas.create_image(x, y, image = self.ball_img)
