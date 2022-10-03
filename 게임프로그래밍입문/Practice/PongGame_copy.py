@@ -54,6 +54,23 @@ class Ball(GameObject):
     def collide(self, game_objects):
         coords = self.get_position()
         x = (coords[0] + coords[2]) * 0.5
+        
+        
+        # if (len(objects) == 1):
+        #     hello = objects[0]
+        #     coords = self.canvas.coords(hello)
+        #     print(coords)
+        # 겹치게 된 object의 좌표
+        # coord_overlapped = 
+        # print(coord_overlapped)
+        # 공의 중심 좌표
+        # ball_coords_c = self.ball.get_position_center()
+        
+        
+        
+        
+        
+        
         if len(game_objects) > 1:
             self.direction[1] *= -1
         elif len(game_objects) == 1:

@@ -1,5 +1,5 @@
-from cgi import print_arguments
 import random
+import math
 from tabnanny import check
 import tkinter as tk
 from PIL import ImageTk, Image
@@ -52,22 +52,52 @@ class Ball(GameObject):
         y = self.direction[1] * self.speed
         self.move(x, y)
 
+    def solution(self, b, c, range_one, range_two):
+        D = (b**2) - (4*c)
+        if D>0:
+            r1= (-b + (b**2-4*c)**0.5)/(2)
+            r2 = (-b - (b**2-4*c)**0.5)/(2)
+            return r1, r2
+            # if (r1 <= range_one and r1 >= range_two):
+            #     return r1
+            # else:
+            #     return r2
+        elif D==0:
+            x = -b / 2
+            return x
+        else:
+            pass
+        # if b**2 - 4*c > 0:
+        #     x1 = (-b + math.sqrt(b**2 - 4*c)) / 2
+        #     x2 = (-b - math.sqrt(b**2 - 4*c)) / 2
+        # # 해가 1개인 경우
+        # elif b**2 - 4*c == 0:
+        #     x1 = (-b + math.sqrt(b**2 - 4*c)) / 2
+        #     return x1        
+        # # 해가 없는 경우
+        # elif b**2 - 4*c < 0:
+        #     pass
 
     def collide_where(self, rectangle, circle):
         rectangle_xy = rectangle
-        circle_xy = circle;
+        print(rectangle_xy)
+        circle_x = circle[0];
+        circle_y = circle[1];
+        check_x = (rectangle_xy[0] + rectangle_xy[2])/2
+        check_y = (rectangle_xy[1] + rectangle_xy[3])/2
         
-        check_x = rectangle_xy[0] + rectangle_xy[2]
-        check_y = rectangle_xy[1] + rectangle_xy[3]
-        if (circle_xy[0] > check_x):
-            print("왼쪽의 y축 직선과 충돌")
+        if (circle_y > check_y):
+            find_x = self.solution(-2*circle_x, circle_x**2-100+(rectangle_xy[3]-circle_y)**2, rectangle_xy[0], rectangle_xy[2])
+            print("x: ", find_x)
         else:
-            print("오른쪽의 y축 직선과 충돌")
-        if (circle_xy[1] > check_y):
-            print("아래의 축의 x직선과 충돌")
+            find_x = self.solution(-2*circle_x, circle_x**2-100+(rectangle_xy[1]-circle_y)**2, rectangle_xy[0], rectangle_xy[2])
+            print("x: ", find_x)
+        if (circle_x < check_x):
+            find_y = self.solution(-2*circle_y, circle_y**2-100+(rectangle_xy[0]-circle_x)**2, rectangle_xy[1], rectangle_xy[3])
+            print("y: ", find_y)
         else:
-            print("위의 축의 x직선과 충돌")
-
+            find_y = self.solution(-2*circle_y, circle_y**2-100+(rectangle_xy[2]-circle_x)**2, rectangle_xy[1], rectangle_xy[3])
+            print("y: ", find_y)
 
     def collide(self, game_objects):
         coords = self.get_position()
