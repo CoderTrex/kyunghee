@@ -1,6 +1,4 @@
 from asyncio.windows_events import NULL
-import pygame
-import math
 import random
 import tkinter as tk
 from PIL import ImageTk, Image
@@ -18,7 +16,6 @@ class GameObject(object):
 
     def delete(self):
         self.canvas.delete(self.item)   
-
 
 class Ball(GameObject):
     def __init__(self, canvas, x, y):
@@ -53,7 +50,6 @@ class Ball(GameObject):
         y = self.direction[1] * self.speed
         self.move(x, y)
 
-
     # 근의 공식 값 출력
     def solution(self, b, c, range_one, range_two):
         D = (b**2) - (4*c)
@@ -71,12 +67,11 @@ class Ball(GameObject):
         else:
             pass
 
-
     # 충돌을 어디에서 발생했는지 리턴하는 함수
     def collide_where(self, rectangle, circle):
         rectangle_xy = rectangle
         
-        # 충돌 처리 영역을 확장하면 바깥으로 직선을 그린 것 같이 됨
+        # 충돌 처리 영역을 확장하면 충돌 처리 직선을 바깥으로 그리고 그것이 기준이 된 것 같이 됨
         rectangle_xy[0] -= 0.5
         rectangle_xy[1] -= 0.5
         rectangle_xy[2] += 0.5
@@ -124,6 +119,7 @@ class Ball(GameObject):
         # 백터의 방향 설정
         abs1 = 1
         abs2 = 1
+        # 충돌하는 위치에 따라 생성되는 법선 백터의 값은 동일함
         if (x1 > x2 and y1 > y2):
             abs1 *= -1
         elif (x1 > x2 and y1 < y2):
@@ -132,22 +128,25 @@ class Ball(GameObject):
         elif (x1 < x2 and y1 < y2):
             abs2 *= -1
         
-        # 새롭게 생성된 백터
-        new_vector_x = abs1*abs(y1 - y2)
-        new_vector_y = abs2*abs(x1 - x2)
+        # 법선 백터
+        N_vector_x = abs1*abs(y1 - y2)
+        N_vector_y = abs2*abs(x1 - x2)
 
-        #단위 백터로 치환
-        new_length = ((new_vector_x)**2 + (new_vector_y)**2)**(0.5)
-        new_vector_x = new_vector_x/new_length
-        new_vector_y = new_vector_y/new_length
+        # 법선 백터를 단위 백터로 치환
+        new_length = ((N_vector_x)**2 + (N_vector_y)**2)**(0.5)
+        N_vector_x = N_vector_x/new_length
+        N_vector_y = N_vector_y/new_length
         
         # 반사 백터 구하기
-        vt_x = self.direction[0] + new_vector_x
-        vt_y = self.direction[1] + new_vector_y
-        self.direction[0] = vt_x
-        self.direction[1] = vt_y
+        vec_X_reflection = self.direction[0] + N_vector_x
+        vec_Y_reflection = self.direction[1] + N_vector_y
         
+        R_length = ((vec_X_reflection)**2 + (vec_Y_reflection)**2)**(0.5)
+        vec_X_reflection = vec_X_reflection/R_length
+        vec_Y_reflection = vec_Y_reflection/R_length
         
+        self.direction[0] = vec_X_reflection
+        self.direction[1] = vec_Y_reflection
         
     def collide(self, game_objects):
         coords = self.get_position()
@@ -327,8 +326,6 @@ class Game(tk.Frame):
         items = self.canvas.find_overlapping(*ball_coords)
         objects = [self.items[x] for x in items if x in self.items]
         self.ball.collide(objects)
-
-
 
 if __name__ == '__main__':
     root = tk.Tk()
