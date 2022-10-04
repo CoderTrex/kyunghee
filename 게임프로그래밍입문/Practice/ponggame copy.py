@@ -62,7 +62,7 @@ class Ball(GameObject):
             if (r1 >= range_one and r1 <= range_two):
                 return r1
             else:
-                return r2
+                pass
         elif D==0:
             x = -b / 2
             return x
@@ -111,7 +111,7 @@ class Ball(GameObject):
             return NULL
 
     def check_90degree(self, x, y):
-        degree = math.acos(x*self.direction[1]+y*self.direction[0]) * (180/3.14)
+        degree = math.acos(x*self.direction[1]+y*self.direction[0]) * (180/pi)
         print(degree)
         if (degree > 90):
             return True
@@ -257,6 +257,10 @@ class Game(tk.Frame):
         self.canvas.bind('<Left>',lambda _: self.paddle.move(-10))
         self.canvas.bind('<Right>',lambda _: self.paddle.move(10))
 
+
+
+
+
     def make_brick(self, level):
         if (level == 0):
             for x in range(5, self.width - 5, 75):
@@ -265,13 +269,74 @@ class Game(tk.Frame):
                     pass
                 else:
                     self.add_brick(x + 37.5, 50, 1)
-        else:
+        elif (level == 1):
             for x in range(5, self.width - 5, 75):
                 rand_num = random.randint(0, 9)
-                if (rand_num % 3 == 0):
+                if (rand_num % 4 == 0):
+                    pass
+                else:
+                    self.add_brick(x + 37.5, 50, 1)
+                if (rand_num % 2 == 0):
+                    pass
+                else:
+                    self.add_brick(x + 37.5, 70, 1)
+        elif (level == 2):
+            for x in range(5, self.width - 5, 75):
+                rand_num = random.randint(0, 9)
+                if (rand_num % 4 == 0):
                     pass
                 else:
                     self.add_brick(x + 37.5, 50, 2)
+                if (rand_num % 2 == 0):
+                    pass
+                else:
+                    self.add_brick(x + 37.5, 70, 2)
+        elif (level == 3):
+            for x in range(5, self.width - 5, 75):
+                rand_num = random.randint(0, 9)
+                if (rand_num % 4 == 0):
+                    pass
+                else:
+                    self.add_brick(x + 37.5, 50, 3)
+                if (rand_num % 2 == 0):
+                    pass
+                else:
+                    self.add_brick(x + 37.5, 70, 2)
+                if (rand_num % 2 == 0):
+                    pass
+                else:
+                    self.add_brick(x + 37.5, 90, 1)
+        elif (level == 4):
+            for x in range(5, self.width - 5, 75):
+                rand_num = random.randint(0, 9)
+                if (rand_num % 4 == 0):
+                    pass
+                else:
+                    self.add_brick(x + 37.5, 50, 3)
+                if (rand_num % 2 == 0):
+                    pass
+                else:
+                    self.add_brick(x + 37.5, 70, 2)
+                if (rand_num % 2 == 0):
+                    pass
+                else:
+                    self.add_brick(x + 37.5, 90, 2)
+        elif (level == 5):
+            for x in range(5, self.width - 5, 75):
+                rand_num = random.randint(0, 9)
+                if (rand_num % 4 == 0):
+                    pass
+                else:
+                    self.add_brick(x + 37.5, 50, 3)
+                if (rand_num % 2 == 0):
+                    pass
+                else:
+                    self.add_brick(x + 37.5, 70, 3)
+                if (rand_num % 2 == 0):
+                    pass
+                else:
+                    self.add_brick(x + 37.5, 90, 3)
+
 
     def setup_game(self, level, reset):
         self.add_ball()

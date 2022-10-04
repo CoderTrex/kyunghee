@@ -1,3 +1,4 @@
+#include <iostream>
 class FullQueue
 {};  
 
@@ -39,6 +40,6 @@ private:
     int rear;
     ItemType* items;
     int maxQue;
+    int length;
+    void Trim();
 };
-
-
