@@ -71,8 +71,3 @@ void QueType::Dequeue(ItemType& item)
     item = items[front];
   }
 }
-
-
-int QueType::Length(){
-  return (rear + 1);
-}

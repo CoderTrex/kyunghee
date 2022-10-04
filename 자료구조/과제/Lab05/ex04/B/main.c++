@@ -6,31 +6,23 @@ using namespace std;
 
 int main(){
     srand(time(NULL));
-    QueType one, same, different;
-    cout << "one and same value : ";
-    for (int i = 0; i < 10; i++){
-        int number = rand() % 100;
-        cout << number << " ";
-        one.Enqueue(number);
-        same.Enqueue(number);
-    }
+    QueType one, two;
+    int range_one = rand() % 10;
+    int range_two = rand() % 10 + 3;
 
-    cout << "\n" << "different value : ";
-    for (int i = 0; i < 10; i++){
+    cout << "one: " << range_one << "\n";
+    for (int i=0; i<range_one; i++){
         int number = rand() % 100;
-        cout << number << " ";
-        different.Enqueue(number);
+        one.Enqueue(number);
+    }
+    cout << "two: " << range_two << "\n";
+    for (int i=0; i<range_two; i++){
+        int number = rand() % 100;
+        two.Enqueue(number);
     }
     cout << "\n";
 
-    if (one.Identical(same))
-        cout << "same!" << endl;
-    else
-        cout << "different!" << endl;
-
-    if (one.Identical(different))
-        cout << "same!" << endl;
-    else
-        cout << "different!" << endl;
-
+    int one_len = one.Length();
+    int two_len = two.Length();
+    cout << "one len : " << one_len << "\n" << "two len : " << two_len << "\n";
 }

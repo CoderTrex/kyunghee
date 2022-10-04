@@ -34,12 +34,10 @@ public:
     //       and item is undefined
     //       else front element has been removed from queue and
     //       item is a copy of removed element.
-    int Length();
+    void ReplaceItem(ItemType oldItem, ItemType newItem);
 private:
     int front;
     int rear;
     ItemType* items;
     int maxQue;
 };
-
-

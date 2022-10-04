@@ -1,3 +1,4 @@
+#include <iostream>
 class FullQueue
 {};  
 
@@ -34,12 +35,16 @@ public:
     //       and item is undefined
     //       else front element has been removed from queue and
     //       item is a copy of removed element.
-    int Length();
+    void MinDeque(ItemType& item);
 private:
     int front;
     int rear;
     ItemType* items;
     int maxQue;
+    int min_pos;
+    int minus_pos;
+
+    void FindMin();
 };
 
 

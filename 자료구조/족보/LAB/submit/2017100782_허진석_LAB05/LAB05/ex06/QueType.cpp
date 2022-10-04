@@ -9,8 +9,11 @@ QueType::QueType(int max)
   maxQue = max + 1;
   front = maxQue - 1;
   rear = maxQue - 1;
+  minus_pos = -1;
+  min_pos = front;
   items = new ItemType[maxQue];
 }
+
 QueType::QueType()          // Default class constructor
 // Post: maxQue, front, and rear have been initialized.
 //       The array to hold the queue elements has been dynamically
@@ -19,8 +22,11 @@ QueType::QueType()          // Default class constructor
   maxQue = 501;
   front = maxQue - 1;
   rear = maxQue - 1;
+  minus_pos = -1;
+  min_pos = front;
   items = new ItemType[maxQue];
 }
+
 QueType::~QueType()         // Class destructor
 {
   delete [] items;
@@ -51,11 +57,14 @@ void QueType::Enqueue(ItemType newItem)
 {
   if (IsFull())
     throw FullQueue();
+  else if (minus_pos != -1)
+    items[minus_pos] = newItem;
   else
   {
-    rear = (rear +1) % maxQue;
+    rear = (rear + 1) % maxQue;
     items[rear] = newItem;
   }
+  FindMin();
 }
 
 void QueType::Dequeue(ItemType& item)
@@ -72,7 +81,28 @@ void QueType::Dequeue(ItemType& item)
   }
 }
 
+void QueType::MinDeque(ItemType& item)
+{
+  if (IsEmpty())
+    throw EmptyQueue();
+  else
+  {
+    item = items[min_pos];
+    items[min_pos] = -1;
+    minus_pos = min_pos;
+    FindMin();
+  }
+}
 
-int QueType::Length(){
-  return (rear + 1);
+void QueType::FindMin()
+{
+  int min = 2147483647;
+  for (int i = (front + 1) % maxQue; i < (rear + 1) % maxQue; i++)
+  {
+    if (i != min_pos && items[i] != -1 && items[i] < min)
+    {
+      min_pos = i;
+      min = items[i];
+    }
+  }
 }

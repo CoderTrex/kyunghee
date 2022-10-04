@@ -72,7 +72,24 @@ void QueType::Dequeue(ItemType& item)
   }
 }
 
+void QueType::ReplaceItem(ItemType oldItem, ItemType newItem)
+{
+  QueType temp;
 
-int QueType::Length(){
-  return (rear + 1);
+	while (!IsEmpty()) {
+		int item;
+
+		Dequeue(item);
+		if (item != oldItem) {
+			temp.Enqueue(item);
+		} else {
+			temp.Enqueue(newItem);
+		}
+	}
+	while (!temp.IsEmpty()) {
+		int item;
+
+		temp.Dequeue(item);
+		Enqueue(item);
+	}
 }

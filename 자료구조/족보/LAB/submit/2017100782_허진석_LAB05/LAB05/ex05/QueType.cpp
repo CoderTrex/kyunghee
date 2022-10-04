@@ -7,18 +7,21 @@ QueType::QueType(int max)
 //       allocated.
 {
   maxQue = max + 1;
-  front = maxQue - 1;
-  rear = maxQue - 1;
+  front = 0;
+  rear = 0;
+  length = 0;
   items = new ItemType[maxQue];
 }
+
 QueType::QueType()          // Default class constructor
 // Post: maxQue, front, and rear have been initialized.
 //       The array to hold the queue elements has been dynamically
 //       allocated.
 {
   maxQue = 501;
-  front = maxQue - 1;
-  rear = maxQue - 1;
+  front = 0;
+  rear = 0;
+  length = 0;
   items = new ItemType[maxQue];
 }
 QueType::~QueType()         // Class destructor
@@ -29,20 +32,33 @@ QueType::~QueType()         // Class destructor
 void QueType::MakeEmpty()
 // Post: front and rear have been reset to the empty state.
 {
-  front = maxQue - 1;
-  rear = maxQue - 1;
+  front = 0;
+  rear = 0;
+  length = 0;
 }
 
 bool QueType::IsEmpty() const
 // Returns true if the queue is empty; false otherwise.
 {
-  return (rear == front);
+  return length == 0;
 }
 
 bool QueType::IsFull() const
 // Returns true if the queue is full; false otherwise.
 {
-  return ((rear + 1) % maxQue == front);
+  return (length == maxQue);
+}
+
+void QueType::Trim() {
+  int diff = front;
+  int left = front;
+  int right = rear;
+  while (left <= right) {
+    items[left - diff] = items[left];
+    left++;
+  }
+  front -= diff;
+  rear -= diff;
 }
 
 void QueType::Enqueue(ItemType newItem)
@@ -53,8 +69,10 @@ void QueType::Enqueue(ItemType newItem)
     throw FullQueue();
   else
   {
-    rear = (rear +1) % maxQue;
-    items[rear] = newItem;
+    if (rear == maxQue - 1)
+      Trim();
+    items[rear++] = newItem;
+    length++;
   }
 }
 
@@ -67,12 +85,7 @@ void QueType::Dequeue(ItemType& item)
     throw EmptyQueue();
   else
   {
-    front = (front + 1) % maxQue;
-    item = items[front];
+    item = items[front++];
+    length--;
   }
-}
-
-
-int QueType::Length(){
-  return (rear + 1);
 }

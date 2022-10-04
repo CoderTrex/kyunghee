@@ -72,7 +72,7 @@ void QueType::Dequeue(ItemType& item)
   }
 }
 
-
-int QueType::Length(){
-  return (rear + 1);
+int QueType::Length() const
+{
+  return (rear + 1) % maxQue - (front + 1) % maxQue;
 }

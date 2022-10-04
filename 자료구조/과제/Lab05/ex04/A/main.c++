@@ -5,31 +5,29 @@
 using namespace std;
 
 int Length(QueType queue){
-    int i;
-    while (queue.Dequeue(i)){
-        
+    int i = 0, num;
+    while (!queue.IsEmpty()){
+        queue.Dequeue(num);
+        i++;
     }
-    
+    return i;
 }
 
 int main(){
     srand(time(NULL));
     QueType one, two;
     int range_one = rand() % 10;
-    int range_two = rand() % 10;
+    int range_two = rand() % 10 + 3;
 
     cout << "one: " << range_one << "\n";
-    for (int i = 0; i < range_one; i++){
+    for (int i=0; i<range_one; i++){
         int number = rand() % 100;
-        cout << number << " ";
         one.Enqueue(number);
     }
-
-    cout << "two: " << range_one << "\n";
-    for (int i = 0; i < range_one; i++){
+    cout << "two: " << range_two << "\n";
+    for (int i=0; i<range_two; i++){
         int number = rand() % 100;
-        cout << number << " ";
-        one.Enqueue(number);
+        two.Enqueue(number);
     }
     cout << "\n";
 

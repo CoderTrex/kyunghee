@@ -72,7 +72,26 @@ void QueType::Dequeue(ItemType& item)
   }
 }
 
+bool QueType::Identical(QueType &queue)
+{
+  bool ans = false;
+  QueType tmp1, tmp2;
 
-int QueType::Length(){
-  return (rear + 1);
+  while (!IsEmpty() && !queue.IsEmpty())
+  {
+    ItemType item1, item2;
+
+    Dequeue(item1);
+    tmp1.Enqueue(item1);
+    queue.Dequeue(item2);
+    tmp2.Enqueue(item2);
+    if (item1 != item2)
+    {
+      ans = false;
+      break;
+    }
+  }
+  if (IsEmpty() && queue.IsEmpty())
+    ans = true;
+  return ans;
 }

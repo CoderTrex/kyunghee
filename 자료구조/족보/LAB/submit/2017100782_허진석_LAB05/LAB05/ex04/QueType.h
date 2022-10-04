@@ -1,3 +1,4 @@
+#include <iostream>
 class FullQueue
 {};  
 
@@ -34,7 +35,8 @@ public:
     //       and item is undefined
     //       else front element has been removed from queue and
     //       item is a copy of removed element.
-    int Length();
+    int Length() const;
+
 private:
     int front;
     int rear;
