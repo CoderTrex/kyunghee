@@ -73,37 +73,48 @@ class Ball(GameObject):
     def collide_where(self, rectangle, circle):
         rectangle_xy = rectangle
         
-        # 충돌 처리 영역을 확장하면 충돌 처리 직선을 바깥으로 그리고 그것이 기준이 된 것 같이 됨
+        # 충돌 처리 영역을 확장하면 충돌 처리 직선을 바깥으로 그린것이 되고 
+        # 그것이 충돌 처리 위치의 기준이 됨
         rectangle_xy[0] -= 0.5
         rectangle_xy[1] -= 0.5
         rectangle_xy[2] += 0.5
         rectangle_xy[3] += 0.5
         
-        # 원의 x좌표와 y좌표를 구한다.
+        # 원의 중심 x좌표와 y좌표를 구한다.
         circle_x = circle[0]
         circle_y = circle[1]
         
-        # 구분이 되는 x와 y값을 구한다.
+        # 충돌지점을 확인하기 위해 사각형의 중심이 되는 x와 y값을 구한다.
         check_x = (rectangle_xy[0] + rectangle_xy[2])/2
         check_y = (rectangle_xy[1] + rectangle_xy[3])/2
+        
+        # find_x의 값은 초기에 none으로 할당이 됨
         find_x = None
         find_y = None
         
         # 기준에 따라 충돌된 x좌표와 y좌표를 구할 수 있다.
+        # 이는 사각형의 중심보다 위에 충돌이 되었다. 이러한 정보를 통해 특정되서 미리 알 수 있는 값은 
+        # 사각형의 아래 y값, 원의 반지름, 원의 중심값
+        # 이를 통해 알 수 있는 값은 사각형의 밑변의 충돌한 x값이다. 
         if (circle_y > check_y):
+            # 근의 방정식에 의해 충돌된 
             find_x = self.solution(-2*circle_x, circle_x**2-100+(rectangle_xy[3]-circle_y)**2, rectangle_xy[0], rectangle_xy[2])
             and_y = rectangle_xy[3]
+        # 여기서는 사각형의 윗변의 충돌한 x값이다.
         else:
             find_x = self.solution(-2*circle_x, circle_x**2-100+(rectangle_xy[1]-circle_y)**2, rectangle_xy[0], rectangle_xy[2])
             and_y = rectangle_xy[1]
+        # 여기서는 사각형의 왼쪽 변의 충돌한 y값이다.
         if (circle_x < check_x):
             find_y = self.solution(-2*circle_y, circle_y**2-100+(rectangle_xy[0]-circle_x)**2, rectangle_xy[1], rectangle_xy[3])
             and_x = rectangle_xy[0]
+        # 여기서는 사각형의 오른쪽 변의 충돌한 y값이다.
         else:
             find_y = self.solution(-2*circle_y, circle_y**2-100+(rectangle_xy[2]-circle_x)**2, rectangle_xy[1], rectangle_xy[3])
             and_x = rectangle_xy[2]
         
         # 만약 모서리 충돌이 발생했다면 if문 아래로 들어간다.
+        # 또한 모서리 충돌이 아닌 변의 충돌이면 둘중에 하나가 none이다.
         if (find_x != None and find_y != None):
             coords = [find_x, and_y, and_x, find_y]
             return coords
@@ -111,26 +122,28 @@ class Ball(GameObject):
             return NULL
 
     def check_90degree(self, x, y):
+        # 2개의 백터를 통해서 degree 구하는 공식 통해서 degree를 구함.
         degree = math.acos(x*self.direction[1]+y*self.direction[0]) * (180/3.14)
-        print(degree)
+        # 만약 90 이상이면, true로 처리하며 충돌 처리 함.
         if (degree > 90):
             return True
+        # 90 미만이면, False로 처리하며 충돌 처리 안함.
         else:
             return False
 
-
+    # 반사되는 백터를 구하기 위한 함수
     def cal_reflection(self, meet):
-        # x축과 교점의 좌표
+        # 사각형의 밑변에 부딛친 x축쪽의 교점의 좌표
         x1 = meet[0]
         y1 = meet[1]
-        # y축과 교점의 좌표
+        # 사각형의 옆면에 부딛친 y축쪽의 교점의 좌표
         x2 = meet[2]
         y2 = meet[3]
 
         # 백터의 방향 설정
         abs1 = 1
         abs2 = 1
-        # 충돌하는 위치에 따라 생성되는 법선 백터의 값은 동일함
+        # 충돌하는 위치에 따라 생성되는 법선 백터의 부호의 값은 일정함.
         if (x1 > x2 and y1 > y2):
             abs1 *= -1
         elif (x1 > x2 and y1 < y2):
@@ -140,6 +153,7 @@ class Ball(GameObject):
             abs2 *= -1
         
         # 법선 백터
+        # 둘의 거리를 절대값으로 구해주고 판정된 법선 벡터의 부호를 곱해준다.
         N_vector_x = abs1*abs(y1 - y2)
         N_vector_y = abs2*abs(x1 - x2)
 
@@ -148,15 +162,18 @@ class Ball(GameObject):
         N_vector_x = N_vector_x/new_length
         N_vector_y = N_vector_y/new_length
         
+        # 법선 백터가 충돌하기전에 사잇각이 90도 이하인지 확인하고 이하이면 충돌 발생 X
         if (self.check_90degree(N_vector_x, N_vector_y)):
-            # 반사 백터 구하기
+            # 반사 백터 구하기 : 2개의 백터(법선 백터와 진입 백터를 더하면 반사백터를 구할 수 있다.)
             vec_X_reflection = self.direction[0] + N_vector_x
             vec_Y_reflection = self.direction[1] + N_vector_y
             
+            # 반사 벡터를 구하고 이를 단위 백터로 구현해준다.
             R_length = ((vec_X_reflection)**2 + (vec_Y_reflection)**2)**(0.5)
             vec_X_reflection = vec_X_reflection/R_length
             vec_Y_reflection = vec_Y_reflection/R_length
             
+            # 반사백터를 이동하는 방향 백터에 넣어준다.
             self.direction[0] = vec_X_reflection
             self.direction[1] = vec_Y_reflection
         
@@ -238,7 +255,7 @@ class Game(tk.Frame):
     def __init__(self, master):
         super(Game, self).__init__(master)
         self.lives = 3
-        self.level = 0
+        self.level = 1
         self.reset = 1
         self.width = 610
         self.height = 400
@@ -258,14 +275,14 @@ class Game(tk.Frame):
         self.canvas.bind('<Right>',lambda _: self.paddle.move(10))
 
     def make_brick(self, level):
-        if (level == 0):
+        if (level == 1):
             for x in range(5, self.width - 5, 75):
                 rand_num = random.randint(0, 9)
                 if (rand_num % 2 == 0):
                     pass
                 else:
                     self.add_brick(x + 37.5, 50, 1)
-        elif (level == 1):
+        elif (level == 2):
             for x in range(5, self.width - 5, 75):
                 rand_num = random.randint(0, 9)
                 if (rand_num % 4 == 0):
@@ -276,7 +293,7 @@ class Game(tk.Frame):
                     pass
                 else:
                     self.add_brick(x + 37.5, 70, 1)
-        elif (level == 2):
+        elif (level == 3):
             for x in range(5, self.width - 5, 75):
                 rand_num = random.randint(0, 9)
                 if (rand_num % 4 == 0):
@@ -287,21 +304,6 @@ class Game(tk.Frame):
                     pass
                 else:
                     self.add_brick(x + 37.5, 70, 2)
-        elif (level == 3):
-            for x in range(5, self.width - 5, 75):
-                rand_num = random.randint(0, 9)
-                if (rand_num % 4 == 0):
-                    pass
-                else:
-                    self.add_brick(x + 37.5, 50, 3)
-                if (rand_num % 2 == 0):
-                    pass
-                else:
-                    self.add_brick(x + 37.5, 70, 2)
-                if (rand_num % 2 == 0):
-                    pass
-                else:
-                    self.add_brick(x + 37.5, 90, 1)
         elif (level == 4):
             for x in range(5, self.width - 5, 75):
                 rand_num = random.randint(0, 9)
@@ -316,7 +318,7 @@ class Game(tk.Frame):
                 if (rand_num % 2 == 0):
                     pass
                 else:
-                    self.add_brick(x + 37.5, 90, 2)
+                    self.add_brick(x + 37.5, 90, 1)
         elif (level == 5):
             for x in range(5, self.width - 5, 75):
                 rand_num = random.randint(0, 9)
@@ -327,11 +329,11 @@ class Game(tk.Frame):
                 if (rand_num % 2 == 0):
                     pass
                 else:
-                    self.add_brick(x + 37.5, 70, 3)
+                    self.add_brick(x + 37.5, 70, 2)
                 if (rand_num % 2 == 0):
                     pass
                 else:
-                    self.add_brick(x + 37.5, 90, 3)
+                    self.add_brick(x + 37.5, 90, 2)
 
     def setup_game(self, level, reset):
         self.add_ball()
