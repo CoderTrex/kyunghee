@@ -55,7 +55,7 @@ class PlayerCannon(Actor):
                     pass
                 else:
                     self.move(self.speed * movement * elapsed)
-            elif self.x >= self.parent.width:
+            elif self.x >= self.parent.width - w:
                 if (movement > 0):
                     pass
                 else:
