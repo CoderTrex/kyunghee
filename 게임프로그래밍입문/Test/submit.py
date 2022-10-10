@@ -38,12 +38,11 @@ class Minesweeper:
 
 
         self.menubar = tkinter.Menu()
-        filemenu = tk.Menu(self.menubar, tearoff=0)
-        filemenu.add_command(label="9*9")
-        filemenu.add_separator()
-        filemenu.add_command(label="Exit",
-        command=master.destroy)
-        self.menubar.add_cascade(label="File", menu=filemenu)
+        self.filemenu = tk.Menu(self.menubar, tearoff=0)
+        self.filemenu.add_command(label="9*9")
+        self.filemenu.add_separator()
+        self.filemenu.add_command(label="Exit", command=master.destroy)
+        self.menubar.add_cascade(label="File", menu = self.filemenu)
         master.config(menu= self.menubar)
 
 
