@@ -58,7 +58,7 @@ class GameBoard:        # 게임 보드 클래스 생성
                 if backText == 0:
                     self.tileBack[x][y] = tk.Label(self.tileFrame[x][y], text='')
                 elif backText == 9:
-                    self.tileBack[x][y] = tk.Label(self.tileFrame[x][y], text='', image=self.imgMine)
+                    self.tileBack[x][y] = tk.Label(self.tileFrame[x][y], text='', fg='red')#image=self.imgMine)
                 else:
                     self.tileBack[x][y] = tk.Label(self.tileFrame[x][y], text=backText)     # 타일의 데이터에 따라 빈칸, 이미지, 숫자 라벨 구성 (패킹하지 않음)
 
@@ -99,13 +99,8 @@ class GameBoard:        # 게임 보드 클래스 생성
             else:
                 self.tileBtn[x][y].configure(image='', text='?')        # 타일의 버튼 이미지를 [0 : 표시하지 않음, 1 : 깃발, 2 : 물음표]로 표시함
                 self.flag -= 1                                          # 우클릭 횟수에 따라 사용된 깃발 수를 관리
-            if self.mine-self.flag < 0:
-                flagCnt.configure(text=' 깃발을 너무 많이 사용했습니다!', foreground='red')                  # 지뢰의 수보다 깃발을 많이 사용하면 안내
-            else:
-                flagCnt.configure(text=' 남은 지뢰 : %d' % (self.mine-self.flag), foreground='black')      # 남은 지뢰(깃발)의 수를 안내
 
     def win(self):
-        winLose.configure(text='WIN!!!', foreground='blue')
         self.disabled = True        # 승리시 승리 메시지 출력, 게임판 비활성화
 
     def lose(self):                                                                         # 패배시
@@ -120,7 +115,6 @@ class GameBoard:        # 게임 보드 클래스 생성
 
                 elif self.tileBtnImg[x_][y_] == 1:
                     self.tileBtn[x_][y_].configure(image=self.imgWrongFlag, text='')        # 잘못 사용한 플래그 위치 표시
-        winLose.configure(text='LOSE...', foreground='red')
         self.disabled = True        # 패배시 패배 메시지 출력, 게임판 비활성화
 
     def unpackBoard(self):
@@ -136,7 +130,6 @@ def gameLevelCancel():
         game.disabled = False
 
 def gameStart(frame, level):
-    winLose.configure(text='')      # 승, 패 안내 초기화
     global game     # 전역변수 game 사용
 
     if game is not None:
@@ -160,22 +153,13 @@ def gameStart(frame, level):
     mainWindow.geometry('%dx%d+%d+%d' % ((w + 1) * TILE_SIZE, (h + 1) * TILE_SIZE + 64, (scrW - (w + 1) * TILE_SIZE) / 2, (scrH - (h + 1) * TILE_SIZE - 64) / 2))
     mainFrame.configure(width=(w + 1) * TILE_SIZE, height=(h + 1) * TILE_SIZE)      # 화면의 사이즈와 위치 조정
 
-    flagCnt.configure(text=' 남은 지뢰 : %d' % game.mine)
     uiPlace(w, h)
     game.disabled = False       # ui 재설정 및 게임 활성화
 
 def uiPlace(w, h):
-    flagCnt.place(y=8)
     mainFrame.place(y=32)
-    newGameBtn.place(x=6, y=(h + 1) * TILE_SIZE + 32)
-    quitGameBtn.place(x=w*TILE_SIZE-12, y=(h + 1) * TILE_SIZE + 32)
-    winLose.place(x=w * TILE_SIZE / 2, y=(h + 1) * TILE_SIZE + 32)      # mainWindow 의 위젯들 배치
 
 game = None
-
-def quitGame():
-    if msg.askokcancel('지뢰찾기', '게임을 종료하시겠습니까?'):
-        mainWindow.destroy()        # 게임종료 대화상자를 표시, 게임종료
 
 mainWindow = tk.Tk()
 scrW = mainWindow.winfo_screenwidth()
@@ -186,7 +170,6 @@ mainWindow.title('지뢰 찾기')
 mainWindow.lift()       # mainWindow tk 윈도우를 생성, 초기설정
 
 
-mainWindow.protocol("WM_DELETE_WINDOW", quitGame)       # 창 닫기 버튼 클릭 시 quitGame 함수 호출
 
 defaultFont = tk.font.Font(family='맑은 고딕', size=10, weight='bold')
 mainWindow.option_add("*Font", defaultFont)             # mainWindow 기본 폰트 지정
@@ -206,16 +189,10 @@ mainWindow.config(menu=menubar)
 
 """ mainWindow 의 GUI 구성 """
 imgFlagCnt = tk.PhotoImage(file='C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\3_minesweeper\\tkMine\\img\\flag.png')
-flagCnt = tk.Label(mainWindow, image=imgFlagCnt, text=' 남은 지뢰 : 10', compound='left')       # 남은 지뢰 수 표시 라벨 생성
 
 mainFrame = tk.Frame(mainWindow, width=10 * TILE_SIZE, height=10 * TILE_SIZE, padx=11, pady=11, relief='sunken', bd=1)
 mainFrame.pack_propagate(False)     # 게임이 들어갈 mainFrame 생성
 
-newGameBtn = tk.Button(mainWindow, text='새 게임', command=gameLevel)
-quitGameBtn = tk.Button(mainWindow, text=' X ', command=quitGame, foreground='red')     # 게임종료 버튼 생성
-
-winLoseFont = tk.font.Font(family='맑은 고딕', size=14, weight='bold')
-winLose = tk.Label(mainWindow, text='', anchor=tk.CENTER, font=winLoseFont)         # 승, 패 표시 라벨 생성
 
 uiPlace(9, 9)       # mainWindow 위젯 배치 함수
 

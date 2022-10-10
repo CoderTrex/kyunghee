@@ -53,19 +53,45 @@ class Game:
                         result += 1
         return result
     
+    # __init__에서 구성된 보드를 부모 프레임에 표시를 진행함
     def boardActivated(self):
+        # 가로와 세로만큼 for문을 돌린다.
         for x in range(self.width):
             for y in range(self.height):                                  # padx and pady = 여백 크기 0 / relief 테두리 스타일
                 self.tileFrame[x][y] = tk.Frame(self.board, width=TILE_SIZE, height=TILE_SIZE, padx=0, pady=0, relief='raised', bd = 1)
                 self.tileFrame[x][y].pack_propagate(False)
-                self.tileFrame[x][y].grid()
+                self.tileFrame[x][y].grid(column=x, row=y) # 타일의 사이즈를 가진 작은 프레임을 형성
                 
                 backText = self.dataBoard[x][y]
+                # 아무 것도 아닌 공간의 색은 없다.
                 if backText == 0:
                     self.tileBack[x][y] = tk.Label(self.tileFrame[x][y], text = '')
+                # 지뢰의 원래 색을 red이다.
                 elif backText == 9:
-                    self.tileBack[x][y] = tk.Label(self.tileFrame[x][y], text = '')
+                    self.tileBack[x][y] = tk.Label(self.tileFrame[x][y], text = '', fg='red')
+                # 이외 숫자를 가진 타일은 그대로의 모습을 가져간다.
                 else:
-                    self.tileBack[x][y] = tk.Label(self.tileFrame[x][y], text='')
+                    self.tileBack[x][y] = tk.Label(self.tileFrame[x][y], text=backText) # 타일 데이터에 따라 빈칸, 이미지, 숫자 라벨 구성
                 
-                self.tileBtn[x][y] = tk.Button(self.tileFrame[x][y], command=(lambda))
+                self.tileBtn[x][y] = tk.Button(self.tileFrame[x][y], command=(lambda x_=x, y_=y: self.boardClick(x_, y_)), bd=1)
+                self.tileBtn[x][y].bind('<Button-3>', (lambda event, x_=x,y_=y: self.boarRightClick(x_, y_)))
+                self.tileBtn[x][y].pack(fill=tk.BOTH, expand=tk.YES)
+    
+    # x, y 좌표의 타일이 클릭되었을 때 호출
+    def boardClick(self, x, y):
+        if not self.disabled: #보드가 활성화된 경우
+            self.tileBtn[x][y].pack_forget()
+            self.tileBack[x][y].pack(fill=tk.BOTH, expand=tk.YES) # 버튼을 언패킹, 지뢰 그림, 인접 지뢰 숫자등을 포함한 레벨 패킹
+            
+            if self.dataBoard[x][y] == 9:
+                self.tileBack[x][y].configure(background='RED', relief='flat')
+                self.lose()
+            else:
+                self.tileLeft -= 1
+                if self.tileLeft == 0:
+                    self.win()
+                
+                if self.dataBoard[x][y] == 0:
+                    for i in range(-1, 2):
+                        for j in range(-1, 2):
+                            
