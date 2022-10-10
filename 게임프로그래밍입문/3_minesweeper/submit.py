@@ -68,5 +68,4 @@ class Game:
                 else:
                     self.tileBack[x][y] = tk.Label(self.tileFrame[x][y], text='')
                 
-                
-                    
+                self.tileBtn[x][y] = tk.Button(self.tileFrame[x][y], command=(lambda))

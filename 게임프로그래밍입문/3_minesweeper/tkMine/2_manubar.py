@@ -1,6 +1,6 @@
 import tkinter as tk
 import tkinter.font
-from tkinter import messagebox as msg
+from tkinter import Variable, messagebox as msg
 import numpy as np
 
 TILE_SIZE = 24      # 지뢰찾기 게임의 타일 크기를 지정
@@ -130,26 +130,23 @@ class GameBoard:        # 게임 보드 클래스 생성
 def gameLevel():
     if game is not None:
         game.disabled = True
-    newGameWindow.deiconify()       # 새 게임 대화상자를 화면에 표시, 게임판 비활성화
 
 def gameLevelCancel():
     if game is not None:
         game.disabled = False
-    newGameWindow.withdraw()        # 새 게임 대화상자를 화면에서 숨김, 게임판 활성화
 
-def gameStart(frame):
+def gameStart(frame, level):
     winLose.configure(text='')      # 승, 패 안내 초기화
-    newGameWindow.withdraw()        # 새 게임 대화상자 닫음
     global game     # 전역변수 game 사용
 
     if game is not None:
         game.unpackBoard()      # 실행 중이던 게임이 있으면 화면에서 지움
 
-    if level.get() == 0:
+    if level == 0:
         w = 9
         h = 9
         mine = 10
-    elif level.get() == 1:
+    elif level == 1:
         w = 16
         h = 16
         mine = 40
@@ -194,38 +191,20 @@ mainWindow.protocol("WM_DELETE_WINDOW", quitGame)       # 창 닫기 버튼 클�
 defaultFont = tk.font.Font(family='맑은 고딕', size=10, weight='bold')
 mainWindow.option_add("*Font", defaultFont)             # mainWindow 기본 폰트 지정
 
-newGameWindow = tk.Toplevel(mainWindow)
-newGameWindow.geometry('344x156+%d+%d' % ((scrW - 344)/2, (scrH - 156)/2))
-newGameWindow.resizable(False, False)
-newGameWindow.title('새 게임')
-newGameWindow.wm_attributes("-topmost", 1)      # 새 게임 대화상자 윈도우를 생성, 초기설정
-newGameWindow.protocol("WM_DELETE_WINDOW", gameLevelCancel)         # 새 게임 대화상자의 창 닫기 버튼을 gamelevelCancel 에 연결
-
+level = tk.IntVar()
 menubar = tk.Menu(mainWindow)
 filemenu = tk.Menu(menubar, tearoff=0)
-filemenu.add_command(label="9*9")
+filemenu.add_command(label="9*9", command=(lambda: gameStart(mainFrame, 0)))
+filemenu.add_separator()
+filemenu.add_command(label="16*16", command=(lambda: gameStart(mainFrame, 1)))
+filemenu.add_separator()
+filemenu.add_command(label="30*16", command=(lambda: gameStart(mainFrame, 2)))
 filemenu.add_separator()
 filemenu.add_command(label="Exit")
 menubar.add_cascade(label="File", menu=filemenu)
 mainWindow.config(menu=menubar)
-""" 새 게임 대화상자의 GUI 구성 """
-
-levelLabel = tk.Label(newGameWindow, text='난이도를 선택해 주세요!')
-levelLabel.grid(column=0, row=0)
-
-level = tk.IntVar()
-newGameEasy = tk.Radiobutton(newGameWindow, text='쉬움\t\t  (9x9 보드 / 지뢰 10개))', variable=level, value=0)
-newGameMedium = tk.Radiobutton(newGameWindow, text='중간\t\t(16x16 보드 / 지뢰 40개)', variable=level, value=1)
-newGameHard = tk.Radiobutton(newGameWindow, text='어려움\t\t(30x16 보드 / 지뢰 99개)', variable=level, value=2)
-gameStartBtn = tk.Button(newGameWindow, text='게임 시작', command=(lambda: gameStart(mainFrame)))       # 난이도 선택 라디오 버튼 및 게임시작 버튼 생성
-
-newGameEasy.grid(column=0, row=1, padx=16)
-newGameMedium.grid(column=0, row=2, padx=16)
-newGameHard.grid(column=0, row=3, padx=16)
-gameStartBtn.grid(column=0, row=4, padx=0, pady=16)     # 난이도 선택 라디오 버튼 및 게임시작 버튼 배치
 
 """ mainWindow 의 GUI 구성 """
-
 imgFlagCnt = tk.PhotoImage(file='C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\3_minesweeper\\tkMine\\img\\flag.png')
 flagCnt = tk.Label(mainWindow, image=imgFlagCnt, text=' 남은 지뢰 : 10', compound='left')       # 남은 지뢰 수 표시 라벨 생성
 
