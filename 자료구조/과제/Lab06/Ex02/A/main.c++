@@ -4,13 +4,29 @@
 #include <time.h>
 using namespace std;
 
-template <class ItemType>
-void ReplaceItem(QueType<ItemType> &queue, ItemType oldItem, ItemType newItem);
+void ReplaceItem(QueType<int> &queue, int oldItem, int newItem){
+    QueType<int> temp_Queue; // 백업용 스텍
+    int temp_Item; // top을 받는 아이템
 
-template <class ItemType>
+    while (!queue.IsEmpty()){
+        queue.Dequeue(temp_Item);
+        if (temp_Item == oldItem){
+            temp_Queue.Enqueue(newItem);
+        }
+        else{
+            temp_Queue.Enqueue(temp_Item);
+        }
+    }
+    while (!temp_Queue.IsEmpty()){
+        int item;
+        temp_Queue.Dequeue(item);
+        queue.Enqueue(item);
+    }
+}
+
 int main(){
     srand(time(NULL));
-    QueType<ItemType> original;
+    QueType<int> original;
     cout << "pushed num : ";
     for (int i=0; i < 5; i++){
         int a;
@@ -28,28 +44,5 @@ int main(){
     for (int i = 0; i < 5; i++){
         original.Dequeue(show);
         cout << show << " ";
-    }
-}
-
-template <class ItemType>
-void ReplaceItem(QueType<ItemType> &queue, ItemType oldItem, ItemType newItem){
-    QueType<ItemType> temp_Queue; // 백업용 스텍
-    ItemType temp_Item; // top을 받는 아이템
-
-    while (!queue.IsEmpty()){
-        int item;
-        queue.Dequeue(item);
-
-        if (item == oldItem){
-            temp_Queue.Enqueue(newItem);
-        }
-        else{
-            temp_Queue.Enqueue(item);
-        }
-    }
-    while (!queue.IsEmpty()){
-        int item;
-        temp_Queue.Dequeue(item);
-        queue.Enqueue(item);
     }
 }

@@ -161,10 +161,17 @@ void QueType<ItemType>::Dequeue(ItemType& item)
 
 template <class ItemType>
 void QueType<ItemType>::ReplaceItem(ItemType oldItem, ItemType newItem){
-  while (front != NULL) {
-    if(front->info == oldItem){
-      front->info == newItem
-    }
-    front = front->next;
+  NodeType<ItemType> *tmp = front;
+
+  for (; tmp != NULL; tmp = tmp->next)
+  {
+    if (tmp->info == oldItem)
+      tmp->info = newItem;
+  }
+
+  for (NodeType<int> *tmp = front; tmp != rear; tmp = tmp->next)
+  {
+    if (tmp->info == oldItem)
+      tmp->info = newItem;
   }
 }

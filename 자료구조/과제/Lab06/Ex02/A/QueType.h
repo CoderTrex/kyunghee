@@ -42,6 +42,7 @@ public:
     //       and item is undefined
     //       else front element has been removed from queue and
     //       item is a copy of removed element.
+    void ReplaceItem(ItemType oldItem, ItemType newItem);
 private:
   NodeType<ItemType>* front;
   NodeType<ItemType>* rear;
@@ -156,4 +157,3 @@ void QueType<ItemType>::Dequeue(ItemType& item)
     delete tempPtr;
   }
 }
-

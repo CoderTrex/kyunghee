@@ -88,11 +88,13 @@ StackType::StackType()	// Class constructor.
 }
 
 void StackType::ReplaceItem(ItemType oldItem, ItemType newItem){
-    while (topPtr != NULL){
-        topPtr = topPtr->next;
-        if (topPtr->info == oldItem){
-            topPtr->info = newItem;
+    NodeType *tmp = topPtr;
+
+    while (tmp != NULL){
+        if (tmp->info == oldItem){
+            tmp->info = newItem;
         }
+        tmp = tmp->next;
     }
 }
 
