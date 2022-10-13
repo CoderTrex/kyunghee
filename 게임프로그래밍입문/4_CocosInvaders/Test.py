@@ -1,15 +1,14 @@
+from logging import setLogRecordFactory
+from operator import truediv
 import random
-
 from collections import defaultdict
+import re
 from pyglet.image import load, ImageGrid, Animation
 from pyglet.window import key
-
 import cocos.layer
 import cocos.sprite
 import cocos.collision_model as cm
 import cocos.euclid as eu
-import time
-
 
 class Actor(cocos.sprite.Sprite):
     def __init__(self, image, x, y):
@@ -19,6 +18,18 @@ class Actor(cocos.sprite.Sprite):
                                      self.width * 0.5,
                                      self.height * 0.5)
 
+    
+    # 이거 수정해야 함
+    # 지금 현재 가로로만 움직임
+    def move_X(self, offset):
+        x = self.position[0]
+        y = self.position[1]
+        self.position = [x + offset, y]
+    def move_Y(self, offset):
+        x = self.position[0]
+        y = self.position[1]
+        self.position = [x, y + offset]
+        self.cshape.center[1] += offset
     def move(self, offset):
         self.position += offset
         self.cshape.center += offset
@@ -37,31 +48,55 @@ class PlayerCannon(Actor):
         super(PlayerCannon, self).__init__('img/cannon.png', x, y)
         self.speed = eu.Vector2(200, 0)
                     
-                    # 경과 시간을 의미함
     def update(self, elapsed):
         pressed = PlayerCannon.KEYS_PRESSED
         space_pressed = pressed[key.SPACE] == 1
         
-        # if PlayerShoot.INSTANCE is None and space_pressed:
-        if PlayerShoot.INSTANCE is None and space_pressed:
+        if space_pressed and self.Check_position():
             self.parent.add(PlayerShoot(self.x, self.y + 50))
 
-        movement = pressed[key.RIGHT] - pressed[key.LEFT]
+
+        #상하 처리
+        movement_y = pressed[key.UP] - pressed[key.DOWN]
+        h = self.height * 0.5
+        if (movement_y != 0 and h <= self.y <= self.parent.width - h):
+            self.move_Y(self.speed * movement_y * elapsed)
+        else:
+            if h >= self.y:
+                if (movement_y < 0):
+                    pass
+                else:
+                    self.move_Y(self.speed * movement_y * elapsed)
+            elif self.y >= self.parent.width - h:
+                if (movement_y > 0):
+                    pass
+                else:
+                    self.move_Y(self.speed * movement_y * elapsed)
+        # 좌우 처리
+        movement_x = pressed[key.RIGHT] - pressed[key.LEFT]
         w = self.width * 0.5 
-        if movement != 0 and w <= self.x <= self.parent.width - w:
-            self.move(self.speed * movement * elapsed)
+        if movement_x != 0 and w <= self.x <= self.parent.width - w:
+            self.move_X(self.speed * movement_x * elapsed)
         else:
             if w >= self.x:
-                if (movement < 0):
+                if (movement_x < 0):
                     pass
                 else:
-                    self.move(self.speed * movement * elapsed)
-            elif self.x >= self.parent.width:
-                if (movement > 0):
+                    self.move_X(self.speed * movement_x * elapsed)
+            elif self.x >= self.parent.width - w:
+                if (movement_x > 0):
                     pass
                 else:
-                    self.move(self.speed * movement * elapsed)
-                    
+                    self.move_X(self.speed * movement_x * elapsed)
+
+    def Check_position(self):
+        if (PlayerShoot.INSTANCE is not None):
+            if (PlayerShoot.INSTANCE.position[1] >= 200):
+                return True
+            else:
+                return False
+        else:
+            return True
 
     def collide(self, other):
         other.kill()
@@ -88,8 +123,7 @@ class GameLayer(cocos.layer.Layer):
         self.create_player()
         self.create_alien_group(100, 300)
         cell = 1.25 * 50
-        self.collman = cm.CollisionManagerGrid(0, w, 0, h, 
-                                               cell, cell)
+        self.collman = cm.CollisionManagerGrid(0, w, 0, h, cell, cell)
         self.schedule(self.update)
 
     def create_player(self):
@@ -127,7 +161,6 @@ class GameLayer(cocos.layer.Layer):
         if random.random() < 0.001:
             self.add(MysteryShip(50, self.height - 50))
 
-
     def collide(self, node):
         if node is not None:
             for other in self.collman.iter_colliding(node):
@@ -149,9 +182,6 @@ class Alien(Actor):
         return Animation.from_image_sequence(seq, 0.5)
     
     TYPES = {
-        # '1': (load_animation('img/alien1.png'), 40),
-        # '2': (load_animation('img/alien2.png'), 20),
-        # '3': (load_animation('img/alien3.png'), 10)
         '1': (load_animation('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\실습코드\\Chapter 2\\code\\img\\alien1.png'), 40),
         '2': (load_animation('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\실습코드\\Chapter 2\\code\\img\\alien2.png'), 20),
         '3': (load_animation('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\실습코드\\Chapter 2\\code\\img\\alien3.png'), 10)
@@ -175,7 +205,7 @@ class AlienColumn(object):
     def __init__(self, x, y):
         alien_types = enumerate(['3', '3', '2', '2', '1'])
         self.aliens = [Alien.from_type(x, y+i*60, alien, self) 
-                       for i, alien in alien_types]
+                        for i, alien in alien_types]
 
     def should_turn(self, d):
         if len(self.aliens) == 0:
@@ -192,7 +222,6 @@ class AlienColumn(object):
             pos = self.aliens[0].position
             return Shoot(pos[0], pos[1] - 50)
         return None
-
 
 class AlienGroup(object):
     def __init__(self, x, y):
@@ -216,7 +245,7 @@ class AlienGroup(object):
 
     def side_reached(self):
         return any(map(lambda c: c.should_turn(self.direction), 
-                       self.columns))
+                        self.columns))
 
     def __iter__(self):
         for column in self.columns:
@@ -269,8 +298,8 @@ class HUD(cocos.layer.Layer):
     def show_game_over(self):
         w, h = cocos.director.director.get_window_size()
         game_over = cocos.text.Label('Game Over', font_size=50,
-                                     anchor_x='center',
-                                     anchor_y='center')
+                                        anchor_x='center',
+                                        anchor_y='center')
         game_over.position = w * 0.5, h * 0.5
         self.add(game_over)
 
@@ -280,7 +309,7 @@ class MysteryShip(Alien):
     def __init__(self, x, y):
         score = random.choice(MysteryShip.SCORES)
         super(MysteryShip, self).__init__('img/alien4.png', x, y, 
-                                          score)
+                                            score)
         self.speed = eu.Vector2(150, 0)
 
     def update(self, elapsed):
@@ -289,7 +318,7 @@ class MysteryShip(Alien):
 
 if __name__ == '__main__':
     cocos.director.director.init(caption='Cocos Invaders', 
-                                 width=800, height=650)
+                                    width=800, height=650)
     main_scene = cocos.scene.Scene()
     hud_layer = HUD()
     main_scene.add(hud_layer, z=1)
