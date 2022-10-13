@@ -89,12 +89,18 @@ StackType::StackType()	// Class constructor.
 }
 
 void StackType::Copy(StackType& anotherStack){
+  StackType tmp_stack;
   NodeType *tempNode;
   tempNode = topPtr;
+
   for (; tempNode->next != nullptr;){
     int number = tempNode->info;
-    anotherStack.Push(number);
+    tmp_stack.Push(number);
     tempNode = tempNode->next;
   }
   anotherStack.Push(tempNode->info);
+  while (!tmp_stack.IsEmpty())
+  {
+  }
+  
 }

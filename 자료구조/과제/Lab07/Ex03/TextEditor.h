@@ -1,69 +1,71 @@
 #include <iostream>
+#include <string.h>
 using namespace std;
 
-template<class ItemType>
-class TextEditor
-{
-private:
-    LineType<ItemType>* listdata;
-    LineType<ItemType>* currentPos;
-    int length;
-public:
-    TextEditor(){
-        head = 0;
-        tail = 0;
-        length = 0;
-        listdata = NULL;
-    };~TextEditor();
-    void RestText();
-    void GoToTop();
-    void GoToBottom();
-    void InsertItem(char newline[]);
-    void Print();
-};
-
-template<class ItemType>
 struct LineType
 {
     char info[80];
-    int* Header;
-    int* Tailer;
+    LineType* next;
+    LineType* before;
 };
 
-template<class ItemType>
-void TextEditor<ItemType>::GoToTop(){
-    while (listdata->Tailer != nullptr){
-        listdata = listdata->Tailer;
-    }
-    listdata = listdata->Header;
-}
-
-template<class ItemType>
-void TextEditor<ItemType>::GoToBottom(){
-    while (listdata->Header != nullptr){
-        listdata = listdata->Hailer;
-    }
-    listdata = listdata->Tailer;
-}
-
-template<class ItemType>
-void TextEditor<ItemType>::InsertItem(char newline[])
+class TextEditor
 {
-    LineType<ItemType> *location;
+private:
+    LineType *pos_line;
+    LineType *head;
+    LineType *tail;
+    int length;
+public:
+    TextEditor(){};
+    ~TextEditor();
+    void ResetText();
+    void GoToTop();
+    void GoToBottom();
+    void Insertline(char newline[]);
+    void Print();
+};
 
-    location = new LineType<ItemType>;
-    location->info = newline;
-    location->next = listData;
-    listData = location;
-    length++;
+LineType *newline(){
+    LineType *new_line;
+    new_line = new LineType;
+    new_line->before = NULL;
+    new_line->next = NULL;
+    return new_line;
 }
 
-template<class ItemType>
-void TextEditor<ItemType>::Print(){
-    LineType<ItemType> *tempPtr = listdata;
-
-    while (tempPtr != NULL){
-        cout << tempPtr->info << " ";
-        tempPtr = tempPtr->Header;
-    }
+TextEditor::TextEditor(){
+    length = 0;
+    head = newline();
+    tail = newline();
+    head->next = tail;
+    tail->before = head;
+    pos_line = head;
 }
+
+// void TextEditor::GoToTop(){
+//     pos_line = head->next;
+// }
+
+// void TextEditor::GoToBottom(){
+//     pos_line = tail->before;
+// }
+
+
+// void TextEditor::Insertline(char newline[])
+// {
+//     LineType *location;
+//     for (int i = 0; newline[i] != 0, i < 80; i++){
+//         location->info[i] = newline[i];
+//     }
+//     location = location->next;
+//     length++;
+// }
+
+// void TextEditor::Print(){
+//     LineType *Line_print = head->next;
+//     while (Line_print != tail){
+//         cout << Line_print->info << "\n";
+//         Line_print = Line_print->next;
+//     }
+// }

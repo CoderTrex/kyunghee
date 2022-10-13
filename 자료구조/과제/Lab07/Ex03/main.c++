@@ -3,9 +3,10 @@
 using namespace std;
 
 int main(){
-    TextEditor<int> tester;
+    TextEditor tester;
+    char arr[10] = "hello";
     for (int i=0; i < 10; i++){
-        tester.InsertItem("hello");
+        tester.Insertline(arr);
     }
     tester.Print();
 }
