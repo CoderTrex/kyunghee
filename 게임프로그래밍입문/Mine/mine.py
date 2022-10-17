@@ -32,6 +32,7 @@ class Game(tk.Frame):
         self.pack()
         menubar = tk.Menu(master)
         filemenu = tk.Menu(menubar, tearoff=0)
+        filemenu.add_command(label="9*9", command= self.)
         filemenu.add_command(label="9*9", command = self.begin)
 
         self.items = {}

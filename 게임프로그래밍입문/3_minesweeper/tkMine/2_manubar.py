@@ -7,10 +7,10 @@ TILE_SIZE = 24      # 지뢰찾기 게임의 타일 크기를 지정
 
 class GameBoard:        # 게임 보드 클래스 생성
     def __init__(self, w, h, mine, frame):      # 게임판의 가로, 세로, 지뢰의 수, 게임판이 표시될 프레임
-        self.imgFlag = tk.PhotoImage(file='C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\3_minesweeper\\tkMine\\img\\flag.png')
-        self.imgWrongFlag = tk.PhotoImage(file='C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\3_minesweeper\\tkMine\\img\\wrongflag.png')
-        self.imgMine = tk.PhotoImage(file='C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\3_minesweeper\\tkMine\\img\\mine.png')
-        self.imgFlaggedMine = tk.PhotoImage(file='C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\3_minesweeper\\tkMine\\img\\flaggedmine.png')     # 게임에 사용되는 4종의 이미지 불러옴
+        self.imgFlag = tk.PhotoImage(file='C:\\KyungHee\\kyunghee\\게임프로그래밍입문\\3_minesweeper\\tkMine\\img\\flag.png')
+        self.imgWrongFlag = tk.PhotoImage(file='C:\\KyungHee\\kyunghee\\게임프로그래밍입문\\3_minesweeper\\tkMine\\img\\flag.png')
+        self.imgMine = tk.PhotoImage(file='C:\\KyungHee\\kyunghee\\게임프로그래밍입문\\3_minesweeper\\tkMine\\img\\flag.png')
+        self.imgFlaggedMine = tk.PhotoImage(file='C:\\KyungHee\\kyunghee\\게임프로그래밍입문\\3_minesweeper\\tkMine\\img\\flag.png')     # 게임에 사용되는 4종의 이미지 불러옴
         self.board = tk.Frame(frame)        # 게임보드의 타일들을 포함할 프레임 'board' 생성
         self.board.pack()
         self.tileLeft = w * h - mine        # 게임에 승리하기 위해 클릭해야 하는 타일의 수를 저장
