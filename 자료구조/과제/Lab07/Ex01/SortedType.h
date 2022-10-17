@@ -81,16 +81,16 @@ struct NodeType
 template <class ItemType>
 void SortedType<ItemType>::PrintReverse()
 {
-  NodeType<int> *location;
-  
-  location = listData;
-  int *arr = (int*)malloc(sizeof(int) * length), len = 0;
-
-  for (int i = 0; length > i; len++, i++){
-    arr[i] = location->info;
-    location = location->next;
+  int *arr = (int *)malloc(sizeof(int) * length);
+  NodeType<ItemType> *tmp;
+  if (!listData)
+    return ;
+  tmp = listData->next;
+  for (int i=0; i<length; i++){
+    arr[i] = tmp->info;
+    tmp = tmp->next;
   }
-  for (; len >= 0; --len){
+  for (int len = length - 1; len >=0; len--){
     cout << arr[len] << " ";
   }
 }

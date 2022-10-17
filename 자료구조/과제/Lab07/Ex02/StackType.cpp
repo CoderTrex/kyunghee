@@ -99,8 +99,8 @@ void StackType::Copy(StackType& anotherStack){
     tempNode = tempNode->next;
   }
   anotherStack.Push(tempNode->info);
-  while (!tmp_stack.IsEmpty())
-  {
+  while (!tmp_stack.IsEmpty()){
+    anotherStack.Push(tmp_stack.Top());
+    tmp_stack.Pop();
   }
-  
 }
