@@ -8,8 +8,6 @@ TILE_SIZE = 24
 
 class Game:
     def __init__(self, w, h, mine, frame):
-        
-        
         self.board = tk.Frame(frame)
         self.board.pack()
         self.tileLeft = w*h - mine     # 게임 승리를 위해 눌어야 하는 지뢰의 수
@@ -94,4 +92,54 @@ class Game:
                 if self.dataBoard[x][y] == 0:
                     for i in range(-1, 2):
                         for j in range(-1, 2):
+                            if (0 <= x + i < self.width and 0 <= y + j < self.height and self.tileBtn[x + i][y + j].winfo_ismapped()):
+                                self.boardClick(x + i, y + j)
                             
+            if self.tileBtnImg[x][y] == 1:
+                self.boardClick(x, y)
+
+
+    def boardRightClick(self, x, y):
+        if not self.disabled:
+            self.tileBtnImg[x][y]
+
+
+
+game = None
+
+mainWindow = tk.Tk()
+scrW = mainWindow.winfo_screenwidth()
+scrH = mainWindow.winfo_screenheight()
+mainWindow.geometry('%dx%d+%d+%d' % (10 * TILE_SIZE, 10 * TILE_SIZE + 64, (scrW - 10 * TILE_SIZE)/2, (scrH - 10 * TILE_SIZE - 64)/2))
+mainWindow.resizable(False, False)
+mainWindow.title('지뢰 찾기')
+mainWindow.lift()       # mainWindow tk 윈도우를 생성, 초기설정
+
+
+
+defaultFont = tk.font.Font(family='맑은 고딕', size=10, weight='bold')
+mainWindow.option_add("*Font", defaultFont)             # mainWindow 기본 폰트 지정
+
+level = tk.IntVar()
+menubar = tk.Menu(mainWindow)
+filemenu = tk.Menu(menubar, tearoff=0)
+filemenu.add_command(label="9*9", command=(lambda: gameStart(mainFrame, 0)))
+filemenu.add_separator()
+filemenu.add_command(label="16*16", command=(lambda: gameStart(mainFrame, 1)))
+filemenu.add_separator()
+filemenu.add_command(label="30*16", command=(lambda: gameStart(mainFrame, 2)))
+filemenu.add_separator()
+filemenu.add_command(label="Exit", command=(lambda: exit()))
+menubar.add_cascade(label="File", menu=filemenu)
+mainWindow.config(menu=menubar)
+
+""" mainWindow 의 GUI 구성 """
+imgFlagCnt = tk.PhotoImage(file='C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\3_minesweeper\\tkMine\\img\\flag.png')
+
+mainFrame = tk.Frame(mainWindow, width=10 * TILE_SIZE, height=10 * TILE_SIZE, padx=11, pady=11, relief='sunken', bd=1)
+mainFrame.pack_propagate(False)     # 게임이 들어갈 mainFrame 생성
+
+
+uiPlace(9, 9)       # mainWindow 위젯 배치 함수
+
+mainWindow.mainloop()
