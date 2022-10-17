@@ -22,14 +22,17 @@ class Actor(cocos.sprite.Sprite):
     # 이거 수정해야 함
     # 지금 현재 가로로만 움직임
     def move_X(self, offset):
-        x = self.position[0]
-        y = self.position[1]
-        self.position = [x + offset, y]
+        # print("self.position : ", self.position)
+        # print("offset : ", offset)
+        # print(self.cshape.center)
+        self.position += offset
+        self.cshape.center += offset
     def move_Y(self, offset):
-        x = self.position[0]
-        y = self.position[1]
-        self.position = [x, y + offset]
-        self.cshape.center[1] += offset
+        # print("self.position : ", self.position)
+        print("offset : ", offset)
+        # print(self.cshape.center)
+        self.position += offset
+        self.cshape.center += offset
     def move(self, offset):
         self.position += offset
         self.cshape.center += offset
@@ -46,7 +49,8 @@ class PlayerCannon(Actor):
 
     def __init__(self, x, y):
         super(PlayerCannon, self).__init__('img/cannon.png', x, y)
-        self.speed = eu.Vector2(200, 0)
+        self.speed_x = eu.Vector2(200, 0)
+        self.speed_y = eu.Vector2(0, 200)
                     
     def update(self, elapsed):
         pressed = PlayerCannon.KEYS_PRESSED
@@ -60,34 +64,34 @@ class PlayerCannon(Actor):
         movement_y = pressed[key.UP] - pressed[key.DOWN]
         h = self.height * 0.5
         if (movement_y != 0 and h <= self.y <= self.parent.width - h):
-            self.move_Y(self.speed * movement_y * elapsed)
+            self.move_Y(self.speed_y * movement_y * elapsed)
         else:
             if h >= self.y:
                 if (movement_y < 0):
                     pass
                 else:
-                    self.move_Y(self.speed * movement_y * elapsed)
+                    self.move_Y(self.speed_y * movement_y * elapsed)
             elif self.y >= self.parent.width - h:
                 if (movement_y > 0):
                     pass
                 else:
-                    self.move_Y(self.speed * movement_y * elapsed)
+                    self.move_Y(self.speed_y * movement_y * elapsed)
         # 좌우 처리
         movement_x = pressed[key.RIGHT] - pressed[key.LEFT]
         w = self.width * 0.5 
         if movement_x != 0 and w <= self.x <= self.parent.width - w:
-            self.move_X(self.speed * movement_x * elapsed)
+            self.move_X(self.speed_x * movement_x * elapsed)
         else:
             if w >= self.x:
                 if (movement_x < 0):
                     pass
                 else:
-                    self.move_X(self.speed * movement_x * elapsed)
+                    self.move_X(self.speed_x * movement_x * elapsed)
             elif self.x >= self.parent.width - w:
                 if (movement_x > 0):
                     pass
                 else:
-                    self.move_X(self.speed * movement_x * elapsed)
+                    self.move_X(self.speed_x * movement_x * elapsed)
 
     def Check_position(self):
         if (PlayerShoot.INSTANCE is not None):
