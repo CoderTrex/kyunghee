@@ -9,7 +9,7 @@ import cocos.collision_model as cm
 import pyglet.image
 from pyglet.image import Animation
 
-raw = pyglet.image.load('assets/explosion.png')
+raw = pyglet.image.load('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\실습코드\\Chapter 3\\code\\towerdefense\\assets/explosion.png')
 seq = pyglet.image.ImageGrid(raw, 1, 8)
 explosion_img = Animation.from_image_sequence(seq, 0.07, False)
 
