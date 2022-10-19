@@ -43,8 +43,8 @@ def get_scenario():
     bunker_position = (528, 430)
     enemy_start = (-80, 110)
     sc = Scenario('map0', turret_slots,
-                  bunker_position, enemy_start)
+                    bunker_position, enemy_start)
     sc.actions = [move(610, 0), LEFT, move(0, 160),
-                  LEFT, move(-415, 0), RIGHT,
-                  move(0, 160), RIGHT, move(420, 0)]
+                    LEFT, move(-415, 0), RIGHT,
+                    move(0, 160), RIGHT, move(420, 0)]
     return sc

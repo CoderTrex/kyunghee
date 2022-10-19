@@ -64,7 +64,8 @@ class GameLayer(cocos.layer.Layer):
             turret.collide(obj)
         for obj in self.coll_man.iter_colliding(self.bunker):
             self.bunker.collide(obj)
-
+        
+        # 적 등장 확률 조정
         if random.random() < 0.005:
             self.create_enemy()
 
@@ -89,7 +90,9 @@ class GameLayer(cocos.layer.Layer):
         elif isinstance(obj, actors.Enemy) and obj.destroyed:
             self.score += obj.score
             self.points += 5
-        super(GameLayer, self).remove(obj)
+        # 없어진 것을 지우라는 명령이 다시 발생하기 때문에 오류가 발생함.
+        if obj.is_running: 
+            super(GameLayer, self).remove(obj)
 
 
 class HUD(cocos.layer.Layer):

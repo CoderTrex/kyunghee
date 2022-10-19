@@ -8,7 +8,8 @@ import cocos.collision_model as cm
 
 import pyglet.image
 from pyglet.image import Animation
-raw = pyglet.image.load('게임프로그래밍입문\\5_towerDefends\실습코드\\towerdefense\\assets\explosion.png')
+Chapter 3\code\towerdefense\assets\explosion.png
+raw = pyglet.image.load('assets/explosion.png')
 seq = pyglet.image.ImageGrid(raw, 1, 8)
 explosion_img = Animation.from_image_sequence(seq, 0.07, False)
 
@@ -75,10 +76,8 @@ class Turret(Actor):
     def collide(self, other):
         self.target = other
         if self.target is not None:
-            # 백터값을 구해서 각돌르 구한다.
             x, y = other.x - self.x, other.y - self.y
-            angle = -math.atan2(y, x) #ccw로 표핸해야 하기 때문에 -를 붙인다.
-            # 구한 각도로 회전 시킨다.
+            angle = -math.atan2(y, x)
             self.rotation = math.degrees(angle)
 
 
@@ -106,7 +105,7 @@ class Bunker(Actor):
     def __init__(self, x, y):
         super(Bunker, self).__init__('bunker.png', x, y)
         self.hp = 100
-    
+
     def collide(self, other):
         if isinstance(other, Enemy):
             self.hp -= 10
