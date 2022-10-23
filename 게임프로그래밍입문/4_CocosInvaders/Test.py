@@ -22,15 +22,10 @@ class Actor(cocos.sprite.Sprite):
     # 이거 수정해야 함
     # 지금 현재 가로로만 움직임
     def move_X(self, offset):
-        # print("self.position : ", self.position)
-        # print("offset : ", offset)
-        # print(self.cshape.center)
         self.position += offset
         self.cshape.center += offset
     def move_Y(self, offset):
-        # print("self.position : ", self.position)
         print("offset : ", offset)
-        # print(self.cshape.center)
         self.position += offset
         self.cshape.center += offset
     def move(self, offset):
@@ -186,9 +181,9 @@ class Alien(Actor):
         return Animation.from_image_sequence(seq, 0.5)
     
     TYPES = {
-        '1': (load_animation('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\실습코드\\Chapter 2\\code\\img\\alien1.png'), 40),
-        '2': (load_animation('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\실습코드\\Chapter 2\\code\\img\\alien2.png'), 20),
-        '3': (load_animation('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\실습코드\\Chapter 2\\code\\img\\alien3.png'), 10)
+        '1': (load_animation('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\4_CocosInvaders\\img\\alien1.png'), 40),
+        '2': (load_animation('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\4_CocosInvaders\\img\\alien2.png'), 20),
+        '3': (load_animation('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\4_CocosInvaders\\img\\alien3.png'), 10)
     }
 
     def from_type(x, y, alien_type, column):
