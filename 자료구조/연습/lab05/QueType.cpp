@@ -1,4 +1,5 @@
 #include "QueType.h"
+#define MAX 10000;
 
 QueType::QueType(int max)
 // Parameterized class constructor
@@ -64,7 +65,7 @@ void QueType::Enqueue(ItemType newItem)
     rear = (rear + 1) % maxQue;
     items[rear] = newItem;
   }
-  FindMin();
+  // FindMin();
 }
 
 void QueType::Dequeue(ItemType& item)
@@ -81,25 +82,24 @@ void QueType::Dequeue(ItemType& item)
   }
 }
 
-void QueType::MinDeque(ItemType& item)
-{
-  if (IsEmpty())
-    throw EmptyQueue();
-  else
-  {
-    FindMin();
-    item = items[min_pos];
-    items[min_pos] = -1;
-    minus_pos = min_pos;
-  }
-}
-
-void QueType::FindMin(){
-  int min = INT_MAX;
-  for (int i = (front + 1) % maxQue; i < (rear + 1) % maxQue; i++){
-    if (i != min_pos && items[i] != -1 && items[i] < min){
-      min_pos = i;
-      min = items[i];
+void QueType::MinDeque(ItemType& item){
+  int result = MAX;
+  int result_num = 0;
+  for (int i = 0; i < rear - front; i++){
+    if (result > items[i] && items[i] != -1){
+        item = items[i];
+        result_num = i;
     }
   }
+  items[result_num] = -1;
 }
+
+// void QueType::FindMin(){
+//   int min = INT_MAX;
+//   for (int i = (front + 1) % maxQue; i < (rear + 1) % maxQue; i++){
+//     if (i != min_pos && items[i] != -1 && items[i] < min){
+//       min_pos = i;
+//       min = items[i];
+//     }
+//   }
+// }
