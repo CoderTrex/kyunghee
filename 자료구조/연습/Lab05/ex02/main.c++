@@ -14,6 +14,8 @@ void ReplaceItem(QueType &queue, int oldItem, int newItem){
         }
     }
     while (!temp.IsEmpty()){
+        temp.Dequeue(item);
+        queue.Enqueue(item);
     }
 }
 
@@ -28,4 +30,8 @@ int main(){
     queue.Enqueue(18);
     queue.Enqueue(19);
     ReplaceItem(queue, 10, 83);
+    for (int i =0; i < 6; i++){
+        queue.Dequeue(item);
+        cout << item << " ";
+    }
 }
