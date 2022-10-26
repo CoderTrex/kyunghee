@@ -58,24 +58,27 @@ class GameLayer(cocos.layer.Layer):
             line = cocos.draw.Line((0, y*self.square), (self.width, y*self.square), (255, 0, 255, 255))
             self.add(line)
 
+        # 스프라이트가 드어가는 위치
         self.disk = [[None for i in range(self.column)] for j in range(self.row)]
 
         for y in range (0, self.row) :
             for x in range (0, self.column) :
+                # 센터값 찾고 위치에 돌을 놓게 됨
                 centerPt = eu.Vector2(x*self.square + self.square/2, y*self.square + self.square/2)
                 self.disk[y][x] = cocos.sprite.Sprite('ball.png', position = centerPt, color = (255, 255, 255))
                 self.add(self.disk[y][x])
 
         self.setup()
+        # 사람 턴
         self.turn = GameLayer.PERSON
-        self.count = 0
+        self.count = 0 #딜레이를 설정함
         self.schedule(self.update)
 
     def setup(self):
         for y in range (0, self.row) :
             for x in range (0, self.column) :
                 self.table[y][x] = 0
-
+        # 초기돌 설정
         self.table[3][3] = GameLayer.PERSON
         self.table[3][4] = GameLayer.COMPUTER
         self.table[4][3] = GameLayer.COMPUTER
@@ -119,6 +122,9 @@ class GameLayer(cocos.layer.Layer):
         if self.turn == GameLayer.COMPUTER and self.count > 100:
             self.computer()
 
+    
+    # 뒤집히는 좌표의 리스트를 반환함
+    # 좌표와 누구의 턴인지, 보드를 호출한다.
     def isPossible(self, x, y, turn, board):
         rtnList = list()
         
@@ -126,12 +132,17 @@ class GameLayer(cocos.layer.Layer):
 
         for dirX in range(-1, 2):
             for dirY in range(-1,2):
+                # 자신의 위치는 건너뜀
                 if dirX == 0 and dirY == 0: continue
+                # 경계를 뛰어넘는 위치의 값은 계산하지 않음(바운더리 계산)
                 if(x+dirX < 0 or x+dirX >= self.column): continue
                 if(y+dirY < 0 or y+dirY >= self.row): continue
-
+                
+                
                 xList = list()
                 yList = list()
+                
+                
                 if dirX == 0:
                     for yy in range(y+dirY*2, self.row*dirY,dirY):
                         if(yy < 0 or yy >= self.row): break
