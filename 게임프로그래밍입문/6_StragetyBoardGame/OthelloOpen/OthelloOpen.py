@@ -17,9 +17,9 @@ class HUD(cocos.layer.Layer):
     def show_game_over(self, winner):
         w, h = cocos.director.director.get_window_size()
         game_over = cocos.text.Label(winner, font_size=50,
-                                     anchor_x='center',
-                                     anchor_y='center',
-                                     color=(50, 50, 255, 255))
+                                    anchor_x='center',
+                                    anchor_y='center',
+                                    color=(50, 50, 255, 255))
         game_over.position = w * 0.5, h * 0.5
         self.add(game_over)
 
@@ -144,12 +144,14 @@ class GameLayer(cocos.layer.Layer):
                 
                 
                 if dirX == 0:
-                    for yy in range(y+dirY*2, self.row*dirY,dirY):
+                    # 계산의 바운더리를 넓게 계산함
+                    for yy in range(y+dirY*2, self.row*dirY, dirY):
+                        # 넓은 바운더리의 처리는 break로 예외 처리 함
                         if(yy < 0 or yy >= self.row): break
                         xList.append(x)
                         yList.append(yy)
                 elif dirY == 0:
-                    for xx in range(x+dirX*2, self.column*dirX,dirX):
+                    for xx in range(x+dirX*2, self.column*dirX, dirX):
                         if(xx < 0 or xx >= self.column): break
                         xList.append(xx)
                         yList.append(y)
@@ -162,18 +164,23 @@ class GameLayer(cocos.layer.Layer):
 
                 bDetected = False
                 revList = []
+                # 상대방 돌인지 아닌지 확인함 맞다면 진행함.
                 if board[y+dirY][x+dirX] == turn*-1:
                     revList.append((x+dirX, y+dirY))
                     for xx, yy in zip(xList, yList):
                         if xx >= self.column or xx < 0 or yy >= self.row or yy < 0:
                             break
+                        # 만약 상대방 돌이라면 리스트에 계속해서 추가함.
                         if board[yy][xx] == turn*-1:
                             revList.append((xx, yy))
+                        # 내 돌을 만나면 종료하고 트루를 반환함
                         if board[yy][xx] == turn:
                             bDetected = True
                             break
                         if board[yy][xx] == 0:
                             break
+                    # 자신의 돌을 만났는지 여부를 확인하고 만나지 않았다면, 빈리스트를 반환함.
+                    
                     if(bDetected == False): revList = []
 
                 rtnList += revList;
@@ -211,9 +218,10 @@ class GameLayer(cocos.layer.Layer):
                 self.table[revY][revX] = GameLayer.PERSON
             
         self.turn *= -1
+        # 딜레이 시간 초기화
         self.count = 0     
             
-    def computer(self):       
+    def computer(self):  
         move = self.minimax(GameLayer.COMPUTER)
 
         if len(move) > 0:
@@ -243,7 +251,7 @@ class GameLayer(cocos.layer.Layer):
             else:
                 scores[i] = self.minMove(boardCopy, 2, alpha, beta)
 
-        maxIndex = np.argmax(scores)
+        maxIndex = np.argmax(scores) #가장 큰 것에 대한 인덱스 값
 
         return moves[maxIndex]
 
