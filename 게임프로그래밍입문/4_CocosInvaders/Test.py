@@ -23,7 +23,6 @@ class Actor(cocos.sprite.Sprite):
         self.position += offset
         self.cshape.center += offset
     def move_Y(self, offset):
-        print("offset : ", offset)
         self.position += offset
         self.cshape.center += offset
     def move(self, offset):
@@ -50,7 +49,7 @@ class PlayerCannon(Actor):
         space_pressed = pressed[key.SPACE] == 1
         if space_pressed and self.Check_position():
             self.parent.add(PlayerShoot(self.x, self.y + 50))
-
+            
         #상하 처리
         movement_y = pressed[key.UP] - pressed[key.DOWN]
         h = self.height * 0.5
@@ -142,7 +141,9 @@ class GameLayer(cocos.layer.Layer):
             self.collman.add(node)
             if not self.collman.knows(node):
                 self.remove(node)
+        
         self.collide(PlayerShoot.INSTANCE)
+        
         if self.collide(self.player):
             self.respawn_player()
 
@@ -312,8 +313,7 @@ class MysteryShip(Alien):
 
 
 if __name__ == '__main__':
-    cocos.director.director.init(caption='Cocos Invaders', 
-                                    width=800, height=650)
+    cocos.director.director.init(caption='Cocos Invaders', width=800, height=650)
     main_scene = cocos.scene.Scene()
     hud_layer = HUD()
     main_scene.add(hud_layer, z=1)
