@@ -31,6 +31,7 @@ class Actor(cocos.sprite.Sprite):
 
     def collide(self, other):
         pass
+    
 
 class PlayerCannon(Actor, cocos.layer.Layer):
     #static no!
@@ -44,15 +45,9 @@ class PlayerCannon(Actor, cocos.layer.Layer):
     def update(self, elapsed):
         pressed = PlayerCannon.KEYS_PRESSED
         space_pressed = pressed[key.SPACE] == 1
-        pause_pressed = pressed[key.ESCAPE] == 1
         if space_pressed and self.Check_position():
             basket_bullet.append(PlayerShoot(self.x, self.y + 50))
             self.parent.add(PlayerShoot(self.x, self.y + 50))
-        
-        if pause_pressed == 1:
-            self.hud.sho
-        
-        
         
         #상하 처리
         movement_y = pressed[key.UP] - pressed[key.DOWN]
@@ -167,9 +162,6 @@ class GameLayer(cocos.layer.Layer):
         if random.random() < 0.001:
             self.add(MysteryShip(50, self.height - 50))
         
-        #pause 처리
-        if (pause_pressed == 1):
-            self.hud
         
     def collide(self, node):
         if node is not None:
