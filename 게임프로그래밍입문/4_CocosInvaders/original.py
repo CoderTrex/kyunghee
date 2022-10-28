@@ -1,3 +1,4 @@
+from asyncio import base_tasks
 from logging import setLogRecordFactory
 from operator import truediv
 import random
@@ -10,6 +11,8 @@ import cocos.sprite
 import cocos.collision_model as cm
 import cocos.euclid as eu
 
+basket_bullet = []
+
 class Actor(cocos.sprite.Sprite):
     def __init__(self, image, x, y):
         super(Actor, self).__init__(image)
@@ -17,14 +20,8 @@ class Actor(cocos.sprite.Sprite):
         self.cshape = cm.AARectShape(self.position,
                                      self.width * 0.5,
                                      self.height * 0.5)
-    # 이거 수정해야 함
-    # 지금 현재 가로로만 움직임
-    def move_X(self, offset):
-        self.position += offset
-        self.cshape.center += offset
-    def move_Y(self, offset):
-        self.position += offset
-        self.cshape.center += offset
+        self.basket_bullet = []
+        
     def move(self, offset):
         self.position += offset
         self.cshape.center += offset
@@ -35,7 +32,7 @@ class Actor(cocos.sprite.Sprite):
     def collide(self, other):
         pass
 
-class PlayerCannon(Actor):
+class PlayerCannon(Actor, cocos.layer.Layer):
     #static no!
     KEYS_PRESSED = defaultdict(int)
 
@@ -47,42 +44,49 @@ class PlayerCannon(Actor):
     def update(self, elapsed):
         pressed = PlayerCannon.KEYS_PRESSED
         space_pressed = pressed[key.SPACE] == 1
+        pause_pressed = pressed[key.ESCAPE] == 1
         if space_pressed and self.Check_position():
+            basket_bullet.append(PlayerShoot(self.x, self.y + 50))
             self.parent.add(PlayerShoot(self.x, self.y + 50))
-
+        
+        if pause_pressed == 1:
+            self.hud.sho
+        
+        
+        
         #상하 처리
         movement_y = pressed[key.UP] - pressed[key.DOWN]
         h = self.height * 0.5
-        if (movement_y != 0 and h <= self.y <= self.parent.width - h):
-            self.move_Y(self.speed_y * movement_y * elapsed)
+        if (movement_y != 0 and h <= self.y <= self.parent.height - h):
+            self.move(self.speed_y * movement_y * elapsed)
         else:
             if h >= self.y:
                 if (movement_y < 0):
                     pass
                 else:
-                    self.move_Y(self.speed_y * movement_y * elapsed)
-            elif self.y >= self.parent.width - h:
+                    self.move(self.speed_y * movement_y * elapsed)
+            elif self.y >= self.parent.height - h:
                 if (movement_y > 0):
                     pass
                 else:
-                    self.move_Y(self.speed_y * movement_y * elapsed)
+                    self.move(self.speed_y * movement_y * elapsed)
 
         # 좌우 처리
         movement_x = pressed[key.RIGHT] - pressed[key.LEFT]
         w = self.width * 0.5 
         if movement_x != 0 and w <= self.x <= self.parent.width - w:
-            self.move_X(self.speed_x * movement_x * elapsed)
+            self.move(self.speed_x * movement_x * elapsed)
         else:
             if w >= self.x:
                 if (movement_x < 0):
                     pass
                 else:
-                    self.move_X(self.speed_x * movement_x * elapsed)
+                    self.move(self.speed_x * movement_x * elapsed)
             elif self.x >= self.parent.width - w:
                 if (movement_x > 0):
                     pass
                 else:
-                    self.move_X(self.speed_x * movement_x * elapsed)
+                    self.move(self.speed_x * movement_x * elapsed)
 
     def Check_position(self):
         if (PlayerShoot.INSTANCE is not None):
@@ -98,6 +102,7 @@ class PlayerCannon(Actor):
         self.kill()
 
 class GameLayer(cocos.layer.Layer):
+    # KEYS_PRESSED = defaultdict(int)
     is_event_handler = True
 
     def on_key_press(self, k, _):
@@ -136,14 +141,17 @@ class GameLayer(cocos.layer.Layer):
             self.add(alien)
 
     def update(self, dt):
+        # pressed = GameLayer.KEYS_PRESSED
+        # pause_pressed = pressed[key.ESCAPE] == 1
         self.collman.clear()
         for _, node in self.children:
             self.collman.add(node)
             if not self.collman.knows(node):
                 self.remove(node)
-        
-        self.collide(PlayerShoot.INSTANCE)
-        
+
+        for i in basket_bullet:
+            self.collide(i.INSTANCE)
+
         if self.collide(self.player):
             self.respawn_player()
 
@@ -158,9 +166,12 @@ class GameLayer(cocos.layer.Layer):
         self.alien_group.update(dt)
         if random.random() < 0.001:
             self.add(MysteryShip(50, self.height - 50))
-
+        
+        #pause 처리
+        if (pause_pressed == 1):
+            self.hud
+        
     def collide(self, node):
-        # 의심
         if node is not None:
             for other in self.collman.iter_colliding(node):
                 node.collide(other)
@@ -274,6 +285,7 @@ class PlayerShoot(Shoot):
 
     def on_exit(self):
         super(PlayerShoot, self).on_exit()
+        del basket_bullet[0]
         PlayerShoot.INSTANCE = None
 
 class HUD(cocos.layer.Layer):
@@ -295,11 +307,15 @@ class HUD(cocos.layer.Layer):
 
     def show_game_over(self):
         w, h = cocos.director.director.get_window_size()
-        game_over = cocos.text.Label('Game Over', font_size=50,
-                                        anchor_x='center',
-                                        anchor_y='center')
+        game_over = cocos.text.Label('Game Over', font_size=50, anchor_x='center', anchor_y='center')
         game_over.position = w * 0.5, h * 0.5
         self.add(game_over)
+    
+    def pause(self):
+        w, h = cocos.director.director.get_window_size()
+        pause = cocos.text.Label('pause', font_size=50, anchor_x='center', anchor_y='center')
+        pause.position = w * 0.5, h * 0.5
+        self.add(pause)
 
 class MysteryShip(Alien):
     SCORES = [10, 50, 100, 200]

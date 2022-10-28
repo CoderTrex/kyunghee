@@ -149,12 +149,9 @@ class Alien(Actor):
         return Animation.from_image_sequence(seq, 0.5)
     
     TYPES = {
-        # '1': (load_animation('img/alien1.png'), 40),
-        # '2': (load_animation('img/alien2.png'), 20),
-        # '3': (load_animation('img/alien3.png'), 10)
-        '1': (load_animation('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\실습코드\\Chapter 2\\code\\img\\alien1.png'), 40),
-        '2': (load_animation('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\실습코드\\Chapter 2\\code\\img\\alien2.png'), 20),
-        '3': (load_animation('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\실습코드\\Chapter 2\\code\\img\\alien3.png'), 10)
+        '1': (load_animation('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\4_CocosInvaders\\img\\alien1.png'), 40),
+        '2': (load_animation('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\4_CocosInvaders\\img\\alien1.png'), 20),
+        '3': (load_animation('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\4_CocosInvaders\\img\\alien1.png'), 10),
     }
 
     def from_type(x, y, alien_type, column):

@@ -17,14 +17,6 @@ class Actor(cocos.sprite.Sprite):
         self.cshape = cm.AARectShape(self.position,
                                      self.width * 0.5,
                                      self.height * 0.5)
-    # 이거 수정해야 함
-    # 지금 현재 가로로만 움직임
-    def move_X(self, offset):
-        self.position += offset
-        self.cshape.center += offset
-    def move_Y(self, offset):
-        self.position += offset
-        self.cshape.center += offset
     def move(self, offset):
         self.position += offset
         self.cshape.center += offset
@@ -43,50 +35,50 @@ class PlayerCannon(Actor):
         super(PlayerCannon, self).__init__('img/cannon.png', x, y)
         self.speed_x = eu.Vector2(200, 0)
         self.speed_y = eu.Vector2(0, 200)
-                    
+
     def update(self, elapsed):
         pressed = PlayerCannon.KEYS_PRESSED
         space_pressed = pressed[key.SPACE] == 1
         if space_pressed and self.Check_position():
             self.parent.add(PlayerShoot(self.x, self.y + 50))
-            
+
         #상하 처리
         movement_y = pressed[key.UP] - pressed[key.DOWN]
         h = self.height * 0.5
         if (movement_y != 0 and h <= self.y <= self.parent.width - h):
-            self.move_Y(self.speed_y * movement_y * elapsed)
+            self.move(self.speed_y * movement_y * elapsed)
         else:
             if h >= self.y:
                 if (movement_y < 0):
                     pass
                 else:
-                    self.move_Y(self.speed_y * movement_y * elapsed)
+                    self.move(self.speed_y * movement_y * elapsed)
             elif self.y >= self.parent.width - h:
                 if (movement_y > 0):
                     pass
                 else:
-                    self.move_Y(self.speed_y * movement_y * elapsed)
+                    self.move(self.speed_y * movement_y * elapsed)
 
         # 좌우 처리
         movement_x = pressed[key.RIGHT] - pressed[key.LEFT]
         w = self.width * 0.5 
         if movement_x != 0 and w <= self.x <= self.parent.width - w:
-            self.move_X(self.speed_x * movement_x * elapsed)
+            self.move(self.speed_x * movement_x * elapsed)
         else:
             if w >= self.x:
                 if (movement_x < 0):
                     pass
                 else:
-                    self.move_X(self.speed_x * movement_x * elapsed)
+                    self.move(self.speed_x * movement_x * elapsed)
             elif self.x >= self.parent.width - w:
                 if (movement_x > 0):
                     pass
                 else:
-                    self.move_X(self.speed_x * movement_x * elapsed)
+                    self.move(self.speed_x * movement_x * elapsed)
 
     def Check_position(self):
         if (PlayerShoot.INSTANCE is not None):
-            if (PlayerShoot.INSTANCE.position[1] >= self.position[1] + 200):
+            if (PlayerShoot.INSTANCE.position[1] >= self.position[1] + 300):
                 return True
             else:
                 return False
@@ -138,10 +130,20 @@ class GameLayer(cocos.layer.Layer):
     def update(self, dt):
         self.collman.clear()
         for _, node in self.children:
+            print(node)
             self.collman.add(node)
             if not self.collman.knows(node):
                 self.remove(node)
         
+        self.collide(PlayerShoot.INSTANCE)
+        self.collide(PlayerShoot.INSTANCE)
+        self.collide(PlayerShoot.INSTANCE)
+        self.collide(PlayerShoot.INSTANCE)
+        self.collide(PlayerShoot.INSTANCE)
+        self.collide(PlayerShoot.INSTANCE)
+        self.collide(PlayerShoot.INSTANCE)
+        self.collide(PlayerShoot.INSTANCE)
+        self.collide(PlayerShoot.INSTANCE)
         self.collide(PlayerShoot.INSTANCE)
         
         if self.collide(self.player):
@@ -154,11 +156,13 @@ class GameLayer(cocos.layer.Layer):
 
         for _, node in self.children:
             node.update(dt)
+    
         self.alien_group.update(dt)
         if random.random() < 0.001:
             self.add(MysteryShip(50, self.height - 50))
 
     def collide(self, node):
+        # 의심
         if node is not None:
             for other in self.collman.iter_colliding(node):
                 node.collide(other)
@@ -257,7 +261,7 @@ class Shoot(Actor):
         self.move(self.speed * elapsed)
 
 class PlayerShoot(Shoot):
-    INSTANCE = None
+    INSTANCE =  None
 
     def __init__(self, x, y):
         super(PlayerShoot, self).__init__(x, y, 'img/laser.png')
@@ -313,7 +317,8 @@ class MysteryShip(Alien):
 
 
 if __name__ == '__main__':
-    cocos.director.director.init(caption='Cocos Invaders', width=800, height=650)
+    cocos.director.director.init(caption='Cocos Invaders', 
+                                    width=800, height=650)
     main_scene = cocos.scene.Scene()
     hud_layer = HUD()
     main_scene.add(hud_layer, z=1)
