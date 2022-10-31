@@ -4,6 +4,7 @@ from operator import truediv
 import random
 from collections import defaultdict
 import re
+from time import sleep
 from pyglet.image import load, ImageGrid, Animation
 from pyglet.window import key
 import cocos.layer
@@ -11,6 +12,7 @@ import cocos.sprite
 import cocos.collision_model as cm
 import cocos.euclid as eu
 
+# 전역 번수로 설정한다. 이는 발사된 총알을 전부다 담는다.
 basket_bullet = []
 
 class Actor(cocos.sprite.Sprite):
@@ -46,6 +48,7 @@ class PlayerCannon(Actor, cocos.layer.Layer):
         pressed = PlayerCannon.KEYS_PRESSED
         space_pressed = pressed[key.SPACE] == 1
         if space_pressed and self.Check_position():
+            # 추가되는 playershoot를 리스트에 추가해준다.
             basket_bullet.append(PlayerShoot(self.x, self.y + 50))
             self.parent.add(PlayerShoot(self.x, self.y + 50))
         
@@ -69,22 +72,31 @@ class PlayerCannon(Actor, cocos.layer.Layer):
         # 좌우 처리
         movement_x = pressed[key.RIGHT] - pressed[key.LEFT]
         w = self.width * 0.5 
+        # 움직임이 0이 아니고, 좌우 거리에 어느 정도 거리
+        # (왼쪽 끝부터 자신의 x축 거리의 반절거리, 끝보다 자신의 반절보다 약간 짧은 거리)를 두고 범위를 정한다.
         if movement_x != 0 and w <= self.x <= self.parent.width - w:
             self.move(self.speed_x * movement_x * elapsed)
         else:
+            # 만약 더 작은 범위에 있다면 
             if w >= self.x:
+                # 왼쪽으로 가는 커맨드는 무시한다.
                 if (movement_x < 0):
                     pass
+                # 그 외의 x축으로의 이동은 실행한다.
                 else:
                     self.move(self.speed_x * movement_x * elapsed)
+            # 더 큰 범위를 가는 커맨드를 무시한다.
             elif self.x >= self.parent.width - w:
+                # 오른쪽으로 가는 커맨드는 무시한다.
                 if (movement_x > 0):
                     pass
+                # 그 외의 x축으로의 이동은 실행한다.
                 else:
                     self.move(self.speed_x * movement_x * elapsed)
 
     def Check_position(self):
         if (PlayerShoot.INSTANCE is not None):
+            # 만약에 playershoot의 위치가 현재 플레이어의 위치보다 높아지면 출력이 됨 -> 자연스러운 연발로 나가는 것이 구현이 됨
             if (PlayerShoot.INSTANCE.position[1] >= self.position[1] + 200):
                 return True
             else:
@@ -136,14 +148,14 @@ class GameLayer(cocos.layer.Layer):
             self.add(alien)
 
     def update(self, dt):
-        # pressed = GameLayer.KEYS_PRESSED
-        # pause_pressed = pressed[key.ESCAPE] == 1
         self.collman.clear()
         for _, node in self.children:
             self.collman.add(node)
             if not self.collman.knows(node):
                 self.remove(node)
-
+        
+        # basket_bullet 이라는 배열에 총알을 담아 두고 for 문을 돌면서 self.collide()에 넣어서 진행한다.
+        # 현재 충돌이 되지 않는 것은 업데이트를 진행해도 처음 발사된 sprite만 충돌 처리를 했기 때문이기에 이런 방식으로 전체를 순환해준다.
         for i in basket_bullet:
             self.collide(i.INSTANCE)
 
@@ -159,7 +171,7 @@ class GameLayer(cocos.layer.Layer):
             node.update(dt)
     
         self.alien_group.update(dt)
-        if random.random() < 0.001:
+        if random.random() < 0.01:
             self.add(MysteryShip(50, self.height - 50))
         
         
@@ -243,7 +255,7 @@ class AlienGroup(object):
                 self.direction *= -1  
                 offset = eu.Vector2(0, -10)
             for alien in self:
-                alien.move(offset)
+                alien.move(offset)  
 
     def side_reached(self):
         return any(map(lambda c: c.should_turn(self.direction), 
@@ -257,7 +269,8 @@ class AlienGroup(object):
 class Shoot(Actor):
     def __init__(self, x, y, img='img/shoot.png'):
         super(Shoot, self).__init__(img, x, y)
-        self.speed = eu.Vector2(0, -400)
+        i = random.randrange(-200, 200)
+        self.speed = eu.Vector2(i, -400)
     def update(self, elapsed):
         self.move(self.speed * elapsed)
 
@@ -316,12 +329,24 @@ class MysteryShip(Alien):
         score = random.choice(MysteryShip.SCORES)
         super(MysteryShip, self).__init__('img/alien4.png', x, y, 
                                             score)
-        self.speed = eu.Vector2(150, 0)
-
+        self.speed_1 = eu.Vector2(900, 0)
+        self.speed_2 = eu.Vector2(0, -900)
+        self.speed_3 = eu.Vector2(-900, 0)
+        self.speed_4 = eu.Vector2(0, 900)
+        
+        
     def update(self, elapsed):
-        self.move(self.speed * elapsed)
-
-
+        print(self.x)
+        if(self.x < self.parent.width - 50 and self.y==600):
+            self.move(self.speed_1 * elapsed)
+        elif (self.x > self.parent.width - 50 and self.y>130):
+            self.move(self.speed_2 * elapsed)
+        elif (self.x > 50 and self.y <= 130):
+            self.move(self.speed_3 * elapsed)
+        else:
+            self.move(self.speed_4 * elapsed)
+        
+        
 if __name__ == '__main__':
     cocos.director.director.init(caption='Cocos Invaders', 
                                     width=800, height=650)
