@@ -24,8 +24,9 @@ float SqrRoot_non_recursion(float number, float approx, float tol)
 }
 
 int main(){
-    float result;
-    // result = SqrRoot_recursion(2, 1, 0.1);
-    result = SqrRoot_non_recursion(2, 1, 0.1);
-    cout << result << endl;
+    float result_A, result_B;
+    result_A = SqrRoot_recursion(2, 1, 0.1);
+    result_B = SqrRoot_non_recursion(2, 1, 0.1);
+    cout << "recursion     : "<< result_A << endl;
+    cout << "non_recursion : " << result_B << endl;
 }

@@ -7,4 +7,5 @@ int main(){
     list.InsertItem(2);
     list.InsertItem(7);
     list.InsertItem(5);
+    list.PrintMinLoc();
 }

@@ -261,11 +261,14 @@ ItemType UnsortedType<ItemType>::SumSquares_d(NodeType<ItemType>* list){
 
 template<class ItemType>
 ItemType UnsortedType<ItemType>::SumSquares_e(NodeType<ItemType>* list){
-  int sum = list->info^2;
-  if(list->next ==NULL)
+
+  if(list ==NULL)
     return 0; 
+  else if (list->next == NULL){
+    return list->info*list->info;
+  }
   else{
-    return (SumSquares_e(list->next)^2);
+    return (SumSquares_e(list->next) + list->info * list->info);
   }
 };
 

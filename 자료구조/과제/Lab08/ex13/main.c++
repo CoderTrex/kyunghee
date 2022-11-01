@@ -3,7 +3,7 @@ using namespace std;
 
 int fibo(int num){
     if (num == 0)
-        return 1;
+        return 0;
     else if (num == 1)
         return 1;
     else
@@ -11,25 +11,27 @@ int fibo(int num){
 }
 
 int Fibonacci_non_recursive(int n){
-    int result = 0, first = 0, second = 1;
-    if (n == 1)
+    int first = 0, second = 1;
+
+    if (n == 0)
         return 0;
-    else if (n == 2){
+    else if (n == 1){
         return 1;
     }
-    while (n-- > 2){
-        int tmp = first;
+    for (int i = 0; i < n - 1; i++){
+        int tmp = first + second;
         first = second;
-        second= tmp + second;
-        result += first + second;
+        second= tmp;
     }
-    return result;
+    return second;
     
 }
 
 int main(){
+    // 0    1    1    2    3    5    8    13   21   34   55   89
     int result;
-    result = fibo(6) - 1;
-    result = Fibonacci_non_recursive(6);
-    cout << result << endl;
+    result = fibo(11);
+    cout << "recursion     : " << result << endl;
+    result = Fibonacci_non_recursive(11);
+    cout << "non_recursion : " << result << endl;
 }

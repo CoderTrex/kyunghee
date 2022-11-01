@@ -292,29 +292,26 @@ void UnsortedType<ItemType>::PrintSumSquares()
 
 template <class ItemType>
 void UnsortedType<ItemType>::Sort(NodeType<ItemType> *location){
-  int check = location->info;
-  while (location != NULL){
-    if (location->next->info < check){
-      check = location->next->info;
-      location->next->info = location->info;
-      location->info = check;
-    }
-    location = location->next;
-  }
-}
+  ItemType tmp;
+  NodeType<ItemType> *tmp_node;
 
+  if (location != NULL){
+    tmp_node = MinLoc(location, location);
+    tmp = tmp_node->info;
+    tmp_node->info = location->info;
+    location->info = tmp;
+    Sort(location->next);
+  }
+
+}
 template <class ItemType>
 NodeType<ItemType>* UnsortedType<ItemType>::MinLoc(NodeType<ItemType> *location, NodeType<ItemType>* minPtr)
 {
-  // Sort(location);
   if(location != NULL){
-    ItemType change;
     if(location->info < minPtr->info){
-      change = location->info;
-      location->info = minPtr->info
+      minPtr = location;
     }
-    minPtr->info = change;
-    return MinLoc(location, minPtr); // ?? ??? ?? ?? ??
+    return MinLoc(location->next, minPtr); // ?? ??? ?? ?? ??
   }
   else // base case
     return minPtr;
@@ -323,6 +320,19 @@ NodeType<ItemType>* UnsortedType<ItemType>::MinLoc(NodeType<ItemType> *location,
 template<class ItemType>
 void UnsortedType<ItemType>::PrintMinLoc()
 {
-  NodeType<int> Min_list
-  cout << MinLoc(listData, Min_list) << endl;
+	NodeType<ItemType> *tmp = listData;
+  cout << "List is unsorted" << "\n";
+	for (int i = 0; i < length; i++){
+		cout << tmp->info << " ";
+		tmp = tmp->next;
+	}
+	Sort(listData);
+  cout << endl;
+	tmp = listData;
+  cout << "List is sorted" << "\n";
+	for (int i = 0; i < length; i++)
+	{
+		std::cout << tmp->info << " ";
+		tmp = tmp->next;
+	}
 };

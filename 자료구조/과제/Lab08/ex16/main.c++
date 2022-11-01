@@ -33,8 +33,8 @@ int NumPaths_B(int row,int col,int n)
 
 int main(){
     int result_a, result_b;
-    result_a = NumPaths_A(1,1,4);
-    result_b = NumPaths_B(1,1,4);
+    result_a = NumPaths_A(1,1,5);
+    result_b = NumPaths_B(1,1,5);
     cout << result_a << endl;
     cout << result_b << endl;
 }
