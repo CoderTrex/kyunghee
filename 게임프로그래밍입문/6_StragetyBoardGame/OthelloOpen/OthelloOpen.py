@@ -84,7 +84,6 @@ class GameLayer(cocos.layer.Layer):
         self.table[4][3] = GameLayer.COMPUTER
         self.table[4][4] = GameLayer.PERSON
         
-        
     def update(self, dt):
         computer = 0
         person = 0
@@ -187,18 +186,6 @@ class GameLayer(cocos.layer.Layer):
 
         return rtnList
 
-    def getMoves(self, turn, board):
-        moves = []
-        for y in range  (0, self.row) :
-            for x in range  (0, self.column) :
-                if board[y][x] != 0: continue
-
-                revList = self.isPossible(x, y, turn, board)
-                if len(revList) > 0 :
-                    moves.append((x, y, revList))
-
-        return moves
-
     def on_mouse_release(self, x, y, buttons, mod):
         if self.turn != GameLayer.PERSON:
             return
@@ -220,6 +207,39 @@ class GameLayer(cocos.layer.Layer):
         self.turn *= -1
         # 딜레이 시간 초기화
         self.count = 0     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    # AI 파트
+    
+    
+    # 놓을 수 있는 위치에 대한 정보값을 다 저장함.
+    def getMoves(self, turn, board):
+        moves = []
+        for y in range  (0, self.row) :
+            for x in range  (0, self.column) :
+                if board[y][x] != 0: continue
+
+                revList = self.isPossible(x, y, turn, board)
+                if len(revList) > 0 :
+                    moves.append((x, y, revList))
+
+        return moves
+
             
     def computer(self):  
         move = self.minimax(GameLayer.COMPUTER)
@@ -238,7 +258,7 @@ class GameLayer(cocos.layer.Layer):
         if len(moves) == 0: return moves
         
         scores = np.zeros(len(moves))
-    
+        
         alpha = float("-inf")
         beta = float("inf")
 
@@ -246,7 +266,7 @@ class GameLayer(cocos.layer.Layer):
             boardCopy = self.getNewBoard(move[0], move[1], move[2], GameLayer.COMPUTER, np.copy(self.table))
             #scores[i] = self.maxMove(boardCopy, 1, alpha, beta)
             
-            if 1 >=self.levelDepth:
+            if 1 >= self.levelDepth:
                 scores[i] = self.boardScore(boardCopy)
             else:
                 scores[i] = self.minMove(boardCopy, 2, alpha, beta)
@@ -255,27 +275,60 @@ class GameLayer(cocos.layer.Layer):
 
         return moves[maxIndex]
 
+
     def getNewBoard(self, x, y, revList, player, table):   
         table[y][x] = player
-        
         for (x,y) in revList:
             table[y][x] = player
-
         return table    
+
+
+
+    def minMove(self, board, depth, alpha, beta):
+        # 사람이 놓을 수 있는 위치를 받아옴
+        moves = self.getMoves(GameLayer.PERSON, board)
+        # 점수에 대해서 0으로 세팅
+        scores = np.zeros(len(moves))
+
+        # 움직일 수 있는 곳이 없다면
+        if len(moves)==0:
+            # 만약 depth가 레벨 난이도 보다 작다면 maxMove를 계속해서 진행함
+            if depth <= self.levelDepth:
+                return self.maxMove(board, depth+1, alpha, beta)
+            # 보드의 스코어를 반환함.
+            else:
+                return self.boardScore(board)
+
+        for i, move in enumerate(moves):
+            # 카피된 보드의 위치
+            boardCopy = self.getNewBoard(move[0], move[1], move[2], GameLayer.PERSON, np.copy(board))
+            # 레벨 깊이보다 매개 변수 depth의 크기가 크면 값을 더 이상 찾지 않는다.
+            if depth >= self.levelDepth:
+                scores[i] = self.boardScore(boardCopy)
+            else:
+                # maxMove를 이용해 찾을 값을 score에 넣는다.
+                scores[i] = self.maxMove(boardCopy, depth+1, alpha, beta)
+                # 그 값이 beta보다 작다면, beta에 그 값을 넣는다.
+                if beta > scores[i]:
+                    beta = scores[i]
+                if beta <= alpha:
+                    return scores[i]
+
+        return min(scores)
 
     def maxMove(self, board, depth, alpha, beta):
         moves = self.getMoves(GameLayer.COMPUTER, board)
         scores = np.zeros(len(moves))
 
         if len(moves)==0:
-            if depth<=self.levelDepth:
+            if depth <= self.levelDepth:
                 return self.minMove(board, depth+1, alpha, beta)
             else:
                 return self.boardScore(board)
 
         for i, move in enumerate(moves):
             boardCopy = self.getNewBoard(move[0], move[1], move[2], GameLayer.COMPUTER, np.copy(board))
-            if depth>=self.levelDepth:
+            if depth >= self.levelDepth:
                 scores[i] = self.boardScore(boardCopy)
             else:
                 scores[i] = self.minMove(boardCopy, depth+1, alpha, beta)
@@ -285,28 +338,8 @@ class GameLayer(cocos.layer.Layer):
                     return scores[i]
         return max(scores)
 
-    def minMove(self, board, depth, alpha, beta):
-        moves = self.getMoves(GameLayer.PERSON, board)
-        scores = np.zeros(len(moves))
-
-        if len(moves)==0:
-            if depth<=self.levelDepth:
-                return self.maxMove(board, depth+1, alpha, beta)
-            else:
-                return self.boardScore(board)
-
-        for i, move in enumerate(moves):
-            boardCopy = self.getNewBoard(move[0], move[1], move[2], GameLayer.PERSON, np.copy(board))
-            if depth>=self.levelDepth:
-                scores[i] = self.boardScore(boardCopy)
-            else:
-                scores[i] = self.maxMove(boardCopy, depth+1, alpha, beta)
-                if beta > scores[i]:
-                    beta = scores[i]
-                if beta <= alpha:
-                    return scores[i]
-        return min(scores)
-
+    # 보드의 스코어를 출력하는 함수 
+    # ai의 버튼이 더 많으면 양수를 출력하고 / 플레이어의 버튼이 더 많으면 음수를 출력한다.
     def boardScore(self, board):
         computerWeightSum = 0
         personWeightSum = 0

@@ -290,6 +290,7 @@ class PlayerShoot(Shoot):
 
     def on_exit(self):
         super(PlayerShoot, self).on_exit()
+        # 만약 sprite가 나갔다면 리스트를 제거해줌
         del basket_bullet[0]
         PlayerShoot.INSTANCE = None
 
