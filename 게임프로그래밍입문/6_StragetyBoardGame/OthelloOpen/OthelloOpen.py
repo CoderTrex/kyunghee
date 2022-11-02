@@ -179,7 +179,6 @@ class GameLayer(cocos.layer.Layer):
                         if board[yy][xx] == 0:
                             break
                     # 자신의 돌을 만났는지 여부를 확인하고 만나지 않았다면, 빈리스트를 반환함.
-                    
                     if(bDetected == False): revList = []
 
                 rtnList += revList;
@@ -265,7 +264,6 @@ class GameLayer(cocos.layer.Layer):
         for i, move in enumerate(moves):
             boardCopy = self.getNewBoard(move[0], move[1], move[2], GameLayer.COMPUTER, np.copy(self.table))
             #scores[i] = self.maxMove(boardCopy, 1, alpha, beta)
-            
             if 1 >= self.levelDepth:
                 scores[i] = self.boardScore(boardCopy)
             else:
