@@ -208,24 +208,7 @@ class GameLayer(cocos.layer.Layer):
         self.count = 0     
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     # AI 파트
-    
-    
     # 놓을 수 있는 위치에 대한 정보값을 다 저장함.
     def getMoves(self, turn, board):
         moves = []
@@ -236,7 +219,6 @@ class GameLayer(cocos.layer.Layer):
                 revList = self.isPossible(x, y, turn, board)
                 if len(revList) > 0 :
                     moves.append((x, y, revList))
-
         return moves
 
             
@@ -354,7 +336,7 @@ class GameLayer(cocos.layer.Layer):
         
 class MainMenu(Menu):
     def __init__(self):
-        super(MainMenu, self).__init__('Menu')
+        super(MainMenu, self).__init__('Game')
         self.font_title['font_name'] = 'Times New Roman'
         self.font_title['font_size'] = 60
         self.font_title['bold'] = True
