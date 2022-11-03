@@ -7,6 +7,8 @@ def job():
 
 schedule.every(1).second.do(job)
 
+
+cocos.
 count = 0
 
 while True:
