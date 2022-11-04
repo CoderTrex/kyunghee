@@ -28,28 +28,33 @@ ticker_name = ["Blank", "KRW-BTC", "kRW-XRP", "kRW-DOGE", "kRW-WEMIX", "kRW-ETH"
 Valuation_coin = 0
 
 
+class coin_list():
+    print()
+
 
 def coin_list():
+    # for name, count in have_coin_info.items(): 
     for name, count in have_coin.items(): 
         Val = 0
+        # coin_amount = have_coin_info.get(str(name))
         coin_current_price = pyupbit.get_current_price(ticker_name[int(name)])
+        # 코인 평가 금액
+        # Val += coin_current_price * coin_amount[0]
         Val += coin_current_price * count
-        print("coin:{0}, count:{1}, price:{2}, total:{3}".format(ticker_name[int(name)],count,coin_current_price,Val))
+        print("coin:{0}\nprice:{1}".format(ticker_name[int(name)], Val))
     print()
 
 def check_coin_price():
     Val = 0
+    # for name, count in have_coin_info.items(): 
     for name, count in have_coin.items(): 
         coin_current_price = pyupbit.get_current_price(ticker_name[int(name)])
         Val += coin_current_price * count
+        # coin_amount = have_coin_info.get(str(name))
+        # 코인 평가 금액 +=  
+        # print(coin_current_price)
+        # Val += coin_current_price * coin_amount[0]
     return Val
-
-
-def call_sell(sell_amount, coin_index, coin_in_bank):
-    global have_Money
-    sell_coin_price = pyupbit.get_current_price(ticker_name[coin_index])
-    have_coin.update({str(coin_index) : coin_in_bank - sell_amount})
-    have_Money += sell_amount * sell_coin_price
 
 
 def main():
@@ -62,7 +67,7 @@ def main():
         print("hand money       : {}".format(have_Money))
         print ("\n\n")
         print("Enter the number to be done\n")
-        print("1. buy  2. sell  3. investment analysis  4. Balance Check  5. Clear Page")
+        print("1. buy  2. sell  3. infomation  4. Balance Check")
         behavior = int(input())
 
         # 구매 작업
@@ -83,54 +88,15 @@ def main():
                     purchase_coin_price = pyupbit.get_current_price(ticker_name[buy_ticker_num])
                     # 구매코인의 개수 = 구매하려는 금액 / 구매 코인의 가격
                     number_coin = purchase_amount / purchase_coin_price
-                    coin_amount = have_coin.get(str(buy_ticker_num))
-                    have_coin.update({str(buy_ticker_num): number_coin + coin_amount})
+                    # coin_amount = have_coin.get(str(buy_ticker_num))
+                    coin_amount = have_coin_info.get(str(buy_ticker_num))
+                    # have_coin.update({str(buy_ticker_num): number_coin + coin_amount})
+                    have_coin_info.update({str(buy_ticker_num): int(number_coin) + int(coin_amount[0])})
                     have_Money -= (purchase_amount)
                     break
-        
-        # 판매
-        if (behavior == 2):
-            while (True):
-                coin_list()
-                sell_ticker_num = int(input("write number what you want sell\n1. KRW-BTC, 2. kRW-XRP, 3. kRW-DOGE, 4. kRW-WEMIX, 5. kRW-ETH, 6. quit\n"))
-                if not (sell_ticker_num < 6 and sell_ticker_num > 0):
-                    break
-                
-                coin_amount = have_coin.get(str(sell_ticker_num))
-                print("you have a coin : {0}".format(coin_amount))
-                # 구매 코인에 대한 
-                sell_method = float(input("input num method of selling your coin\n1. Directly input, 2. 10%, 3. 25%, 4. 50%, 5.100%\n"))
-                
-                if (sell_method == 1):
-                    sell_amount = int(input("write amount purchase coin\n"))
-                    if (sell_amount > coin_amount):
-                        print("You entered an amount greater than your holding amount")
-                        break
-                    else:
-                        sell_coin_price = pyupbit.get_current_price(ticker_name[sell_ticker_num])
-                        have_coin.update({str(sell_ticker_num) : coin_amount - sell_amount})
-                        have_Money += sell_amount * sell_coin_price
-                        break
-                elif (sell_method == 2):
-                    call_sell(coin_amount/10.0, sell_ticker_num, coin_amount)
-                    break
-                elif (sell_method == 3):
-                    call_sell(coin_amount/4.0, sell_ticker_num, coin_amount)
-                    break
-                elif (sell_method == 4):
-                    call_sell(coin_amount/2.0, sell_ticker_num, coin_amount)
-                    break
-                elif (sell_method == 5):
-                    call_sell(coin_amount/1.0, sell_ticker_num, coin_amount)
-                    break
 
-        if (behavior == 3):
-            pass
         if (behavior == 4):
             coin_list()
 
-        if (behavior == 5):
-            for i in range(50):
-                print()
 
 main()
