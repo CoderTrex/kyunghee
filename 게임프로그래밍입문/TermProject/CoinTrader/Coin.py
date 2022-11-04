@@ -8,7 +8,6 @@ import pyupbit
 from pyupbit.exchange_api import Upbit
 
 # 기타 작업을 위한 툴
-import schedule
 import time
 from datetime import datetime
 from os import access
@@ -34,7 +33,7 @@ def coin_list():
         Val = 0
         coin_current_price = pyupbit.get_current_price(ticker_name[int(name)])
         Val += coin_current_price * count
-        print("coin:{0}, count:{1}, price:{2}, total:{3}".format(ticker_name[int(name)],count,coin_current_price,Val))
+        print("{0}: price:{1}, count:{2}, total:{3}".format(ticker_name[int(name)],coin_current_price,count,Val))
     print()
 
 def check_coin_price():
@@ -44,7 +43,14 @@ def check_coin_price():
         Val += coin_current_price * count
     return Val
 
-
+def call_buy(buy_amount, coin_index):
+    global have_Money
+    purchase_coin_price = pyupbit.get_current_price(ticker_name[coin_index])
+    add_coin = buy_amount / purchase_coin_price
+    exist_coin = have_coin.get(str(coin_index))
+    have_coin.update({str(coin_index): add_coin + exist_coin})
+    have_Money -= (buy_amount)
+    
 def call_sell(sell_amount, coin_index, coin_in_bank):
     global have_Money
     sell_coin_price = pyupbit.get_current_price(ticker_name[coin_index])
@@ -65,6 +71,7 @@ def main():
         print("1. buy  2. sell  3. investment analysis  4. Balance Check  5. Clear Page")
         behavior = int(input())
 
+# --------------------------------------------------------------------------------------------------------------------------------------------- #
         # 구매 작업
         if (behavior == 1):
             while (True):
@@ -73,21 +80,42 @@ def main():
                 # 잘못된 입력
                 if not (buy_ticker_num < 6 and buy_ticker_num > 0):
                     break
+                buy_method = float(input("input num method of buying your coin\n1. Directly input, 2. 10%, 3. 25%, 4. 50%, 5.100%\n"))
                 
-                # 구매 코인에 대한 
-                purchase_amount = int(input("write amount purchase coin\n"))
-                if (purchase_amount > have_Money):
-                    print("You entered an amount greater than your holding amount")
+                if (buy_method == 1):
+                    # 구매 코인에 대한 
+                    purchase_amount = int(input("write amount purchase coin\n"))
+                    if (purchase_amount > have_Money):
+                        print("You entered an amount greater than your holding amount")
+                        break
+                    else:
+                        purchase_coin_price = pyupbit.get_current_price(ticker_name[buy_ticker_num])
+                        # 구매코인의 개수 = 구매하려는 금액 / 구매 코인의 가격
+                        add_coin = purchase_amount / purchase_coin_price
+                        exist_coin = have_coin.get(str(buy_ticker_num))
+                        have_coin.update({str(buy_ticker_num): add_coin + exist_coin})
+                        have_Money -= (purchase_amount)
+                        break
+                elif (buy_method == 2):
+                    purchase_amount = have_Money/10
+                    call_buy(purchase_amount, buy_ticker_num)
+                    break
+                elif (buy_method == 3):
+                    purchase_amount = have_Money/2.5
+                    call_buy(purchase_amount, buy_ticker_num)
+                    break
+                elif (buy_method == 4):
+                    purchase_amount = have_Money/2
+                    call_buy(purchase_amount, buy_ticker_num)
+                    break
+                elif (buy_method == 5):
+                    purchase_amount = have_Money/1.0
+                    call_buy(purchase_amount, buy_ticker_num)
                     break
                 else:
-                    purchase_coin_price = pyupbit.get_current_price(ticker_name[buy_ticker_num])
-                    # 구매코인의 개수 = 구매하려는 금액 / 구매 코인의 가격
-                    number_coin = purchase_amount / purchase_coin_price
-                    coin_amount = have_coin.get(str(buy_ticker_num))
-                    have_coin.update({str(buy_ticker_num): number_coin + coin_amount})
-                    have_Money -= (purchase_amount)
                     break
-        
+
+# --------------------------------------------------------------------------------------------------------------------------------------------- #
         # 판매
         if (behavior == 2):
             while (True):
@@ -123,9 +151,13 @@ def main():
                 elif (sell_method == 5):
                     call_sell(coin_amount/1.0, sell_ticker_num, coin_amount)
                     break
+                else:
+                    break
 
+# --------------------------------------------------------------------------------------------------------------------------------------------- #
         if (behavior == 3):
             pass
+
         if (behavior == 4):
             coin_list()
 
