@@ -21,7 +21,7 @@ GRAVITY = 0.98
 bullet_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\attack_bullet.png').convert_alpha()
 bullet_img = pygame.transform.scale(bullet_img, (bullet_img.get_width() * 0.03, bullet_img.get_height() * 0.03))
 # 마법 이미지
-magic_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Effect_Fire.png').convert_alpha()
+magic_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\fire\\Fire01.png').convert_alpha()
 magic_img = pygame.transform.scale(magic_img, (magic_img.get_width() * 0.8, magic_img.get_height() * 0.8))
 
 # 캐릭터 액션 정의
@@ -57,6 +57,7 @@ class Soldier(pygame.sprite.Sprite):
         self.direction = 1
         self.vel_y = 0
         self.jump = False
+        self.spin = False
         self.in_air = True
         self.flip = False
         
@@ -66,7 +67,7 @@ class Soldier(pygame.sprite.Sprite):
         self.action = 0
         self.update_time = pygame.time.get_ticks()
         
-        animation_types =['Idle', 'Walk', 'Jump', 'Death']
+        animation_types = ['Idle', 'Walk', 'Jump', 'Death', 'Spin']
         for animation in animation_types:
             # 임시 이미지 파일 리스트
             temp_list = []
@@ -118,6 +119,11 @@ class Soldier(pygame.sprite.Sprite):
         if self.jump == True and self.in_air == False:
             self.vel_y = -20
             self.jump = False
+            self.in_air = True
+        #spin
+        if self.spin == True and self.in_air == False:
+            self.vel_y = -20
+            self.spin = False
             self.in_air = True
 
         # 중력 적용
@@ -205,7 +211,6 @@ class Bullet(pygame.sprite.Sprite):
             if enemy.alive:
                 enemy.health -= 25
                 self.kill()
-            
 
 class Magic(pygame.sprite.Sprite):
     def __init__(self, x, y, direction):
@@ -276,13 +281,15 @@ while run:
         # 수류탄 투척 액션
         elif magic and magic_thrown == False and player.magic > 0:
             magic = Magic(player.rect.centerx + (1 * player.rect.size[0])\
-                * player.direction, player.rect.top, player.direction)
+                        * player.direction, player.rect.top, player.direction)
             magic_group.add(magic)
             # 수류탄 수 줄어들기
             player.magic -= 1
             magic_thrown = True
         if player.in_air:
             player.update_action(2)#2: jump
+        if player.in_air and player.spin:
+            player.update_action(6)#2: jump
         elif moving_left or moving_right:
             player.update_action(1)#1: run
         else:
@@ -305,6 +312,8 @@ while run:
                 shoot = True
             if event.key == pygame.K_a:
                 magic = True
+            if event.key == pygame.K_s:
+                spin = True
             if event.key == pygame.K_ESCAPE:
                 run = False
         
@@ -319,6 +328,8 @@ while run:
             if event.key == pygame.K_a:
                 magic = False
                 magic_thrown = False
+            if event.key == pygame.K_s:
+                spin = True
     pygame.display.update()
 
 pygame.quit()
