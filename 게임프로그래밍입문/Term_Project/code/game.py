@@ -7,7 +7,7 @@ pygame.init()
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = int(SCREEN_WIDTH * 0.8)
 screen =  pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption('Legend of past')
+pygame.display.set_caption('I\'m slimer')
 
 # 게임 프레임 정의
 clock = pygame.time.Clock()
@@ -18,12 +18,28 @@ GRAVITY = 0.98
 TILE_SIZE = 100
 
 # 이미지 로드
+
 # 슬라임 총알
 bullet_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\attack_bullet.png').convert_alpha()
 bullet_img = pygame.transform.scale(bullet_img, (bullet_img.get_width() * 0.03, bullet_img.get_height() * 0.03))
+
 # 마법 이미지
 magic_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Effect_Water.png').convert_alpha()
 magic_img = pygame.transform.scale(magic_img, (magic_img.get_width() * 0.04, magic_img.get_height() * 0.04))
+
+# 주울 수 있는 아이템
+health_box_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\icon\\heal.png').convert_alpha()
+health_box_img = pygame.transform.scale(health_box_img, (health_box_img.get_width() * 3, health_box_img.get_height() * 3))
+ammo_box_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\icon\\ammo.png').convert_alpha()
+ammo_box_img = pygame.transform.scale(ammo_box_img, (ammo_box_img.get_width() * 3, ammo_box_img.get_height() * 3))
+power_box_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\icon\\power.png').convert_alpha()
+power_box_img = pygame.transform.scale(power_box_img, (power_box_img.get_width() * 3, power_box_img.get_height() * 3))
+
+item_boxes = {
+    'Health': health_box_img,
+    'Ammo': ammo_box_img,
+    'Power': power_box_img
+}
 
 # 캐릭터 액션 정의
 moving_left = False
@@ -35,11 +51,25 @@ magic_thrown = False
 # 배경 형성
 BG = (144, 201, 120)
 RED = (255, 0, 0)
+BLUE = (0, 0, 255)
+WHITE = (255, 255, 255)
+
+# 폰트 정의
+font = pygame.font.SysFont('Futura', 30)
+
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    screen.blit(img, (x, y))
+
 
 # 배경 처리
 def draw_bg():
     screen.fill(BG)
-    pygame.draw.line(screen, RED, (0, 300), (SCREEN_WIDTH, 300))
+    pygame.draw.line(screen, BLUE, (0, 300), (SCREEN_WIDTH, 300))
+    pygame.draw.line(screen, BLUE, (0, 299), (SCREEN_WIDTH, 299))
+    pygame.draw.line(screen, BLUE, (0, 298), (SCREEN_WIDTH, 298))
+    pygame.draw.line(screen, BLUE, (0, 297), (SCREEN_WIDTH, 297))
+    pygame.draw.line(screen, BLUE, (0, 296), (SCREEN_WIDTH, 296))
 
 
 class Soldier(pygame.sprite.Sprite):
@@ -179,8 +209,33 @@ class Soldier(pygame.sprite.Sprite):
     
     def draw(self):
         screen.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
+        # pygame.draw.rect(screen, RED, self.rect, 1)
 
-
+class ItemBox(pygame.sprite.Sprite):
+    def __init__(self, item_type, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.item_type = item_type
+        self.image = item_boxes[self.item_type]
+        self.rect = self.image.get_rect()
+        self.rect.midtop = (x + TILE_SIZE // 2, y + (TILE_SIZE - self.image.get_height()))
+    
+    def update(self):
+        # 플레이어가 물약을 주웠는지 확인함
+        if pygame.sprite.collide_rect(self, player):
+            # 어떤 박스와 충돌했는 지 확인함
+            if self.item_type == 'Health':
+                player.health += 25
+                if player.health > player.max_health:
+                    # 최대 체력보다 많이 회복되면 체력은 최대체력 자체가 됨
+                    player.health = player.max_health
+            elif self.item_type == 'Ammo':
+                player.ammo += 15
+            elif self.item_type == 'Power':
+                player.magic += 3
+            # 아이템 삭제 
+            self.kill()
+            
+                
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, direction):
         pygame.sprite.Sprite.__init__(self)
@@ -282,14 +337,23 @@ class Explosion(pygame.sprite.Sprite):
                 self.image = self.images[self.frame_index]
 
 
-
-
-
+            
+            
+            
 # 스프라이트 그룹을 생성
 enemy_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
 magic_group = pygame.sprite.Group()
 explosion_group = pygame.sprite.Group()
+Item_box_group = pygame.sprite.Group()
+
+# temp - creat item boxes
+Item_box = ItemBox('Health', 10, 200)
+Item_box_group.add(Item_box)
+Item_box = ItemBox('Ammo', 900, 200)
+Item_box_group.add(Item_box)
+Item_box = ItemBox('Power', 700, 200)
+Item_box_group.add(Item_box)
 
 #이미지의 초기 위치 및 크기 지정값
 player = Soldier('player', 200, 200, 3, 5, 20, 5)
@@ -302,7 +366,16 @@ run = True
 while run:
     clock.tick(FPS)
     draw_bg()
+    # 총알 수 출력
+    draw_text('AMMO:'.format(player.ammo), font, WHITE, 10, 35)
+    for x in range(player.ammo):
+        screen.blit(bullet_img, (90 + (x * 10), 40))
+    # 마법 수 출력
+    draw_text('MAGIC:'.format(player.magic), font, WHITE, 10, 65)
+    for x in range(player.magic):
+        screen.blit(magic_img, (90 + (x * 10), 65))
 
+    
     # 플레이어 생성
     player.draw()
     player.update()
@@ -317,9 +390,12 @@ while run:
     bullet_group.update()
     magic_group.update()
     explosion_group.update()
+    Item_box_group.update()
+    
     bullet_group.draw(screen)
     magic_group.draw(screen)
     explosion_group.draw(screen)
+    Item_box_group.draw(screen)
     
     # 플레이어의 액션 상태 업데이트
     if player.alive:
