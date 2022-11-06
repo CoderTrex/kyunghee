@@ -50,7 +50,9 @@ magic_thrown = False
 
 # 배경 형성
 BG = (144, 201, 120)
+BLACK = (0, 0, 0)
 RED = (255, 0, 0)
+GREEN = (0,255, 0)
 BLUE = (0, 0, 255)
 WHITE = (255, 255, 255)
 
@@ -235,7 +237,23 @@ class ItemBox(pygame.sprite.Sprite):
             # 아이템 삭제 
             self.kill()
             
-                
+
+class HealthBar():
+    def __init__(self, x, y, health, max_health):
+        self.x = x
+        self.y = y
+        self.health = health
+        self.max_health = max_health
+    
+    def draw(self, health):
+        self.health = health
+        
+        # calculate health ratio
+        ratio = self.health / self.max_health
+        pygame.draw.rect(screen, BLACK, (self.x - 2, self.y - 2, 154, 24))
+        pygame.draw.rect(screen, RED, (self.x, self.y, 150, 20))
+        pygame.draw.rect(screen, GREEN, (self.x, self.y, 150 * ratio, 20))
+
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, direction):
         pygame.sprite.Sprite.__init__(self)
@@ -357,6 +375,7 @@ Item_box_group.add(Item_box)
 
 #이미지의 초기 위치 및 크기 지정값
 player = Soldier('player', 200, 200, 3, 5, 20, 5)
+health_bar = HealthBar(10, 10, player.health, player.health)
 enemy = Soldier('player', 400, 200, 3, 5, 20, 0)
 enemy2 = Soldier('player', 300, 300, 3, 5, 20, 0)
 enemy_group.add(enemy)
@@ -366,6 +385,9 @@ run = True
 while run:
     clock.tick(FPS)
     draw_bg()
+    
+    # HP 출력
+    health_bar.draw(player.health)
     # 총알 수 출력
     draw_text('AMMO:'.format(player.ammo), font, WHITE, 10, 35)
     for x in range(player.ammo):
