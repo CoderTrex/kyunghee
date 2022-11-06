@@ -15,14 +15,15 @@ FPS = 60
 
 # 게임 변수 설정
 GRAVITY = 0.98
+TILE_SIZE = 40
 
 # 이미지 로드
 # 슬라임 총알
 bullet_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\attack_bullet.png').convert_alpha()
 bullet_img = pygame.transform.scale(bullet_img, (bullet_img.get_width() * 0.03, bullet_img.get_height() * 0.03))
 # 마법 이미지
-magic_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\fire\\Fire01.png').convert_alpha()
-magic_img = pygame.transform.scale(magic_img, (magic_img.get_width() * 0.8, magic_img.get_height() * 0.8))
+magic_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Effect_Water.png').convert_alpha()
+magic_img = pygame.transform.scale(magic_img, (magic_img.get_width() * 0.04, magic_img.get_height() * 0.04))
 
 # 캐릭터 액션 정의
 moving_left = False
@@ -57,7 +58,6 @@ class Soldier(pygame.sprite.Sprite):
         self.direction = 1
         self.vel_y = 0
         self.jump = False
-        self.spin = False
         self.in_air = True
         self.flip = False
         
@@ -67,7 +67,7 @@ class Soldier(pygame.sprite.Sprite):
         self.action = 0
         self.update_time = pygame.time.get_ticks()
         
-        animation_types = ['Idle', 'Walk', 'Jump', 'Death', 'Spin']
+        animation_types =['Idle', 'Walk', 'Jump', 'Death']
         for animation in animation_types:
             # 임시 이미지 파일 리스트
             temp_list = []
@@ -76,7 +76,7 @@ class Soldier(pygame.sprite.Sprite):
                                 .format(self.char_type, animation)))
             for i in range (1, num_of_frames + 1):
                 # 이미지 가져오기
-                img = pygame.image.load("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\{0}\\{1}\\{1}0{2}.png"\
+                img = pygame.image.load("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\{0}\\{1}\\{1}{2}.png"\
                                         .format(self.char_type, animation, i)).convert_alpha()
                 # 이미지의 크기 다시 제정의하기
                 img = pygame.transform.scale(img, (img.get_width() * scale, img.get_height() * scale))
@@ -119,11 +119,6 @@ class Soldier(pygame.sprite.Sprite):
         if self.jump == True and self.in_air == False:
             self.vel_y = -20
             self.jump = False
-            self.in_air = True
-        #spin
-        if self.spin == True and self.in_air == False:
-            self.vel_y = -20
-            self.spin = False
             self.in_air = True
 
         # 중력 적용
@@ -211,6 +206,7 @@ class Bullet(pygame.sprite.Sprite):
             if enemy.alive:
                 enemy.health -= 25
                 self.kill()
+            
 
 class Magic(pygame.sprite.Sprite):
     def __init__(self, x, y, direction):
@@ -240,12 +236,56 @@ class Magic(pygame.sprite.Sprite):
         self.rect.x += dx
         self.rect.y += dy
         
+        # 시간 카운트 다운
+        self.timer -= 1
+        if self.timer <= 0:
+            self.kill()
+            explosion = Explosion(self.rect.x, self.rect.y, 0.9)
+            explosion_group.add(explosion)
+            # 근처의 누구에게나 데미지 입히기 
+            if abs(self.rect.centerx - player.rect.centerx) < TILE_SIZE * 2 and \
+                abs(self.rect.centery - player.rect.centery) < TILE_SIZE * 2:
+                player.health -= 50
+            if abs(self.rect.centerx - player.rect.centerx) < TILE_SIZE * 2 and \
+                abs(self.rect.centery - player.rect.centery) < TILE_SIZE * 2:
+                player.health -= 50
         
+        
+class Explosion(pygame.sprite.Sprite):
+    def __init__(self, x, y, scale):
+        pygame.sprite.Sprite.__init__(self)
+        self.images = []
+        for num in range(1, 8):
+            img =  pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\effect\\Explosion_Water\\water{0}.png'.format(num)).convert_alpha()
+            img = pygame.transform.scale(img, (float(img.get_width() * scale), float(img.get_height() * scale)))
+            self.images.append(img)
+        self.frame_index = 0
+        self.image = self.images[self.frame_index]
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y - 100)
+        self.counter = 0
+
+    def update(self):
+        Explosion_SPEED = 4
+        # 폭발 이미지 업데이트
+        self.counter += 1
+        if self.counter >= Explosion_SPEED:
+            self.counter = 0
+            self.frame_index += 1
+            # 애니메이션이 완성되면 삭제한다.
+            if self.frame_index >= len(self.images):
+                self.kill()
+            else:
+                self.image = self.images[self.frame_index]
+
+
+
+
 
 # 스프라이트 그룹을 생성
 bullet_group = pygame.sprite.Group()
 magic_group = pygame.sprite.Group()
-
+explosion_group = pygame.sprite.Group()
 
 #이미지의 초기 위치 및 크기 지정값
 player = Soldier('player', 200, 200, 3, 5, 20, 5)
@@ -267,11 +307,12 @@ while run:
     enemy.update()
     
     # 총알 및 마법 업데이트 및 생성
-    bullet_group.draw(screen)
     bullet_group.update()
-    magic_group.draw(screen)
     magic_group.update()
-
+    explosion_group.update()
+    bullet_group.draw(screen)
+    magic_group.draw(screen)
+    explosion_group.draw(screen)
     
     # 플레이어의 액션 상태 업데이트
     if player.alive:
@@ -281,15 +322,13 @@ while run:
         # 수류탄 투척 액션
         elif magic and magic_thrown == False and player.magic > 0:
             magic = Magic(player.rect.centerx + (1 * player.rect.size[0])\
-                        * player.direction, player.rect.top, player.direction)
+                * player.direction, player.rect.top, player.direction)
             magic_group.add(magic)
             # 수류탄 수 줄어들기
             player.magic -= 1
             magic_thrown = True
         if player.in_air:
             player.update_action(2)#2: jump
-        if player.in_air and player.spin:
-            player.update_action(6)#2: jump
         elif moving_left or moving_right:
             player.update_action(1)#1: run
         else:
@@ -312,8 +351,6 @@ while run:
                 shoot = True
             if event.key == pygame.K_a:
                 magic = True
-            if event.key == pygame.K_s:
-                spin = True
             if event.key == pygame.K_ESCAPE:
                 run = False
         
@@ -328,8 +365,6 @@ while run:
             if event.key == pygame.K_a:
                 magic = False
                 magic_thrown = False
-            if event.key == pygame.K_s:
-                spin = True
     pygame.display.update()
 
 pygame.quit()
