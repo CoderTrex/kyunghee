@@ -15,7 +15,7 @@ FPS = 60
 
 # 게임 변수 설정
 GRAVITY = 0.98
-TILE_SIZE = 40
+TILE_SIZE = 100
 
 # 이미지 로드
 # 슬라임 총알
@@ -202,11 +202,12 @@ class Bullet(pygame.sprite.Sprite):
             if player.alive:
                 player.health -= 5
                 self.kill()
-        if pygame.sprite.spritecollide(enemy, bullet_group, False):
-            if enemy.alive:
-                enemy.health -= 25
-                self.kill()
-            
+        for enemy in enemy_group:
+            if pygame.sprite.spritecollide(enemy, bullet_group, False):
+                if enemy.alive:
+                    enemy.health -= 25
+                    self.kill()
+                
 
 class Magic(pygame.sprite.Sprite):
     def __init__(self, x, y, direction):
@@ -246,10 +247,12 @@ class Magic(pygame.sprite.Sprite):
             if abs(self.rect.centerx - player.rect.centerx) < TILE_SIZE * 2 and \
                 abs(self.rect.centery - player.rect.centery) < TILE_SIZE * 2:
                 player.health -= 50
-            if abs(self.rect.centerx - player.rect.centerx) < TILE_SIZE * 2 and \
-                abs(self.rect.centery - player.rect.centery) < TILE_SIZE * 2:
-                player.health -= 50
-        
+            for enemy in enemy_group:
+                if abs(self.rect.centerx - enemy.rect.centerx) < TILE_SIZE * 2 and \
+                    abs(self.rect.centery - enemy.rect.centery) < TILE_SIZE * 2:
+                    enemy.health -= 50
+
+            
         
 class Explosion(pygame.sprite.Sprite):
     def __init__(self, x, y, scale):
@@ -283,6 +286,7 @@ class Explosion(pygame.sprite.Sprite):
 
 
 # 스프라이트 그룹을 생성
+enemy_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
 magic_group = pygame.sprite.Group()
 explosion_group = pygame.sprite.Group()
@@ -290,7 +294,9 @@ explosion_group = pygame.sprite.Group()
 #이미지의 초기 위치 및 크기 지정값
 player = Soldier('player', 200, 200, 3, 5, 20, 5)
 enemy = Soldier('player', 400, 200, 3, 5, 20, 0)
-
+enemy2 = Soldier('player', 300, 300, 3, 5, 20, 0)
+enemy_group.add(enemy)
+enemy_group.add(enemy2)
 
 run = True
 while run:
@@ -303,8 +309,9 @@ while run:
     player.move(moving_left, moving_right)
     
     # 적 형성
-    enemy.draw()
-    enemy.update()
+    for enemy in enemy_group:
+        enemy.draw()
+        enemy.update()
     
     # 총알 및 마법 업데이트 및 생성
     bullet_group.update()
