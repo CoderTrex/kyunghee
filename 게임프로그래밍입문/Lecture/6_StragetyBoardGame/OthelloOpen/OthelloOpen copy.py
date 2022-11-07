@@ -239,6 +239,15 @@ class GameLayer(cocos.layer.Layer):
                     moves.append((x, y, revList))
         return moves
 
+    def getMoves_len(self, turn, board):
+        moves = []
+        count = 0
+        for y in range  (0, self.row) :
+            for x in range  (0, self.column) :
+                if board[y][x] != 0: continue
+                else:
+                    count += 1
+        return count
             
     def computer(self):  
         move = self.minimax(GameLayer.COMPUTER)
@@ -250,7 +259,12 @@ class GameLayer(cocos.layer.Layer):
                 self.table[revY][revX] = GameLayer.COMPUTER
 
         self.turn *= -1
+    
+    def addtion_point(self):
         
+        Player_move = self.getMoves_len()
+    
+    
     def minimax(self, player):
         moves = self.getMoves(player, self.table)
 

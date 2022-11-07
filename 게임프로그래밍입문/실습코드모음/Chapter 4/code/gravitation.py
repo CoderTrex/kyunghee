@@ -11,11 +11,12 @@ import cocos.particle_systems as ps
 
 from pyglet.window import key
 
-
 class ActorExplosion(ps.ParticleSystem):
+    # 파티클 입자의 개수
     total_particles = 400
     duration = 0.1
     gravity = eu.Point2(0, 0)
+    #  시작하는 angle 90도임 -> angle_var로 360도 적용시켜서 모두 구현
     angle = 90.0
     angle_var = 360.0
     speed = 40.0
@@ -23,6 +24,7 @@ class ActorExplosion(ps.ParticleSystem):
     life = 3.0
     life_var = 1.5
     emission_rate = total_particles / duration
+    # RGBA (A : 투명도) 범위는 0부터 1까지
     start_color_var = ps.Color(0.0, 0.0, 0.0, 0.2)
     end_color = ps.Color(0.0, 0.0, 0.0, 1.0)
     end_color_var = ps.Color(0.0, 0.0, 0.0, 0.0)
@@ -81,6 +83,7 @@ class MovingActor(Actor):
             return
         dist = self._distance
         self.angle = (self.angle + self.rotationSpeed * dt) % (math.pi * 2)
+        # 시계 방향이니까 부호에 대해서 sin은 -처리를 함
         self.x = self.planet.x + dist * math.cos(self.angle)
         self.y = self.planet.y - dist * math.sin(self.angle)
 
@@ -118,8 +121,9 @@ class Player(MovingActor):
             self.position += self.direction * dt
 
     def switch(self):
-        new_dir = eu.Vector2(self.y - self.planet.y,
-                             self.planet.x - self.x)
+        #                    
+        new_dir = eu.Vector2(self.y - self.planet.y, self.planet.x - self.x)
+        #            직선 운동을 하는 방향 백터 * 선형 속도
         self.direction = new_dir.normalized() * self.linearSpeed
         self.planet = None
         self.particles.gravity = eu.Point2(-self.direction.x, -self.direction.y)
@@ -160,7 +164,7 @@ class Enemy(Actor):
         steering += self.avoid_force()
         steering = truncate(steering, self.max_force)
         self.velocity = truncate(self.velocity + steering,
-                                 self.max_velocity)
+                                    self.max_velocity)
         self.position += self.velocity * dt
 
     def avoid_force(self):
@@ -177,7 +181,7 @@ class Enemy(Actor):
                 proj = self.position + ahead * t / l
                 dist = abs(obj.position - proj)
                 if dist < obj.cshape.r and \
-                   (closest is None or dist < closest_dist):
+                    (closest is None or dist < closest_dist):
                     closest, closest_dist = obj.position, dist
         if closest is not None:
             avoid = self.position + ahead - closest
@@ -227,7 +231,7 @@ class GameLayer(cocos.layer.Layer):
         for obj in self.coll_man.iter_colliding(player):
             if isinstance(obj, Pickup):
                 self.add(ActorExplosion(obj.position,
-                                    obj.particles.start_color))
+                                        obj.particles.start_color))
                 obj.kill()
             else:
                 self.add(ActorExplosion(player.position, player.particles.start_color))
@@ -245,10 +249,8 @@ class GameLayer(cocos.layer.Layer):
 
     def find_closest_planet(self):
         ranked = self.coll_man.ranked_objs_near(self.player, self.planet_area)
-        planet = next(filter(lambda x: isinstance(x[0], Planet),
-                             ranked))
+        planet = next(filter(lambda x: isinstance(x[0], Planet), ranked))
         return planet[0] if planet is not None else None
-
 
 if __name__ == '__main__':
     director.init(width=850, height=600, caption='Gravitation')

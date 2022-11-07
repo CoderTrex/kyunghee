@@ -19,7 +19,6 @@ space = pymunk.Space()
 space.gravity = 0, -10
 space.set_default_collision_handler(coll_handler)
 
-
 class Rigidbody(Component):
     __slots__ = ['mass', 'is_static']
 
