@@ -172,7 +172,7 @@ class Soldier(pygame.sprite.Sprite):
     def shoot(self):
         if self.shoot_cooldown == 0 and self.ammo > 0:
             self.shoot_cooldown = 30
-            bullet = Bullet(self.rect.centerx + self.direction *(self.rect.size[0] *0.6), self.rect.centery, self.direction)
+            bullet = Bullet(self.rect.centerx + self.direction *(self.rect.size[0] * 0.7), self.rect.centery, self.direction)
             bullet_group.add(bullet)
             # 총알 감소
             self.ammo -= 1
@@ -373,10 +373,10 @@ Item_box = ItemBox('Power', 700, 200)
 Item_box_group.add(Item_box)
 
 #이미지의 초기 위치 및 크기 지정값
-player = Soldier('player', 200, 200, 3, 5, 20, 5)
+player = Soldier('player', 200, 200, 2, 5, 20, 5)
 health_bar = HealthBar(10, 10, player.health, player.health)
-enemy = Soldier('player', 400, 200, 3, 5, 20, 0)
-enemy2 = Soldier('player', 300, 300, 3, 5, 20, 0)
+enemy = Soldier('player', 400, 200, 2, 5, 20, 0)
+enemy2 = Soldier('player', 300, 300, 2, 5, 20, 0)
 enemy_group.add(enemy)
 enemy_group.add(enemy2)
 
