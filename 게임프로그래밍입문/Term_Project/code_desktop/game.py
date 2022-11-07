@@ -49,7 +49,7 @@ magic = False
 magic_thrown = False
 
 # 배경 형성
-BG = (144, 201, 120)
+BG = (200, 101, 120)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0,255, 0)
@@ -176,6 +176,11 @@ class Soldier(pygame.sprite.Sprite):
             bullet_group.add(bullet)
             # 총알 감소
             self.ammo -= 1
+    
+    def ai(self):
+        
+        
+    
     
     def update_animation(self):
         # 애니메이션 업데이트
