@@ -280,7 +280,6 @@ class Bullet(pygame.sprite.Sprite):
                 if enemy.alive:
                     enemy.health -= 25
                     self.kill()
-                
 
 class Magic(pygame.sprite.Sprite):
     def __init__(self, x, y, direction):
