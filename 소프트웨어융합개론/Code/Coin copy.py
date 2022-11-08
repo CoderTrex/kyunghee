@@ -27,6 +27,8 @@ have_coin_ppa = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 ticker_name = ["Blank", "KRW-BTC", "kRW-XRP", "kRW-DOGE", "kRW-WEMIX", "kRW-ETH"]
 Valuation_coin = 0
 
+
+
 def coin_list():
     for name, count in have_coin.items(): 
         Val = 0
@@ -35,15 +37,12 @@ def coin_list():
         print("{0}: price:{1}, count:{2}, total:{3}".format(ticker_name[int(name)],coin_current_price,count,Val))
     print()
 
-def check_all_coin_price():
+def check_coin_price():
     Val = 0
     for name, count in have_coin.items(): 
         coin_current_price = pyupbit.get_current_price(ticker_name[int(name)])
         Val += coin_current_price * count
     return Val
-
-def check_coin_yleid():
-    pass
 
 def call_buy(buy_amount, coin_index):
     global have_Money
@@ -52,28 +51,20 @@ def call_buy(buy_amount, coin_index):
     exist_coin = have_coin.get(str(coin_index))
     have_coin.update({str(coin_index): add_coin + exist_coin})
     have_Money -= (buy_amount)
-    updata_ppa(coin_index, add_coin, purchase_coin_price, 1)
-
+    
 def call_sell(sell_amount, coin_index, coin_in_bank):
     global have_Money
     sell_coin_price = pyupbit.get_current_price(ticker_name[coin_index])
     have_coin.update({str(coin_index) : coin_in_bank - sell_amount})
     have_Money += sell_amount * sell_coin_price
-    updata_ppa(coin_index, sell_amount, sell_coin_price, 2)
 
-def updata_ppa(btn, a_coin, pcp, check):
-    get_ppa = have_coin_ppa.get(str(btn))
-    if check == 1:
-        have_coin_ppa.update({str(btn): a_coin * pcp + get_ppa})
-    if check == 2:
-        have_coin_ppa.update({str(btn): -a_coin * pcp + get_ppa})
 
 def main():
     while(True):
         global have_Money
         # 현재 보유하고 있는 코인의 양을 출력함   
         # 가지고 있는 코인의 이름과 개수를 출력함
-        Valuation_coin = float(check_all_coin_price())
+        Valuation_coin = float(check_coin_price())
         print("Valuation amount : {}".format(Valuation_coin + have_Money))
         print("hand money       : {}".format(have_Money))
         print ("\n\n")
@@ -105,6 +96,9 @@ def main():
                         exist_coin = have_coin.get(str(buy_ticker_num))
                         have_coin.update({str(buy_ticker_num): add_coin + exist_coin})
                         have_Money -= (purchase_amount)
+                        exist_coin = have_coin_ppa.get(str(buy_ticker_num))
+                        
+                        have_coin_ppa.update({str(buy_ticker_num): add_coin * purchase_coin_price})
                         break
                 elif (buy_method == 2):
                     purchase_amount = have_Money/10
@@ -148,7 +142,6 @@ def main():
                         sell_coin_price = pyupbit.get_current_price(ticker_name[sell_ticker_num])
                         have_coin.update({str(sell_ticker_num) : coin_amount - sell_amount})
                         have_Money += sell_amount * sell_coin_price
-                        updata_ppa(sell_ticker_num, sell_amount, sell_coin_price, 2)
                         break
                 elif (sell_method == 2):
                     call_sell(coin_amount/10.0, sell_ticker_num, coin_amount)
@@ -167,16 +160,7 @@ def main():
 
 # --------------------------------------------------------------------------------------------------------------------------------------------- #
         if (behavior == 3):
-            have_total_money = check_all_coin_price()
-            print("total rate of return : {}".format(float((have_total_money - 500000000.0)/500000000.0)))
-            for i in range(1, 6):
-                coin_ppa = have_coin_ppa.get(str(i))
-                coin_count = have_coin.get(str(i))
-                if coin_count == 0:
-                    continue
-                name = ticker_name[i]
-                cur_price = pyupbit.get_current_price(name)
-                print("{0}:     {1}".format(name, float((coin_ppa/coin_count - cur_price)/cur_price)))
+            pass
 
         if (behavior == 4):
             coin_list()
