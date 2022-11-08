@@ -27,6 +27,8 @@ have_coin_ppa = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 ticker_name = ["Blank", "KRW-BTC", "kRW-XRP", "kRW-DOGE", "kRW-WEMIX", "kRW-ETH"]
 Valuation_coin = 0
 
+
+# 코인의 리스트를 출력함
 def coin_list():
     for name, count in have_coin.items(): 
         Val = 0
@@ -35,6 +37,9 @@ def coin_list():
         print("{0}: price:{1}, count:{2}, total:{3}".format(ticker_name[int(name)],coin_current_price,count,Val))
     print()
 
+
+
+# 가지고 있는 코인의 가격을 전부다 합해서 총 가격을 출력함 
 def check_all_coin_price():
     Val = 0
     for name, count in have_coin.items(): 
@@ -42,9 +47,13 @@ def check_all_coin_price():
         Val += coin_current_price * count
     return Val
 
+
+
 def check_coin_yleid():
     pass
 
+
+# 코인 구매를 진행함
 def call_buy(buy_amount, coin_index):
     global have_Money
     purchase_coin_price = pyupbit.get_current_price(ticker_name[coin_index])
@@ -53,7 +62,9 @@ def call_buy(buy_amount, coin_index):
     have_coin.update({str(coin_index): add_coin + exist_coin})
     have_Money -= (buy_amount)
     updata_ppa(coin_index, add_coin, purchase_coin_price, 1)
-
+    
+    
+# 코인의 판매를 진행함
 def call_sell(sell_amount, coin_index, coin_in_bank):
     global have_Money
     sell_coin_price = pyupbit.get_current_price(ticker_name[coin_index])
@@ -61,12 +72,15 @@ def call_sell(sell_amount, coin_index, coin_in_bank):
     have_Money += sell_amount * sell_coin_price
     updata_ppa(coin_index, sell_amount, sell_coin_price, 2)
 
+
+# 구매한 코인 구매 가격을 총합함
 def updata_ppa(btn, a_coin, pcp, check):
     get_ppa = have_coin_ppa.get(str(btn))
     if check == 1:
         have_coin_ppa.update({str(btn): a_coin * pcp + get_ppa})
     if check == 2:
         have_coin_ppa.update({str(btn): -a_coin * pcp + get_ppa})
+
 
 def main():
     while(True):
@@ -166,6 +180,7 @@ def main():
                     break
 
 # --------------------------------------------------------------------------------------------------------------------------------------------- #
+        # 현재까지 진행한 거래에 대한 분석
         if (behavior == 3):
             have_total_money = check_all_coin_price()
             print("total rate of return : {}".format(float((have_total_money - 500000000.0)/500000000.0)))
@@ -176,11 +191,19 @@ def main():
                     continue
                 name = ticker_name[i]
                 cur_price = pyupbit.get_current_price(name)
-                print("{0}:     {1}".format(name, float((coin_ppa/coin_count - cur_price)/cur_price)))
+                ap = coin_ppa/coin_count
+                print("{0}:     {1}".format(name, float((cur_price - ap)/ap)))
 
+
+# --------------------------------------------------------------------------------------------------------------------------------------------- #
+        # 지금가지고 있는 코인의 리스트를 출력함
         if (behavior == 4):
             coin_list()
 
+
+
+# --------------------------------------------------------------------------------------------------------------------------------------------- #
+        # 터미널 깔끔하게 정리
         if (behavior == 5):
             for i in range(50):
                 print()
