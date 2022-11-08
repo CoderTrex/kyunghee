@@ -1,6 +1,8 @@
 import pygame
 import random
 import os
+import csv
+
 
 pygame.init()
 
@@ -16,7 +18,11 @@ FPS = 60
 
 # 게임 변수 설정
 GRAVITY = 0.98
-TILE_SIZE = 100
+ROWS = 16
+COL = 150
+TILE_SIZE = SCREEN_WIDTH//ROWS
+TILE_TYPE = 21
+level = 1
 
 # 이미지 로드
 
@@ -423,6 +429,9 @@ enemy = Soldier('enemy_boss', 400, 200, 2, 2, 20, 0)
 enemy2 = Soldier('enemy_boss', 300, 300, 2, 2, 20, 0)
 enemy_group.add(enemy)
 enemy_group.add(enemy2)
+
+
+# 비어있는 파일 리스트를 출력한다.
 
 run = True
 while run:
