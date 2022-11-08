@@ -1,4 +1,5 @@
 import pygame
+import random
 import os
 
 pygame.init()
@@ -20,19 +21,21 @@ TILE_SIZE = 100
 # 이미지 로드
 
 # 슬라임 총알
-bullet_img = pygame.image.load('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\attack_bullet.png').convert_alpha()
+bullet_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\attack_bullet.png').convert_alpha()
 bullet_img = pygame.transform.scale(bullet_img, (bullet_img.get_width() * 0.03, bullet_img.get_height() * 0.03))
+skeleton_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\attack_skeleton.png').convert_alpha()
+skeleton_img = pygame.transform.scale(skeleton_img, (skeleton_img.get_width() * 0.09, skeleton_img.get_height() * 0.09))
 
 # 마법 이미지
-magic_img = pygame.image.load('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Effect_Water.png').convert_alpha()
+magic_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Effect_Water.png').convert_alpha()
 magic_img = pygame.transform.scale(magic_img, (magic_img.get_width() * 0.04, magic_img.get_height() * 0.04))
 
 # 주울 수 있는 아이템
-health_box_img = pygame.image.load('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\icon\\heal.png').convert_alpha()
+health_box_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\icon\\heal.png').convert_alpha()
 health_box_img = pygame.transform.scale(health_box_img, (health_box_img.get_width() * 3, health_box_img.get_height() * 3))
-ammo_box_img = pygame.image.load('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\icon\\ammo.png').convert_alpha()
+ammo_box_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\icon\\ammo.png').convert_alpha()
 ammo_box_img = pygame.transform.scale(ammo_box_img, (ammo_box_img.get_width() * 3, ammo_box_img.get_height() * 3))
-power_box_img = pygame.image.load('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\icon\\power.png').convert_alpha()
+power_box_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\icon\\power.png').convert_alpha()
 power_box_img = pygame.transform.scale(power_box_img, (power_box_img.get_width() * 3, power_box_img.get_height() * 3))
 
 item_boxes = {
@@ -49,7 +52,7 @@ magic = False
 magic_thrown = False
 
 # 배경 형성
-BG = (144, 201, 120)
+BG = (200, 101, 120)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0,255, 0)
@@ -99,16 +102,23 @@ class Soldier(pygame.sprite.Sprite):
         self.action = 0
         self.update_time = pygame.time.get_ticks()
         
+        # ai 변수
+        self.move_counter = 0
+                                    # 넓이와 높이
+        self.vision = pygame.Rect(0, 0, 150, 100)
+        self.idling = False
+        self.idling_counter = 0
+        
         animation_types =['Idle', 'Walk', 'Jump', 'Death']
         for animation in animation_types:
             # 임시 이미지 파일 리스트
             temp_list = []
             # 파일안에 있는 사진 수 세기    
-            num_of_frames = len(os.listdir("C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\\\{0}\\{1}"\
+            num_of_frames = len(os.listdir("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\\\{0}\\{1}"\
                                 .format(self.char_type, animation)))
             for i in range (1, num_of_frames + 1):
                 # 이미지 가져오기
-                img = pygame.image.load("C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\{0}\\{1}\\{1}{2}.png"\
+                img = pygame.image.load("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\{0}\\{1}\\{1}{2}.png"\
                                         .format(self.char_type, animation, i)).convert_alpha()
                 # 이미지의 크기 다시 제정의하기
                 img = pygame.transform.scale(img, (img.get_width() * scale, img.get_height() * scale))
@@ -122,7 +132,6 @@ class Soldier(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (x,y)
 
-    
     def update(self):
         # 애니메이션 업데이트
         self.update_animation()
@@ -130,7 +139,6 @@ class Soldier(pygame.sprite.Sprite):
         # 쿨다운 업데이트
         if self.shoot_cooldown > 0:
             self.shoot_cooldown -= 1
-
 
     def move(self, moving_left, moving_right):
         # 움직임 변수들을 초기화
@@ -172,10 +180,48 @@ class Soldier(pygame.sprite.Sprite):
     def shoot(self):
         if self.shoot_cooldown == 0 and self.ammo > 0:
             self.shoot_cooldown = 30
-            bullet = Bullet(self.rect.centerx + self.direction *(self.rect.size[0] *0.6), self.rect.centery, self.direction)
+            if self.char_type == 'enemy_boss':
+                bullet = Bullet(self.rect.centerx + self.direction *(self.rect.size[0] * 1), self.rect.centery, self.direction, self.char_type)
+            else:
+                bullet = Bullet(self.rect.centerx + self.direction *(self.rect.size[0] * 0.7), self.rect.centery, self.direction, self.char_type)
             bullet_group.add(bullet)
             # 총알 감소
             self.ammo -= 1
+    
+    def ai(self):
+        if self.alive and player.alive:
+            if self.idling == False and random.randint(1, 200) == 3:
+                self.update_action(0) # 멈춰있는 자세 유지
+                self.idling = True
+                self.idling_counter = 100
+            # ai 근처에 플레이어가 있는 지 확인
+            if self.vision.colliderect(player.rect):
+                # 움직이지 않고 플레이어를 바라본다.
+                self.update_action(0)
+                self.shoot()
+            else:
+                if self.idling == False:
+                    if  self.direction == 1:
+                        ai_moving_right = True
+                    else:
+                        ai_moving_right = False
+                    ai_moving_left = not ai_moving_right
+                    self.move(ai_moving_left, ai_moving_right)
+                    # 달리기 상태를 유지함
+                    self.update_action(1)
+                    self.move_counter += 1
+                    # ai가 움직이면서 시야가 달라지는 것을 구현
+                    self.vision.center = (self.rect.centerx + 150 * self.direction, self.rect.centery)
+                    
+                    if self.move_counter > TILE_SIZE:
+                        self.direction *= -1
+                        self.move_counter *= -1
+                else:
+                    self.idling_counter -= 1
+                    if self.idling_counter <= 0:
+                        self.idling = False
+                    
+                    
     
     def update_animation(self):
         # 애니메이션 업데이트
@@ -200,7 +246,6 @@ class Soldier(pygame.sprite.Sprite):
             # 에니메이션의 세팅을 바꿈
             self.frame_index = 0
             self.update_time = pygame.time.get_ticks()
-        
 
     def check_alive(self):
         if self.health <= 0:
@@ -255,10 +300,14 @@ class HealthBar():
         pygame.draw.rect(screen, GREEN, (self.x, self.y, 150 * ratio, 20))
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, x, y, direction):
+    def __init__(self, x, y, direction, char_type):
         pygame.sprite.Sprite.__init__(self)
         self.speed = 10
-        self.image = bullet_img
+        if char_type == "player":
+            self.image = bullet_img
+        elif char_type == "enemy_boss":
+            # self.image = bullet_img
+            self.image = skeleton_img
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.direction = direction
@@ -280,7 +329,6 @@ class Bullet(pygame.sprite.Sprite):
                 if enemy.alive:
                     enemy.health -= 25
                     self.kill()
-                
 
 class Magic(pygame.sprite.Sprite):
     def __init__(self, x, y, direction):
@@ -325,14 +373,12 @@ class Magic(pygame.sprite.Sprite):
                     abs(self.rect.centery - enemy.rect.centery) < TILE_SIZE * 2:
                     enemy.health -= 50
 
-            
-        
 class Explosion(pygame.sprite.Sprite):
     def __init__(self, x, y, scale):
         pygame.sprite.Sprite.__init__(self)
         self.images = []
         for num in range(1, 8):
-            img =  pygame.image.load('C:\\Coding\\github\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\effect\\Explosion_Water\\water{0}.png'.format(num)).convert_alpha()
+            img =  pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\effect\\Explosion_Water\\water{0}.png'.format(num)).convert_alpha()
             img = pygame.transform.scale(img, (float(img.get_width() * scale), float(img.get_height() * scale)))
             self.images.append(img)
         self.frame_index = 0
@@ -355,9 +401,6 @@ class Explosion(pygame.sprite.Sprite):
                 self.image = self.images[self.frame_index]
 
 
-            
-            
-            
 # 스프라이트 그룹을 생성
 enemy_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
@@ -374,10 +417,10 @@ Item_box = ItemBox('Power', 700, 200)
 Item_box_group.add(Item_box)
 
 #이미지의 초기 위치 및 크기 지정값
-player = Soldier('player', 200, 200, 3, 5, 20, 5)
+player = Soldier('player', 200, 200, 2, 5, 20, 5)
 health_bar = HealthBar(10, 10, player.health, player.health)
-enemy = Soldier('player', 400, 200, 3, 5, 20, 0)
-enemy2 = Soldier('player', 300, 300, 3, 5, 20, 0)
+enemy = Soldier('enemy_boss', 400, 200, 2, 2, 20, 0)
+enemy2 = Soldier('enemy_boss', 300, 300, 2, 2, 20, 0)
 enemy_group.add(enemy)
 enemy_group.add(enemy2)
 
@@ -405,9 +448,10 @@ while run:
     
     # 적 형성
     for enemy in enemy_group:
+        enemy.ai()
         enemy.draw()
         enemy.update()
-    
+
     # 총알 및 마법 업데이트 및 생성
     bullet_group.update()
     magic_group.update()
