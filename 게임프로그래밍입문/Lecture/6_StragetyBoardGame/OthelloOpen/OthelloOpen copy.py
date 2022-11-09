@@ -294,8 +294,6 @@ class GameLayer(cocos.layer.Layer):
             table[y][x] = player
         return table    
 
-
-
     def minMove(self, board, depth, alpha, beta):
         # 사람이 놓을 수 있는 위치를 받아옴
         moves = self.getMoves(GameLayer.PERSON, board)
@@ -325,7 +323,7 @@ class GameLayer(cocos.layer.Layer):
                     beta = scores[i]
                 if beta <= alpha:
                     return scores[i]
-
+# 최종 동작 시나리오가 뭔가요?
         return min(scores)
 
     def maxMove(self, board, depth, alpha, beta):

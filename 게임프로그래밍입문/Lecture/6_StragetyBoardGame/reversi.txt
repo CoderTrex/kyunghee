@@ -18,7 +18,6 @@ else
 
 if ( Max Player Stability Value + Min Player Stability Value != 0)
 	Stability  Heuristic Value = 
-	100 * (Max Player Stability Value - Min Player Stability Value) 
-	/ (Max Player Stability Value + Min Player Stability Value)
+	100 * (Max Player Stability Value - Min Player Stability Value) / (Max Player Stability Value + Min Player Stability Value)
 else
 	Stability Heuristic Value = 0
