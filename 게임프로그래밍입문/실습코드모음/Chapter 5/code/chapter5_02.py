@@ -9,7 +9,7 @@ from OpenGL.GLUT import *
 class Light(object):
     enabled = False
     colors = [(1.,1.,1.,1.), (1.,0.5,0.5,1.),
-              (0.5,1.,0.5,1.), (0.5,0.5,1.,1.)]
+                (0.5,1.,0.5,1.), (0.5,0.5,1.,1.)]
 
     def __init__(self, light_id, position):
         self.light_id = light_id

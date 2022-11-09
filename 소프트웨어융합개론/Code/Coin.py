@@ -94,7 +94,9 @@ def main():
         print("Enter the number to be done\n")
         print("1. buy  2. sell  3. investment analysis  4. Balance Check  5. Clear Page")
         behavior = int(input())
-
+        behavior_list = [1,2,3,4,5,6]
+        if  behavior not in behavior_list:
+            continue
 # --------------------------------------------------------------------------------------------------------------------------------------------- #
         # 구매 작업
         if (behavior == 1):
@@ -141,7 +143,7 @@ def main():
 
 # --------------------------------------------------------------------------------------------------------------------------------------------- #
         # 판매
-        if (behavior == 2):
+        elif (behavior == 2):
             while (True):
                 coin_list()
                 sell_ticker_num = int(input("write number what you want sell\n1. KRW-BTC, 2. kRW-XRP, 3. kRW-DOGE, 4. kRW-WEMIX, 5. kRW-ETH, 6. quit\n"))
@@ -181,7 +183,7 @@ def main():
 
 # --------------------------------------------------------------------------------------------------------------------------------------------- #
         # 현재까지 진행한 거래에 대한 분석
-        if (behavior == 3):
+        elif (behavior == 3):
             have_total_money = check_all_coin_price()
             print("total rate of return : {}".format(float((have_total_money - 500000000.0)/500000000.0)))
             for i in range(1, 6):
@@ -197,14 +199,14 @@ def main():
 
 # --------------------------------------------------------------------------------------------------------------------------------------------- #
         # 지금가지고 있는 코인의 리스트를 출력함
-        if (behavior == 4):
+        elif (behavior == 4):
             coin_list()
 
 
 
 # --------------------------------------------------------------------------------------------------------------------------------------------- #
         # 터미널 깔끔하게 정리
-        if (behavior == 5):
+        elif (behavior == 5):
             for i in range(50):
                 print()
 

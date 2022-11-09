@@ -34,8 +34,7 @@ class App(object):
                 x += 0.5 * dt
             self.circle_pos = x, y
             screen.fill((0, 0, 0))
-            pygame.draw.circle(screen, (0, 250, 100),
-                               (int(x), int(y)), 30)
+            pygame.draw.circle(screen, (0, 250, 100), (int(x), int(y)), 30)
             pygame.display.flip()
 
 if __name__ == '__main__':
