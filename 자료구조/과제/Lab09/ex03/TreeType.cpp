@@ -365,3 +365,36 @@ bool IsBST(TreeNode *tree)
 {
 	return Imp_IsBST(tree);
 }
+
+
+bool Imp_IsBST(TreeNode* tree, ItemType &min, ItemType &max);
+
+bool TreeType::IsBST(TreeNode *tree) // 클래스에 IsBST 함수를 선언하세요.
+{
+	ItemType min, max;
+	return Imp_IsBST (root, min, max);
+}
+
+bool Imp_IsBST(TreeNode* tree, ItemType &min, ItemType &max) // min, max: returns the value range of the tree
+{
+	bool isBST;
+	if(tree = NULL) return true; // emptry tree는 BST
+	
+	//왼쪽 노드가 NULL이 아니면, 왼쪽 서브트리가 BST인지 체크하고 tree->info와 비교
+	if (tree -> left != NULL){
+		isBST = Imp_IsBST(tree->left, tree->left->info, tree->info);
+		// 왼쪽 서브트리가 BST가 아니거나 tree->info가 왼쪽 서브트리 값보다 작은 경우
+		if (!isBST || tree->info <= tree->left->info) 
+			return false;
+		//오른쪽 노드가 NULL이 아니면, 오른쪽 서브트리가 BST인지 체크하고 tree->info와 비교
+	}
+	if (tree->right != NULL){
+		isBST = Imp_IsBST(tree->left, tree->info, tree->right->info);
+		if (!isBST || tree->info >= tree->right->info) 
+			return false;
+		
+	}
+	min = (tree->left == NULL) ?  0 : tree->info; 
+	max = ; // min, max의 값을 설정
+	return true;
+}
