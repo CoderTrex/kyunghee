@@ -16,7 +16,6 @@ def get_coin_info():
         dt = pyupbit.get_ohlcv(ticker=ticker_name, interval="day",
                             count=500)  # 1분 봉으로 값을 정렬해서 전해줌
         # df를 데이타 프라임 속성을 부여하여, to_excel 함수를 가질 수 있게 한다.
-        print(dt)
         dt_da = pd.DataFrame(dt)
         # dt_da의 값을 엑셀로 정리하여 sample.xlsx라는 파일의 이름으로 저장하여 기록한다.
         dt_da.to_excel(
