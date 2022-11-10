@@ -7,6 +7,13 @@ struct TreeNode
 	TreeNode *right;
 };
 
+int Imp_LeafCount (TreeNode *tree);
+
+int TreeType::LeafCount()
+{
+	return Imp_LeafCount(root);
+}
+
 int Imp_LeafCount(TreeNode *tree)
 {
 	if (tree == nullptr)
@@ -16,6 +23,8 @@ int Imp_LeafCount(TreeNode *tree)
 	else
 		return Imp_LeafCount(tree->left) + Imp_LeafCount(tree->right);
 }
+
+
 
 bool TreeType::IsFull() const
 // Returns true if there is no room for another item
@@ -349,7 +358,3 @@ void TreeType::GetNextItem(ItemType &item,
 	}
 }
 
-int TreeType::LeafCount()
-{
-	return Imp_LeafCount(root);
-}

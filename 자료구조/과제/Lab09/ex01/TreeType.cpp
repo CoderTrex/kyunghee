@@ -7,6 +7,34 @@ struct TreeNode
   TreeNode* right;
 };
 
+
+// 재귀 방식
+TreeNode* TreeType::PtrTosuccessor_R(TreeNode *tree){
+  TreeNode *tempPtr = tree;
+  if(tree->left != NULL){
+    PtrTosuccessor_R(tree->left);
+  }
+  else{
+    if  (tree->right != NULL){
+      tempPtr = tree->right;
+    }
+    return tempPtr;
+  }
+}
+
+// 비재귀 방식
+TreeNode* TreeType::PtrTosuccessor_NR(TreeNode* tree){
+	TreeNode *tempPtr = tree;
+
+	while (tree->left != nullptr){
+		tempPtr = tree;
+		tree = tree->left;
+	}
+	tempPtr->left = tree->right;
+	return tree;
+}
+
+
 bool TreeType::IsFull() const
 // Returns true if there is no room for another item 
 //  on the free store; false otherwise.
@@ -346,28 +374,4 @@ void TreeType::GetNextItem(ItemType& item,
                         finished = true;
                       break;
   }
-}
-
-TreeNode* TreeType::PtrTosuccessor_R(TreeNode *tree){
-  if(tree->left != NULL){
-    PtrTosuccessor_R(tree->left);
-  }else{
-  TreeNode *tempPtr;
-  tempPtr->info = tree->info;
-  if  (tree->right != NULL){
-    tree->info = tree->right->info;
-  }
-  return tempPtr;
-}
-
-// Nonrecursive version
-TreeNode* TreeType::PtrToSuccessor_NR(TreeNode* tree){
-	TreeNode *tempPtr = tree;
-
-	while (tree->left != nullptr){
-		tempPtr = tree;
-		tree = tree->left;
-	}
-	tempPtr->left = tree->right;
-	return tree;
 }

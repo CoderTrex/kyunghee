@@ -26,8 +26,7 @@ public:
 	void InsertItem(ItemType item);
 	void DeleteItem(ItemType item);
 	void ResetTree(OrderType order);
-	void GetNextItem(ItemType &item, OrderType order,
-					 bool &finished);
+	void GetNextItem(ItemType &item, OrderType order,bool &finished);
 	void Print(std::ofstream &outFile) const;
 	bool IsBST(TreeNode *tree);
 

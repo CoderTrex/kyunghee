@@ -7,27 +7,39 @@ struct TreeNode
 	TreeNode *right;
 };
 
-bool Imp_IsBST(TreeNode *tree)
-{
-	bool is_bst = true; // 최종 결과 변수
+bool Imp_IsBST(TreeNode* tree, ItemType &min, ItemType &max);
 
-	if (tree != nullptr) // tree가 null일 때는 true로 반환
-	{
-		if (tree->left != nullptr)
-		{
-			if (tree->info < tree->left->info) // 만약 tree의 값이 tree의 left 노드의 값보다 작다면 이진트리가 아님
-				return false;
-			is_bst = Imp_IsBST(tree->left); // 만약 위의 조건을 통과했다면 하위 노드를 인자로 재귀호출
-		}
-		if (tree->right != nullptr)
-		{
-			if (is_bst && tree->info > tree->right->info) // 만약 왼쪽 서브트리가 이진 트리가 아니거나 tree의 값이 tree의 right 노드의 값보다 크다면 이진트리가 아님
-				return false;
-			is_bst &= Imp_IsBST(tree->right); // 만약 위의 조건을 통과했다면, 하위 노드를 인자로 재귀호출하고 기존의 is_bst값과 and 연산 진행
-		}
-	}
-	return is_bst;
+bool TreeType::IsBST(TreeNode *tree) // 클래스에 IsBST 함수를 선언하세요.
+{
+	ItemType min, max;
+	return Imp_IsBST (root, min, max);
 }
+
+bool Imp_IsBST(TreeNode* tree, ItemType &min, ItemType &max) // min, max: returns the value range of the tree
+{
+	bool isBST;
+	if(tree = NULL) return true; // emptry tree는 BST
+	
+	//왼쪽 노드가 NULL이 아니면, 왼쪽 서브트리가 BST인지 체크하고 tree->info와 비교
+	if (tree -> left != NULL){
+		isBST = Imp_IsBST(tree->left, tree->left->info, tree->info);
+		// 왼쪽 서브트리가 BST가 아니거나 tree->info가 왼쪽 서브트리 값보다 작은 경우
+		if (!isBST || tree->info <= tree->left->info) 
+			return false;
+	}
+	//오른쪽 노드가 NULL이 아니면, 오른쪽 서브트리가 BST인지 체크하고 tree->info와 비교
+	if (tree->right != NULL){
+		isBST = Imp_IsBST(tree->right, tree->info, tree->right->info);
+		if (!isBST || tree->info >= tree->right->info) 
+			return false;
+		
+	}
+	min = (tree->left == NULL) ?  tree->info : tree->left->info; 
+	max = (tree->right == NULL) ? tree->info : tree->right->info; // min, max의 값을 설정
+	return true;
+}
+
+
 
 bool TreeType::IsFull() const
 // Returns true if there is no room for another item
@@ -361,40 +373,3 @@ void TreeType::GetNextItem(ItemType &item,
 	}
 }
 
-bool IsBST(TreeNode *tree)
-{
-	return Imp_IsBST(tree);
-}
-
-
-bool Imp_IsBST(TreeNode* tree, ItemType &min, ItemType &max);
-
-bool TreeType::IsBST(TreeNode *tree) // 클래스에 IsBST 함수를 선언하세요.
-{
-	ItemType min, max;
-	return Imp_IsBST (root, min, max);
-}
-
-bool Imp_IsBST(TreeNode* tree, ItemType &min, ItemType &max) // min, max: returns the value range of the tree
-{
-	bool isBST;
-	if(tree = NULL) return true; // emptry tree는 BST
-	
-	//왼쪽 노드가 NULL이 아니면, 왼쪽 서브트리가 BST인지 체크하고 tree->info와 비교
-	if (tree -> left != NULL){
-		isBST = Imp_IsBST(tree->left, tree->left->info, tree->info);
-		// 왼쪽 서브트리가 BST가 아니거나 tree->info가 왼쪽 서브트리 값보다 작은 경우
-		if (!isBST || tree->info <= tree->left->info) 
-			return false;
-		//오른쪽 노드가 NULL이 아니면, 오른쪽 서브트리가 BST인지 체크하고 tree->info와 비교
-	}
-	if (tree->right != NULL){
-		isBST = Imp_IsBST(tree->left, tree->info, tree->right->info);
-		if (!isBST || tree->info >= tree->right->info) 
-			return false;
-		
-	}
-	min = (tree->left == NULL) ?   : tree->info; 
-	max = (tree->right == NULL) ? ; // min, max의 값을 설정
-	return true;
-}

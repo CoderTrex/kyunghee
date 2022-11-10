@@ -7,12 +7,19 @@ struct TreeNode
 	TreeNode *right;
 };
 
+int Imp_SingleParentCount (TreeNode *tree);
+
+int TreeType::SingleParentCount()
+{
+	return Imp_SingleParentCount(root);
+}
+
+
 int Imp_SingleParentCount(TreeNode *tree)
 {
 	if (tree == nullptr)
 		return 0;
-	if ((tree->left == nullptr && tree->right != nullptr) || \
-		(tree->right == nullptr && tree->left != nullptr))
+	if ((tree->left == nullptr && tree->right != nullptr) || (tree->right == nullptr && tree->left != nullptr))
 		return 1;
 	else
 		return Imp_SingleParentCount(tree->left) + Imp_SingleParentCount(tree->right);
@@ -348,9 +355,4 @@ void TreeType::GetNextItem(ItemType &item,
 			finished = true;
 		break;
 	}
-}
-
-int TreeType::SingleParentCount()
-{
-	return Imp_SingleParentCount(root);
 }
