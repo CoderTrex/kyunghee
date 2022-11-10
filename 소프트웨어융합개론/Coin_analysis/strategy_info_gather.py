@@ -8,7 +8,7 @@ import openpyxl
 
 # 구매할 코인의 정보를 찾는 작업을 하나로 묶는다.
 ########################################################################################################################################
-first_strategy = [] # 
+first_strategy = {}
 second_strategy = {}
 the_num = False
 
@@ -41,8 +41,7 @@ def find_ticker(count):
                 if (check_box[1] < -0.03):
                     # 마지막날도 떨어져야하지만, 너무 많이 떨어지면 안된다. 기준치인 5퍼에서 1퍼센트가 떨어진 코인을 찾는다.
                     if (-0.05 < check_box[2] < -0.01):
-                        first_strategy.append(ticker_name)
-
+                        first_strategy[ticker_name] = check_box
 
     elif count == 2:
         # 2. (2번 전략(기존의 나와있는 전략): RSi 지표를 통한 매수 매도  https://rebro.kr/139
@@ -62,12 +61,16 @@ def find_ticker(count):
             data = pyupbit.get_ohlcv(ticker="{0}".format(ticker_name), interval="minute5")
             now_rsi = rsi(data, 14).iloc[-1]
             second_strategy[ticker_name] = now_rsi
-            print(now_rsi)
             time.sleep(1)
 
 
 
 def action(number):
+    if number == 1:
+        find_ticker(1)
+        df = pd.DataFrame(data=first_strategy, index=[0])
+        df = (df.T)
+        df.to_excel("C:\\Coding\\kyunghee\\소프트웨어융합개론\\File\\M_strategy\\file.xlsx")
     if number == 2:
         find_ticker(2)
         df = pd.DataFrame(data=second_strategy, index=[0])
