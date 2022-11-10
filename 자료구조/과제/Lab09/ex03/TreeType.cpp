@@ -394,7 +394,7 @@ bool Imp_IsBST(TreeNode* tree, ItemType &min, ItemType &max) // min, max: return
 			return false;
 		
 	}
-	min = (tree->left == NULL) ?  0 : tree->info; 
-	max = ; // min, max의 값을 설정
+	min = (tree->left == NULL) ?   : tree->info; 
+	max = (tree->right == NULL) ? ; // min, max의 값을 설정
 	return true;
 }
