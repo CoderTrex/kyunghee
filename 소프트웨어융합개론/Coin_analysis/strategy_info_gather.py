@@ -1,5 +1,6 @@
 from os import access
 import pyupbit
+import pybithumb
 import time
 # import schedule
 import pandas as pd
