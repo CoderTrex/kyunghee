@@ -199,7 +199,7 @@ class GameLayer(cocos.layer.Layer):
                     # 자신의 돌을 만났는지 여부를 확인하고 만나지 않았다면, 빈리스트를 반환함.
                     if(bDetected == False): revList = []
 
-                rtnList += revList;
+                rtnList += revList
 
         return rtnList
 
@@ -240,18 +240,76 @@ class GameLayer(cocos.layer.Layer):
         return moves
 
     def getMoves_len(self, turn, board):
-        moves = []
         count = 0
-        for y in range  (0, self.row) :
-            for x in range  (0, self.column) :
+        for y in range(0, self.row) :
+            for x in range(0, self.column) :
                 if board[y][x] != 0: continue
-                else:
+                revList = self.isPossible(x, y, turn, board)
+                if len(revList) > 0:
                     count += 1
         return count
-            
-    def computer(self):  
-        move = self.minimax(GameLayer.COMPUTER)
 
+
+    def check_coner_occupancy(self):
+        my_tile = opp_tile = 0
+        if self.table[0][0] == GameLayer.COMPUTER: my_tile += 1
+        elif self.table[0][0] == GameLayer.PERSON: opp_tile += 1
+        if self.table[0][7] == GameLayer.COMPUTER: my_tile += 1
+        elif self.table[0][7] == GameLayer.PERSON: opp_tile += 1
+        if self.table[7][0] == GameLayer.COMPUTER: my_tile += 1
+        elif self.table[7][0] == GameLayer.PERSON: opp_tile += 1
+        if self.table[7][7] == GameLayer.COMPUTER: my_tile += 1
+        elif self.table[7][7] == GameLayer.PERSON: opp_tile += 1
+        return 25 * (my_tile - opp_tile)
+
+    def check_coner_closenss(self):
+        my_tiles = opp_tiles = 0
+        if self.table[0][0] == '-':
+            if(self.table[0][1] == GameLayer.COMPUTER): my_tiles += 1
+            elif(self.table[0][1] == GameLayer.PERSON): opp_tiles += 1
+            if(self.table[1][1] == GameLayer.COMPUTER): my_tiles += 1
+            elif(self.table[1][1] == GameLayer.PERSON): opp_tiles += 1
+            if(self.table[1][0] == GameLayer.COMPUTER): my_tiles += 1
+            elif(self.table[1][0] == GameLayer.PERSON): opp_tiles += 1
+        if self.table[0][7] == '-':
+            if(self.table[0][6] == GameLayer.COMPUTER): my_tiles += 1
+            elif(self.table[0][6] == GameLayer.PERSON): opp_tiles += 1
+            if(self.table[1][6] == GameLayer.COMPUTER): my_tiles += 1
+            elif(self.table[1][6] == GameLayer.PERSON): opp_tiles += 1
+            if(self.table[1][7] == GameLayer.COMPUTER): my_tiles += 1
+            elif(self.table[1][7] == GameLayer.PERSON): opp_tiles += 1
+        if self.table[7][0] == '-':
+            if(self.table[7][1] == GameLayer.COMPUTER): my_tiles += 1
+            elif(self.table[7][1] == GameLayer.PERSON): opp_tiles += 1
+            if(self.table[6][1] == GameLayer.COMPUTER): my_tiles += 1
+            elif(self.table[6][1] == GameLayer.PERSON): opp_tiles += 1
+            if(self.table[6][0] == GameLayer.COMPUTER): my_tiles += 1
+            elif(self.table[6][0] == GameLayer.PERSON): opp_tiles += 1
+        if self.table[7][7] == '-':
+            if(self.table[6][7] == GameLayer.COMPUTER): my_tiles += 1
+            elif(self.table[6][7] == GameLayer.PERSON): opp_tiles += 1
+            if(self.table[6][6] == GameLayer.COMPUTER): my_tiles += 1
+            elif(self.table[6][6] == GameLayer.PERSON): opp_tiles += 1
+            if(self.table[7][6] == GameLayer.COMPUTER): my_tiles += 1
+            elif(self.table[7][6] == GameLayer.PERSON): opp_tiles += 1
+        return -12.5 * (my_tiles - opp_tiles)
+            
+
+    def check_Mobility(self):
+        return 0
+    
+    
+    def check_heurisitic(self, player):
+        total_weight = 0
+        c = self.check_coner_occupancy()
+        l = self.check_coner_closenss()
+        
+        return 0
+        
+        
+    def computer(self):
+        # self.check_heurisitic(GameLayer.COMPUTER)
+        move = self.minimax(GameLayer.COMPUTER)
         if len(move) > 0:
             self.table[move[1]][move[0]] = GameLayer.COMPUTER
 
@@ -259,11 +317,6 @@ class GameLayer(cocos.layer.Layer):
                 self.table[revY][revX] = GameLayer.COMPUTER
 
         self.turn *= -1
-    
-    def addtion_point(self):
-        
-        Player_move = self.getMoves_len()
-    
     
     def minimax(self, player):
         moves = self.getMoves(player, self.table)
@@ -284,7 +337,7 @@ class GameLayer(cocos.layer.Layer):
                 scores[i] = self.minMove(boardCopy, 2, alpha, beta)
 
         maxIndex = np.argmax(scores) #가장 큰 것에 대한 인덱스 값
-
+        print(maxIndex)
         return moves[maxIndex]
 
 
@@ -362,7 +415,7 @@ class GameLayer(cocos.layer.Layer):
                 if board[y][x] == GameLayer.PERSON:
                     personWeightSum += self.weight[y][x]
 
-        return computerWeightSum - personWeightSum;
+        return computerWeightSum - personWeightSum
         
 class MainMenu(Menu):
     def __init__(self):
