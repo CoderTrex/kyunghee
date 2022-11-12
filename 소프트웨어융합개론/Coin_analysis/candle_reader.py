@@ -3,11 +3,12 @@ import pyupbit
 import pandas as pd
 import numpy
 
-
 Path = "C:\\Coding\\kyunghee\\소프트웨어융합개론\\File\\coin_ohlcv\\"
 file_root = (Path+"{0}.xlsx".format("KRW-BTC"))
 readed_excel = pd.read_excel(file_root)
 data_np = pd.DataFrame.to_numpy(readed_excel)
+
+data_dict = {}
 
 # 기본적인 여러가지 식에 대해 정의하는 함수
 def The_define(open, close, high, low):
@@ -99,13 +100,14 @@ def analysis_main():
         # 절대값으로 결과값이 나옴
         day_high_range, day_low_range, day_range_big, day_range_small = The_Detail(
             day_open, day_close, day_high, day_low)
-
+        print(today_date, ":  ")
         # 퍼센트의 세분화
 # ------------------------------------------------------------------------------------------#
         # 0% ~ 1.25%: 매우 작음
         if 0 <= abs(day_percent) <= 0.0125:
             # day_close와 day_open의 가격이 각각 하한가와 상한가와 1.5%미만으로 변동시 이를 작은 십자가형으로 명명한다.
             if day_result_big < 0.02:
+                data_dict["{}".format(today_date)] 
                 print("포프라이트")
             elif 0.02 <= day_result_big <= 0.11:
                 if day_result_big*(0.5) > day_result_small:
@@ -156,7 +158,6 @@ def analysis_main():
                     print('아래망치 일반(작은) 캔들: {0}/{1}'.format(today_result, today_date))
                 else:
                     print("버그값?")
-
 
 # ------------------------------------------------------------------------------------------#
         # 7% ~ 15%: 일반(큼)

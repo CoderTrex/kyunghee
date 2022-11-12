@@ -25,6 +25,7 @@ def find_ticker(count):
     # 모든 티커의 ohlcv의 값을 가져온 뒤에 이들로부터 1일동안의 변동률을 확인한다.
     if count == 1:
         for ticker_name in the_all_ticker:
+            print(ticker_name)
             file_root = "C:\\Coding\\kyunghee\\소프트웨어융합개론\\File\\coin_ohlcv\\{0}.xlsx".format(ticker_name)
             check_box = []
             readed_excel = pd.read_excel(file_root)
@@ -64,8 +65,6 @@ def find_ticker(count):
             second_strategy[ticker_name] = now_rsi
             time.sleep(1)
 
-
-
 def action(number):
     if number == 1:
         find_ticker(1)
@@ -78,6 +77,8 @@ def action(number):
         df = (df.T)
         df.to_excel("C:\\Coding\\kyunghee\\소프트웨어융합개론\\File\\RSI\\RSI.xlsx")
 
-
 def main():
-    action(2)
+    action(1)
+    # action(2)
+    
+main()
