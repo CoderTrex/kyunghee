@@ -7,6 +7,33 @@ from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
+class Cube(object):
+    sides = ((0,1,2,3), (3,2,7,6), (6,7,5,4),
+             (4,5,1,0), (1,5,7,2), (4,0,3,6))
+    normals= ((0., 0., 1.), ( 1., 0., 0.), (0.,0., 1.),
+            (1., 0., 0.), (0., 1., 0), (0.,1., 0.))
+    def __init__(self, position, size, color):
+        self.position = position
+        self.color = color
+        x, y, z = map(lambda i: i/2, size)
+    
+        self.vertices = (
+            (x, -y, -z), (x, y, -z),
+            (-x, y,-z), (-x, -y, -z),
+            (x, -y, z), (x, y, z),
+            (-x, -y, z), (-x, y,  z))
+
+    def render(self):
+        glPushMatrix()
+        glTranslatef(*self.position)
+        glBegin(GL_QUADS)
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, self.color)
+        for index, side in enumerate(Cube.sides):
+            for v in side:
+                glNormal3fv(self.normals[index])
+                glVertex3fv(self.vertices[v])
+        glEnd()
+        glPopMatrix()
 
 class Light(object):
     enabled = False
@@ -66,7 +93,8 @@ class App(object):
         self.light = Light(GL_LIGHT0, (15, 5, 15, 1))
         self.sphere1 = Sphere(2, (0, 0, 0), (1, 1, 1, 1))
         self.sphere2 = Sphere(1, (4, 2, 0), (1, 0.4, 0.4, 1))
-
+        self.cube = Cube(position=(10,0,-5), size=(3, 3, 5), color=(0,0,1,1))
+    
     def start(self):
         pygame.init()
         pygame.display.set_mode((self.width, self.height),
@@ -101,6 +129,7 @@ class App(object):
         self.light.render()
         self.sphere1.render()
         self.sphere2.render()
+        self.cube.render()
         pygame.display.flip()
 
     def process_input(self, dt):

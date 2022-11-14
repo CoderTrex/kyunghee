@@ -346,7 +346,22 @@ class Magic(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.direction = direction
+        self.magic_type = 1
 
+    def get_freeze(enemy):
+        enemy.speed = 0
+    
+    def get_burn(enemy):
+        # enemy.
+        
+        pass
+
+    def get_posion(enemy):
+        # 움직임 좌우로 와리가리
+        while ()
+        enemy.direction 
+        pass
+    
     def update(self):
         self.vel_y += GRAVITY
         dx = self.direction * self.speed
@@ -378,13 +393,50 @@ class Magic(pygame.sprite.Sprite):
                 if abs(self.rect.centerx - enemy.rect.centerx) < TILE_SIZE * 2 and \
                     abs(self.rect.centery - enemy.rect.centery) < TILE_SIZE * 2:
                     enemy.health -= 50
+                # 얼음 마법 진행
+                if self.magic_type == 1:
+                    self.get_freeze(enemy)
+                # 화염 마법 진행
+                elif self.magic_type == 2:
+                    burn = Burn(enemy.rect.centerx, enemy.rect.centery, 1)
+                # 독 마법 진행
+                elif self.magic_type == 3:
+                    self.get_posion(enemy)
 
+class Burn(pygame.sprite.Sprite):
+    def __init__(self, x, y, scale):
+        super().__init__()
+        self.images = []
+        # 이미지 가져와서 여거 숫자 갱신해야함
+        for num in range(1, 10):
+            img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\effect\\Explosion_Water\\water{0}.png'.format(num)).convert_alpha()
+            img = pygame.transform.scale(img, (float(img.get_width() * scale), float(img.get_height() * scale)))
+            self.images.append(img)
+        self.frame_index = 0
+        self.image = self.images[self.frame_index]
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        self.counter = 0
+        
+    def update(self):
+        Explosion_SPEED = 10
+        self.counter += 1
+        if self.counter >= Explosion_SPEED:
+            self.counter = 0
+            self.frame_index += 1
+            if self.frame_index >= len(self.images):
+                self.kill()
+            else:
+                self.image = self.images[self.frame_index]
+            self.
+        
+        
 class Explosion(pygame.sprite.Sprite):
     def __init__(self, x, y, scale):
         pygame.sprite.Sprite.__init__(self)
         self.images = []
         for num in range(1, 8):
-            img =  pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\effect\\Explosion_Water\\water{0}.png'.format(num)).convert_alpha()
+            img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\effect\\Explosion_Water\\water{0}.png'.format(num)).convert_alpha()
             img = pygame.transform.scale(img, (float(img.get_width() * scale), float(img.get_height() * scale)))
             self.images.append(img)
         self.frame_index = 0
