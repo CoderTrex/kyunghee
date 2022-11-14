@@ -16,4 +16,4 @@ for ticker_name  in all_ticker_name:
     df['ror'] = np.where(df['high'] > df['target(=open + range)'], df['close'] / df['target(=open + range)'] - fee, 1)
     df['hpr'] = df['ror'].cumprod()
     df['mdd'] = (df['hpr'].cummax() - df['hpr']) / df['hpr'].cummax() * 100
-    df.to_excel("C:\\Coding\\kyunghee\\소프트웨어융합개론\\File\\all_info_excel\\breakthrough_{0}.xlsx".format(str(ticker_name)))
+    df.to_excel("C:\\Coding\\kyunghee\\소프트웨어융합개론\\File\\all_info\\all_info_{0}.xlsx".format(str(ticker_name)))
