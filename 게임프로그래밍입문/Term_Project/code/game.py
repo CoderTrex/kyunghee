@@ -3,7 +3,6 @@ import random
 import os
 import csv
 
-
 pygame.init()
 
 #초기 화면 설정
@@ -58,6 +57,10 @@ magic = False
 spin = False
 magic_thrown = False
 
+# 마법 상태
+freeze = False
+
+
 # 배경 형성
 BG = (200, 101, 120)
 BLACK = (0, 0, 0)
@@ -94,7 +97,14 @@ class Soldier(pygame.sprite.Sprite):
         self.start_ammo = ammo
         self.magic = magic
         
-        self.health = 100 # 몬스터에 맞춰서 health 구현하기
+        self.burn = False
+        self.freeze = False
+
+        if (char_type == 'lich'):
+            self.health = 300 # 몬스터에 맞춰서 health 구현하기
+        if (char_type == 'player'):
+            self.health = 150
+
         self.max_health = self.health
         self.shoot_cooldown = 0
         self.direction = 1
@@ -121,7 +131,7 @@ class Soldier(pygame.sprite.Sprite):
             # 임시 이미지 파일 리스트
             temp_list = []
             # 파일안에 있는 사진 수 세기    
-            num_of_frames = len(os.listdir("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\\\{0}\\{1}"\
+            num_of_frames = len(os.listdir("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\{0}\\{1}"\
                                 .format(self.char_type, animation)))
             for i in range (1, num_of_frames + 1):
                 # 이미지 가져오기
@@ -187,7 +197,7 @@ class Soldier(pygame.sprite.Sprite):
     def shoot(self):
         if self.shoot_cooldown == 0 and self.ammo > 0:
             self.shoot_cooldown = 30
-            if self.char_type == 'enemy_boss':
+            if self.char_type == 'lich':
                 bullet = Bullet(self.rect.centerx + self.direction *(self.rect.size[0] * 1), self.rect.centery, self.direction, self.char_type)
             else:
                 bullet = Bullet(self.rect.centerx + self.direction *(self.rect.size[0] * 0.7), self.rect.centery, self.direction, self.char_type)
@@ -195,14 +205,17 @@ class Soldier(pygame.sprite.Sprite):
             # 총알 감소
             self.ammo -= 1
     
-    def ai(self):
+    def ai(self, num):
         if self.alive and player.alive:
             if self.idling == False and random.randint(1, 200) == 3:
                 self.update_action(0) # 멈춰있는 자세 유지
                 self.idling = True
                 self.idling_counter = 100
+            if num == 1:
+                print("hi")
+                self.update_action(0)
             # ai 근처에 플레이어가 있는 지 확인
-            if self.vision.colliderect(player.rect):
+            elif self.vision.colliderect(player.rect):
                 # 움직이지 않고 플레이어를 바라본다.
                 self.update_action(0)
                 self.shoot()
@@ -219,7 +232,6 @@ class Soldier(pygame.sprite.Sprite):
                     self.move_counter += 1
                     # ai가 움직이면서 시야가 달라지는 것을 구현
                     self.vision.center = (self.rect.centerx + 150 * self.direction, self.rect.centery)
-                    
                     if self.move_counter > TILE_SIZE:
                         self.direction *= -1
                         self.move_counter *= -1
@@ -227,8 +239,6 @@ class Soldier(pygame.sprite.Sprite):
                     self.idling_counter -= 1
                     if self.idling_counter <= 0:
                         self.idling = False
-                    
-                    
     
     def update_animation(self):
         # 애니메이션 업데이트
@@ -312,8 +322,7 @@ class Bullet(pygame.sprite.Sprite):
         self.speed = 10
         if char_type == "player":
             self.image = bullet_img
-        elif char_type == "enemy_boss":
-            # self.image = bullet_img
+        elif char_type == "lich":
             self.image = skeleton_img
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
@@ -363,31 +372,6 @@ class Spin(pygame.sprite.Sprite):
             self.counter = 0
             self.image = self.images[self.counter]
 
-class Freeze(pygame.sprite.Sprite):
-    def __init__(self, x, y, scale):
-        pygame.sprite.Sprite.__init__(self)
-        self.images = []
-        for num in range(1, 11):
-            img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Explosion_Ice\\{0}.png'.format(num)).convert_alpha()
-            img = pygame.transform.scale(img, (float(img.get_width() * scale), float(img.get_height() * scale)))
-            self.images.append(img)
-        self.frame_index = 0
-        self.image = self.images[self.frame_index]
-        self.rect = self.image.get_rect()
-        self.rect.center = (x, y)
-        self.counter = 0
-        
-    def update(self):
-        Explosion_SPEED = 10
-        self.counter += 1
-        if self.counter >= Explosion_SPEED:
-            self.counter = 0
-            self.frame_index += 1
-            if self.frame_index >= len(self.images):
-                self.kill()
-            else:
-                self.image = self.images[self.frame_index]
-        
         
 class Magic(pygame.sprite.Sprite):
     def __init__(self, x, y, direction):
@@ -431,24 +415,24 @@ class Magic(pygame.sprite.Sprite):
             for enemy in enemy_group:
                 if abs(self.rect.centerx - enemy.rect.centerx) < TILE_SIZE * 2 and \
                     abs(self.rect.centery - enemy.rect.centery) < TILE_SIZE * 2:
-                    enemy.health -= 50
+                    enemy.health -= 10
                 # 얼음 마법 진행
                 if self.magic_type == 1:
                     freeze = Freeze(enemy.rect.centerx, enemy.rect.centery, 1)
-                    freeze_group.add(freeze)    
+                    freeze_group.add(freeze)
                 # 화염 마법 진행
                 elif self.magic_type == 2:
                     self.get_burn(enemy)
                 # 독 마법 진행
                 elif self.magic_type == 3:
-                    poison = Poison(enemy.rect.centerx, enemy.rect.centery, 1)
+                    poison = Poison(enemy.rect.centerx, enemy.rect.centery, 0.5)
                     freeze_group.add(poison)    
 
 class Freeze(pygame.sprite.Sprite):
     def __init__(self, x, y, scale):
         pygame.sprite.Sprite.__init__(self)
         self.images = []
-        for num in range(1, 11):
+        for num in range(1, 8):
             img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Explosion_Ice\\{0}.png'.format(num)).convert_alpha()
             img = pygame.transform.scale(img, (float(img.get_width() * scale), float(img.get_height() * scale)))
             self.images.append(img)
@@ -459,15 +443,18 @@ class Freeze(pygame.sprite.Sprite):
         self.counter = 0
         
     def update(self):
-        Explosion_SPEED = 10
-        self.counter += 1
-        if self.counter >= Explosion_SPEED:
-            self.counter = 0
+        Explosion_SPEED = 200
+        if self.counter <= Explosion_SPEED:
+            freeze = True
             self.frame_index += 1
             if self.frame_index >= len(self.images):
-                self.kill()
+                self.frame_index = len(self.images)
+                self.counter += 1
             else:
                 self.image = self.images[self.frame_index]
+        else:
+            freeze = False
+            self.kill()
 
 class Poison(pygame.sprite.Sprite):
     def __init__(self, x, y, scale):
@@ -543,10 +530,17 @@ Item_box_group.add(Item_box)
 #이미지의 초기 위치 및 크기 지정값
 player = Soldier('player', 200, 200, 2, 5, 20, 5)
 health_bar = HealthBar(10, 10, player.health, player.health)
-enemy = Soldier('enemy_boss', 400, 200, 2, 2, 20, 0)
-enemy2 = Soldier('enemy_boss', 300, 300, 2, 2, 20, 0)
+enemy = Soldier('lich', 400, 200, 2, 2, 20, 0)
+enemy2 = Soldier('lich', 300, 300, 2, 2, 20, 0)
 enemy_group.add(enemy)
 enemy_group.add(enemy2)
+
+
+# create empty tile list
+world_data = []
+
+
+
 
 # 비어있는 파일 리스트를 출력한다.
 run = True
@@ -573,7 +567,9 @@ while run:
     
     # 적 형성
     for enemy in enemy_group:
-        enemy.ai()
+        if freeze == True:
+            enemy.ai(1)
+        enemy.ai(0)
         enemy.draw()
         enemy.update()
 
