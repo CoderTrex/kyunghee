@@ -18,10 +18,13 @@ FPS = 60
 
 # 게임 변수 설정
 GRAVITY = 0.98
+SCROLL_THRESH = 200
 ROWS = 16
 COLS = 150
 TILE_SIZE = SCREEN_HEIGHT//ROWS
 TILE_TYPE = 21
+screen_scroll = 0
+bg_scroll = 0
 level = 1
 
 # 이미지 로드
@@ -65,6 +68,10 @@ magic = False
 spin = False
 magic_thrown = False
 
+pine1_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\level\\img\\Background\\pine1.png').convert_alpha()
+pine2_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\level\\img\\Background\\pine2.png').convert_alpha()
+mountain_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\level\\img\\Background\\mountain.png').convert_alpha()
+
 # 마법 상태
 freeze = False
 
@@ -87,7 +94,13 @@ def draw_text(text, font, text_col, x, y):
 # 배경 처리
 def draw_bg():
     screen.fill(BG)
-
+    width = mountain_img.get_width()
+    for x in range(5):
+        screen.blit(mountain_img, ((x * width - bg_scroll) * 0.6, SCREEN_HEIGHT - mountain_img.get_height() - 300))
+        screen.blit(pine1_img, ((x * width - bg_scroll) * 0.5 - bg_scroll, SCREEN_HEIGHT - pine1_img.get_height() - 150))
+        screen.blit(pine2_img, ((x * width - bg_scroll) * 0.5 - bg_scroll, SCREEN_HEIGHT - pine2_img.get_height()))
+    
+    
 class Soldier(pygame.sprite.Sprite):
     def __init__(self, char_type, x, y, scale, speed, ammo, magic):
         pygame.sprite.Sprite.__init__(self)
@@ -163,6 +176,7 @@ class Soldier(pygame.sprite.Sprite):
 
     def move(self, moving_left, moving_right):
         # 움직임 변수들을 초기화
+        screen_scroll = 0
         dx = 0
         dy = 0
 
@@ -193,6 +207,10 @@ class Soldier(pygame.sprite.Sprite):
             # x축과의 충돌 처리
             if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
                 dx = 0
+                # if the ai has hit a wall then make it turn around
+                if self.char_type == 'lich' or self.char_type == 'goblin':
+                    self.direction *= -1
+                    self.move_counter = 0
             # y축과의 충돌 처리
             if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
                 # 땅에 맡다아 있는지 확인
@@ -206,10 +224,25 @@ class Soldier(pygame.sprite.Sprite):
                     dy = tile[1].top - self.rect.bottom
 
 
+        if self.char_type == 'player':
+            if self.rect.left + dx < 0 or self.rect.right + dx > SCREEN_WIDTH:
+                dx = 0
+            
         # 할당 받은 사각형의 위치를 정해줌
         self.rect.x += dx
         self.rect.y += dy
 
+        # 플레이어의 위치에 기반해 스크롤을 업데이트
+        if self.char_type == 'player':
+            if (self.rect.right > SCREEN_WIDTH - SCROLL_THRESH \
+                and bg_scroll < (world.level_length * TILE_SIZE) - SCREEN_WIDTH) \
+                or (self.rect.left < SCROLL_THRESH and bg_scroll > abs(dx)):
+                self.rect.x -= dx
+                screen_scroll = -dx 
+                
+        return screen_scroll
+        
+        
     # 플레이어의 총알 발사
     def shoot(self):
         if self.shoot_cooldown == 0 and self.ammo > 0:
@@ -256,6 +289,10 @@ class Soldier(pygame.sprite.Sprite):
                     self.idling_counter -= 1
                     if self.idling_counter <= 0:
                         self.idling = False
+                        
+                        
+        # 스크롤
+        self.rect.x += screen_scroll
     
     def update_animation(self):
         # 애니메이션 업데이트
@@ -298,6 +335,10 @@ class World():
         self.obstacle_list = []
     
     def process_data(self, data):
+        self.level_length = len(data[0])
+        
+        
+        
         #iterate through each value in level data file
         for y, row in enumerate(data):
             for x, tile in enumerate(row):
@@ -338,6 +379,7 @@ class World():
 
     def draw(self):
         for tile in self.obstacle_list:
+            tile[1][0] += screen_scroll
             screen.blit(tile[0], tile[1])
 
             
@@ -347,13 +389,16 @@ class Lava(pygame.sprite.Sprite):
         self.image = img
         self.rect = self.image.get_rect()
         self.rect.midtop = (x  + TILE_SIZE // 2, y + (TILE_SIZE - self.image.get_height()))
-
+    def update(self):
+        self.rect.x += screen_scroll
 class Star(pygame.sprite.Sprite):
     def __init__(self, img, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.image = img
         self.rect = self.image.get_rect()
         self.rect.midtop = (x  + TILE_SIZE // 2, y + (TILE_SIZE - self.image.get_height()))
+    def update(self):
+        self.rect.x += screen_scroll
 
             
 class ItemBox(pygame.sprite.Sprite):
@@ -365,6 +410,7 @@ class ItemBox(pygame.sprite.Sprite):
         self.rect.midtop = (x + TILE_SIZE // 2, y + (TILE_SIZE - self.image.get_height()))
     
     def update(self):
+        self.rect.x += screen_scroll
         # 플레이어가 물약을 주웠는지 확인함
         if pygame.sprite.collide_rect(self, player):
             # 어떤 박스와 충돌했는 지 확인함
@@ -411,7 +457,7 @@ class Bullet(pygame.sprite.Sprite):
         
     def update(self):
         # 총알 움직이기
-        self.rect.x += (self.direction * self.speed)
+        self.rect.x += (self.direction * self.speed) + screen_scroll
         # 총알이 화면 밖으로 나갔는가 확인하기
         if  self.rect.right < 0 or self.rect.left > SCREEN_WIDTH:
             self.kill()
@@ -493,7 +539,7 @@ class Magic(pygame.sprite.Sprite):
                     dy = tile[1].top - self.rect.bottom
         
         # 마법의 위치 업데이트
-        self.rect.x += dx
+        self.rect.x += dx + screen_scroll
         self.rect.y += dy
         
         # 시간 카운트 다운
@@ -591,6 +637,7 @@ class Explosion(pygame.sprite.Sprite):
         self.counter = 0
 
     def update(self):
+        self.rect.x += screen_scroll
         Explosion_SPEED = 4
         # 폭발 이미지 업데이트
         self.counter += 1
@@ -705,6 +752,9 @@ while run:
         else:
             player.update_action(0)#0: idle
 
+        screen_scroll = player.move(moving_left, moving_right)
+        bg_scroll -= screen_scroll
+        
     for event in pygame.event.get():
         # when quit game
         if event.type == pygame.QUIT:
