@@ -348,20 +348,6 @@ class Magic(pygame.sprite.Sprite):
         self.direction = direction
         self.magic_type = 1
 
-    def get_freeze(enemy):
-        enemy.speed = 0
-    
-    def get_burn(enemy):
-        # enemy.
-        
-        pass
-
-    def get_posion(enemy):
-        # 움직임 좌우로 와리가리
-        while ()
-        enemy.direction 
-        pass
-    
     def update(self):
         self.vel_y += GRAVITY
         dx = self.direction * self.speed
@@ -395,21 +381,22 @@ class Magic(pygame.sprite.Sprite):
                     enemy.health -= 50
                 # 얼음 마법 진행
                 if self.magic_type == 1:
-                    self.get_freeze(enemy)
+                    freeze = Freeze(enemy.rect.centerx, enemy.rect.centery, 1)
+                    freeze_group.add(freeze)    
                 # 화염 마법 진행
                 elif self.magic_type == 2:
-                    burn = Burn(enemy.rect.centerx, enemy.rect.centery, 1)
+                    self.get_burn(enemy)
                 # 독 마법 진행
                 elif self.magic_type == 3:
-                    self.get_posion(enemy)
+                    poison = Poison(enemy.rect.centerx, enemy.rect.centery, 1)
+                    freeze_group.add(poison)    
 
-class Burn(pygame.sprite.Sprite):
+class Freeze(pygame.sprite.Sprite):
     def __init__(self, x, y, scale):
         super().__init__()
         self.images = []
-        # 이미지 가져와서 여거 숫자 갱신해야함
-        for num in range(1, 10):
-            img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\effect\\Explosion_Water\\water{0}.png'.format(num)).convert_alpha()
+        for num in range(1, 11):
+            img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Explosion_Ice\\{0}.png'.format(num)).convert_alpha()
             img = pygame.transform.scale(img, (float(img.get_width() * scale), float(img.get_height() * scale)))
             self.images.append(img)
         self.frame_index = 0
@@ -428,15 +415,39 @@ class Burn(pygame.sprite.Sprite):
                 self.kill()
             else:
                 self.image = self.images[self.frame_index]
-            self.
+
+class Poison(pygame.sprite.Sprite):
+    def __init__(self, x, y, scale):
+        super().__init__()
+        self.images = []
+        for num in range(1, 11):
+            img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Explosion_Poison\\Explosion_gas{0}.png'.format(num)).convert_alpha()
+            img = pygame.transform.scale(img, (float(img.get_width() * scale), float(img.get_height() * scale)))
+            self.images.append(img)
+        self.frame_index = 0
+        self.image = self.images[self.frame_index]
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        self.counter = 0
         
-        
+    def update(self):
+        Explosion_SPEED = 10
+        self.counter += 1
+        if self.counter >= Explosion_SPEED:
+            self.counter = 0
+            self.frame_index += 1
+            if self.frame_index >= len(self.images):
+                self.kill()
+            else:
+                self.image = self.images[self.frame_index]
+                
+
 class Explosion(pygame.sprite.Sprite):
     def __init__(self, x, y, scale):
         pygame.sprite.Sprite.__init__(self)
         self.images = []
         for num in range(1, 8):
-            img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\effect\\Explosion_Water\\water{0}.png'.format(num)).convert_alpha()
+            img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Explosion_Water\\water{0}.png'.format(num)).convert_alpha()
             img = pygame.transform.scale(img, (float(img.get_width() * scale), float(img.get_height() * scale)))
             self.images.append(img)
         self.frame_index = 0
@@ -464,6 +475,8 @@ enemy_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
 magic_group = pygame.sprite.Group()
 explosion_group = pygame.sprite.Group()
+freeze_group = pygame.sprite.Group()
+poison_group = pygame.sprite.Group()
 Item_box_group = pygame.sprite.Group()
 
 # temp - creat item boxes
@@ -517,11 +530,15 @@ while run:
     bullet_group.update()
     magic_group.update()
     explosion_group.update()
+    freeze_group.update()
+    poison_group.update()
     Item_box_group.update()
     
     bullet_group.draw(screen)
     magic_group.draw(screen)
     explosion_group.draw(screen)
+    freeze_group.draw(screen)
+    poison_group.draw(screen)
     Item_box_group.draw(screen)
     
     # 플레이어의 액션 상태 업데이트
