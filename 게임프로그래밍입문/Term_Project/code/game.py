@@ -8,6 +8,7 @@ pygame.init()
 #초기 화면 설정
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = int(SCREEN_WIDTH * 0.8)
+
 screen =  pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('I\'m slimer')
 
@@ -18,13 +19,20 @@ FPS = 60
 # 게임 변수 설정
 GRAVITY = 0.98
 ROWS = 16
-COL = 150
-TILE_SIZE = SCREEN_WIDTH//ROWS
+COLS = 150
+TILE_SIZE = SCREEN_HEIGHT//ROWS
 TILE_TYPE = 21
 level = 1
 
 # 이미지 로드
-
+# 리스트로 타일 저장
+img_list = []
+for x in range(TILE_TYPE):
+    img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\level\\img\\tile\\{0}.png'.format(x))
+    img = pygame.transform.scale(img, (TILE_SIZE,TILE_SIZE))
+    img_list.append(img)
+    
+    
 # 슬라임 총알
 bullet_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\attack_bullet.png').convert_alpha()
 bullet_img = pygame.transform.scale(bullet_img, (bullet_img.get_width() * 0.03, bullet_img.get_height() * 0.03))
@@ -76,16 +84,9 @@ def draw_text(text, font, text_col, x, y):
     img = font.render(text, True, text_col)
     screen.blit(img, (x, y))
 
-
 # 배경 처리
 def draw_bg():
     screen.fill(BG)
-    pygame.draw.line(screen, BLUE, (0, 300), (SCREEN_WIDTH, 300))
-    pygame.draw.line(screen, BLUE, (0, 299), (SCREEN_WIDTH, 299))
-    pygame.draw.line(screen, BLUE, (0, 298), (SCREEN_WIDTH, 298))
-    pygame.draw.line(screen, BLUE, (0, 297), (SCREEN_WIDTH, 297))
-    pygame.draw.line(screen, BLUE, (0, 296), (SCREEN_WIDTH, 296))
-
 
 class Soldier(pygame.sprite.Sprite):
     def __init__(self, char_type, x, y, scale, speed, ammo, magic):
@@ -148,6 +149,9 @@ class Soldier(pygame.sprite.Sprite):
         #이미지 모양 지정
         self.rect = self.image.get_rect()
         self.rect.center = (x,y)
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
+        
 
     def update(self):
         # 애니메이션 업데이트
@@ -183,11 +187,24 @@ class Soldier(pygame.sprite.Sprite):
         if self.vel_y > 10:
             self.vel_y 
         dy += self.vel_y
-
+        
         # 바닥과 충돌 처리
-        if self.rect.bottom + dy > 300:
-            dy = 300 - self.rect.bottom
-            self.in_air = False
+        for tile in world.obstacle_list:
+            # x축과의 충돌 처리
+            if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
+                dx = 0
+            # y축과의 충돌 처리
+            if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+                # 땅에 맡다아 있는지 확인
+                if self.vel_y < 0:
+                    self.vel_y = 0
+                    dy = tile[1].bottom - self.rect.top
+                # 땅 위에 있는 지 확인
+                elif self.vel_y >= 0:
+                    self.vel_y = 0
+                    self.in_air = False
+                    dy = tile[1].top - self.rect.bottom
+
 
         # 할당 받은 사각형의 위치를 정해줌
         self.rect.x += dx
@@ -275,6 +292,70 @@ class Soldier(pygame.sprite.Sprite):
         screen.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
         # pygame.draw.rect(screen, RED, self.rect, 1)
 
+
+class World():
+    def __init__(self):
+        self.obstacle_list = []
+    
+    def process_data(self, data):
+        #iterate through each value in level data file
+        for y, row in enumerate(data):
+            for x, tile in enumerate(row):
+                if tile >= 0:
+                    img = img_list[tile]
+                    img_rect = img.get_rect()
+                    img_rect.x = x * TILE_SIZE
+                    img_rect.y = y * TILE_SIZE
+                    tile_data = (img, img_rect)
+                    if tile >= 0 and tile <= 8:
+                        self.obstacle_list.append(tile_data)
+                    elif tile >= 9  and tile <= 10:
+                        lava = Lava(img, x*TILE_SIZE, y*TILE_SIZE)
+                        lava_group.add(lava)
+                    elif tile == 11: # 힐팩 생성
+                        Item_box = ItemBox('Health', x*TILE_SIZE, y*TILE_SIZE)
+                        Item_box_group.add(Item_box)
+                    elif tile == 12: # 마법 팩 형성
+                        Item_box = ItemBox('Power', x*TILE_SIZE, y*TILE_SIZE)
+                        Item_box_group.add(Item_box)
+                    elif tile == 13: # 총알 팩 형성
+                        Item_box = ItemBox('Ammo', x*TILE_SIZE, y*TILE_SIZE)
+                        Item_box_group.add(Item_box)
+                    elif tile == 14:
+                        player = Soldier('player', x * TILE_SIZE, y * TILE_SIZE, 2, 5, 20, 5)
+                        health_bar = HealthBar(10, 10, player.health, player.health)
+                    elif tile == 15:
+                        enemy = Soldier('lich', x * TILE_SIZE, y * TILE_SIZE, 2, 2, 20, 0)
+                        enemy_group.add(enemy)
+                    elif tile == 16:
+                        enemy2 = Soldier('goblin', x * TILE_SIZE, y * TILE_SIZE, 2, 2, 20, 0)
+                        enemy_group.add(enemy2)
+                    elif tile == 20:
+                        star = Star(img, x*TILE_SIZE, y*TILE_SIZE)
+                        star_group.add(star)
+                        
+        return player, health_bar
+
+    def draw(self):
+        for tile in self.obstacle_list:
+            screen.blit(tile[0], tile[1])
+
+            
+class Lava(pygame.sprite.Sprite):
+    def __init__(self, img, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.rect.midtop = (x  + TILE_SIZE // 2, y + (TILE_SIZE - self.image.get_height()))
+
+class Star(pygame.sprite.Sprite):
+    def __init__(self, img, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.rect.midtop = (x  + TILE_SIZE // 2, y + (TILE_SIZE - self.image.get_height()))
+
+            
 class ItemBox(pygame.sprite.Sprite):
     def __init__(self, item_type, x, y):
         pygame.sprite.Sprite.__init__(self)
@@ -335,6 +416,11 @@ class Bullet(pygame.sprite.Sprite):
         if  self.rect.right < 0 or self.rect.left > SCREEN_WIDTH:
             self.kill()
         
+        # 레벨과 충돌 처리
+        for tile in world.obstacle_list:
+            if tile[1].colliderect(self.rect):
+                self.kill()
+        
         # 캐릭터와 총알 충돌 체크
         if pygame.sprite.spritecollide(player, bullet_group, False):
             if player.alive:
@@ -382,6 +468,8 @@ class Magic(pygame.sprite.Sprite):
         self.image = magic_img
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
         self.direction = direction
         self.magic_type = 1
 
@@ -390,13 +478,19 @@ class Magic(pygame.sprite.Sprite):
         dx = self.direction * self.speed
         dy = self.vel_y
 
-        # 바닥 및 화면 충돌 처리
-        if self.rect.bottom + dy > 300:
-            dy = 300 - self.rect.bottom
-            self.speed = 0
-        if  self.rect.left + dx < 0 or self.rect.right + dx> SCREEN_WIDTH:
-            self.direction *= -1
-            dx = self.direction * self.speed
+        # 레벨과 충돌 처리
+        for tile in world.obstacle_list:
+            if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
+                self.direction *= -1
+                dx = self.direction * self.speed
+            if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+                self.speed = 0
+                if self.vel_y < 0:
+                    self.vel_y = 0
+                    dy = tile[1].bottom - self.rect.top
+                elif self.vel_y >= 0:
+                    self.vel_y = 0
+                    dy = tile[1].top - self.rect.bottom
         
         # 마법의 위치 업데이트
         self.rect.x += dx
@@ -418,7 +512,7 @@ class Magic(pygame.sprite.Sprite):
                     enemy.health -= 10
                 # 얼음 마법 진행
                 if self.magic_type == 1:
-                    freeze = Freeze(enemy.rect.centerx, enemy.rect.centery, 1)
+                    freeze = Freeze(enemy.rect.centerx, enemy.rect.centery, 0.5)
                     freeze_group.add(freeze)
                 # 화염 마법 진행
                 elif self.magic_type == 2:
@@ -518,35 +612,34 @@ explosion_group = pygame.sprite.Group()
 freeze_group = pygame.sprite.Group()
 poison_group = pygame.sprite.Group()
 Item_box_group = pygame.sprite.Group()
-
-# temp - creat item boxes
-Item_box = ItemBox('Health', 10, 200)
-Item_box_group.add(Item_box)
-Item_box = ItemBox('Ammo', 900, 200)
-Item_box_group.add(Item_box)
-Item_box = ItemBox('Power', 700, 200)
-Item_box_group.add(Item_box)
-
-#이미지의 초기 위치 및 크기 지정값
-player = Soldier('player', 200, 200, 2, 5, 20, 5)
-health_bar = HealthBar(10, 10, player.health, player.health)
-enemy = Soldier('lich', 400, 200, 2, 2, 20, 0)
-enemy2 = Soldier('lich', 300, 300, 2, 2, 20, 0)
-enemy_group.add(enemy)
-enemy_group.add(enemy2)
+lava_group = pygame.sprite.Group()
+star_group = pygame.sprite.Group()
 
 
 # create empty tile list
 world_data = []
+for row in range(ROWS):
+    r = [-1]  * COLS
+    world_data.append(r)
 
+# load in level data and create world
+with open('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\code\\level{}_data.csv'.format(0), newline='') as csvfile:
+    reader = csv.reader(csvfile, delimiter=',')
+    for x, row in enumerate(reader):
+        for y, tile in enumerate(row):
+            world_data[x][y] = int(tile)
 
-
+world = World()
+player, health_bar = world.process_data(world_data)
 
 # 비어있는 파일 리스트를 출력한다.
 run = True
 while run:
     clock.tick(FPS)
+    # 배경 출력
     draw_bg()
+    # 맵 출력
+    world.draw()
     
     # HP 출력
     health_bar.draw(player.health)
@@ -559,12 +652,11 @@ while run:
     for x in range(player.magic):
         screen.blit(magic_img, (90 + (x * 10), 65))
 
-    
     # 플레이어 생성
     player.draw()
     player.update()
     player.move(moving_left, moving_right)
-    
+
     # 적 형성
     for enemy in enemy_group:
         if freeze == True:
@@ -580,6 +672,8 @@ while run:
     freeze_group.update()
     poison_group.update()
     Item_box_group.update()
+    lava_group.update()
+    star_group.update()    
     
     bullet_group.draw(screen)
     magic_group.draw(screen)
@@ -587,6 +681,8 @@ while run:
     freeze_group.draw(screen)
     poison_group.draw(screen)
     Item_box_group.draw(screen)
+    lava_group.draw(screen)
+    star_group.draw(screen)
     
     # 플레이어의 액션 상태 업데이트
     if player.alive:
@@ -595,8 +691,7 @@ while run:
             player.shoot()
         # 수류탄 투척 액션
         elif magic and magic_thrown == False and player.magic > 0:
-            magic = Magic(player.rect.centerx + (1 * player.rect.size[0])\
-                * player.direction, player.rect.top, player.direction)
+            magic = Magic(player.rect.centerx + (1 * player.rect.size[0]) * player.direction, player.rect.top, player.direction)
             magic_group.add(magic)
             # 수류탄 수 줄어들기
             player.magic -= 1
