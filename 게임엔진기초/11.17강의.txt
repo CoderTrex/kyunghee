@@ -1,0 +1,79 @@
+19 page :
+해쉬 테이블 : 
+
+20 page :
+해싱 : 임의의 데이터 타입 -> 인티져
+
+21 page :
+헤싱은 빨라야고, 정확해야 함
+deterministic = 똑같은게 나와야함
+
+암호화에 random이 포함됨
+sudo random : seed값이 동일하다면, deterministic한 random이다.
+그냥 random : 완벽한 random
+
+
+22 page :
+String
+atomic type : 한번에 명령에 처리되야함.
+ex) int double char -> atomic 타입임
+하지만 String은 atomic이 아님
+
+String은 비교도 조금 긴 사이클을 돌아야 한다.
+
+23 page :
+게임은 성능을 중시 -> 때문에 영어로 맞춤화된 구조체 구조를 한국어로 바꾸기만 해도 오류가 발생함
+언어, 쓰는 방식 등등에 의해 문제 많음
+
+24 page :
+25 page :
+경로 문제가 발생할 수 있음 
+
+26 page :
+String을 숫자로 바꾸어서 빠르게 찾는다.
+
+27 page :
+유니코드로 모든 문자열을 해싱을 해놓았다.
+
+29 page :
+
+7. RESOURCES AND THE FILE SYSTEM
+
+2page :
+
+file system api
+
+6 page :
+absolute path : 처음부터 내려와서 들어옴
+relative paht : 작업하고 있는 위치를 기준으로 위치
+
+buffered filed I/O : 임시공간에 넣어두어서 바로 사용하는 파일
+unbuffered filed I/O : 원래의 저장소에 넣어두고 꺼내 사용하는 파일
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
