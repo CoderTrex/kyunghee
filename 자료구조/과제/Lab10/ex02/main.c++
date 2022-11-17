@@ -18,10 +18,10 @@ int main()
     pqueue.Enqueue(24);
     pqueue.Enqueue(5);
 
-    int x, y, z;
     pqueue.Enqueue(28);
     pqueue.Enqueue(2);
     pqueue.Enqueue(40);
+    int x, y, z;
     
     pqueue.Dequeue(x);
     pqueue.Dequeue(y);
@@ -29,3 +29,7 @@ int main()
 
     cout << "x:" << x << " y:" << y << " z:" << z << endl;
 }
+
+// 예상한 결과는 간단하게 생각 없이 queue로 생각해서 56, 27, 42로 생각을 했다.
+// 하지만 이는 pqueue였기 때문에 element가 큰 순서인 56, 42, 40 순서대로 출력이된다.
+// 이는 reheapdown이에서 최대값을 반환하기 때문이다.

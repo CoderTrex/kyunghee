@@ -76,20 +76,15 @@ void PQType<ItemType>::Dequeue(ItemType& item)
   }
 }
 
-
 template<class ItemType>
 void PQType<ItemType>::Dequeue(ItemType& item)
 {
   if (length == 0)
     throw EmptyPQLL();
-  else {
-    ItemType get; // iterator를 사용할 준비
-    bool find;
-  
-    linkedlist->RetrieveItem(get, find); //리스트에서 아이템을 얻고
-    linkedlist->DeleteItem(item) ; //해당 아이템 삭제
-    length--;
-  }
+  linkedlist.RestList();
+  linkedlist.GetNextItem(item); //리스트에서 아이템을 얻고
+  linkedlist.DeleteItem(item); //해당 아이템 삭제
+  length--;
 }
 
 template<class ItemType>
@@ -99,8 +94,8 @@ void PQType<ItemType>::Enqueue(ItemType newItem)
     throw FullPQLL();
   else
   {
+    linkedlist.InsertItem(newItem);
     length++;
-    linkedlist->InsertItem(newItem);
   }
 }
 

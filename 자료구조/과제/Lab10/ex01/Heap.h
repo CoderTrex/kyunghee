@@ -48,9 +48,12 @@ void HeapType<ItemType>::ReheapUp(int root, int bottom)
   while (bottom > root)
   {
     parent = (bottom-1)/2;
-    if (elements[parent] < elements[bottom])
-        swap(elements[parent], elements[bottom]);
-    bottom = parent;
+    if (elements[parent] < elements[bottom]){
+      swap(elements[parent], elements[bottom]);
+      bottom = parent;
+    }
+    else
+      return;
   }
 }
 
@@ -91,19 +94,20 @@ void HeapType<ItemType>::ReheapDown(int root, int bottom)
 {
   int maxChild, leftChild, rightChild;
   bool reheaped = false; // root가 제 위치를 찾아가 reheap이 되면 True
-  leftChild = root * 2 + 1; // root 값으로부터 왼쪽 자식노드의 위치 계산
+  leftChild = root * 2 + 1;
+  
   while(leftChild <= bottom && !reheaped)
   {
     if(leftChild == bottom) // 왼쪽 자식 노드 하나만 있는 경우
       maxChild = leftChild;
     else{
       rightChild = root * 2 + 2;
-      maxChild = (elements[leftChild] <= elements[rightChild]) ? : ;
+      maxChild = (elements[leftChild] <= elements[rightChild]) ? rightChild : leftChild;
     }
     if(elements[root] < elements[maxChild]) {
       Swap(elements[root], elements[maxChild]);
       root = maxChild; // maxChild 가 root의 새로운 위치가 됨
-      leftChild = root;
+      leftChild = root * 2 + 1;
     }
     else
       reheaped = true;

@@ -32,7 +32,7 @@ public:
     // Function: Determines whether the stack is empty.
     // Pre:  Stack has been initialized.
     // Post: Function value = (stack is empty)
-    void Push(ItemType item);
+    void Push(ItemType item, int rand);
     // Function: Adds newItem to the top of the stack.
     // Pre:  Stack has been initialized.
     // Post: If (stack is full), FullStack exception is thrown;
@@ -79,16 +79,16 @@ bool StackType<ItemType>::IsFull() const
 }
 
 template<class ItemType>
-void StackType<ItemType>::Push(ItemType newItem) 
+void StackType<ItemType>::Push(ItemType newItem, int rand) 
 {
   srand((unsigned int)time(NULL));
-  int num;
+  static int num = 10;
 
   if (IsFull()) 
     FullStack();
   top++;
   items[top] = newItem;
-  num = newItem * 10 + 20 * 2 + 32 + 22;
+  num = rand;
   priority[top] = num;
 }
 
@@ -109,6 +109,7 @@ void StackType<ItemType>::Pop()
     len--;
   }
   items[max_index] = items[top];
+  priority[max_index] = priority[top];
   top--;
 }
 
