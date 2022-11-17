@@ -139,7 +139,6 @@ class GameLayer(cocos.layer.Layer):
         if self.turn == GameLayer.COMPUTER and self.count > 100:
             self.computer()
 
-    
     # 뒤집히는 좌표의 리스트를 반환함
     # 좌표와 누구의 턴인지, 보드를 호출한다.
     def isPossible(self, x, y, turn, board):
@@ -155,10 +154,8 @@ class GameLayer(cocos.layer.Layer):
                 if(x+dirX < 0 or x+dirX >= self.column): continue
                 if(y+dirY < 0 or y+dirY >= self.row): continue
                 
-                
                 xList = list()
                 yList = list()
-                
                 
                 if dirX == 0:
                     # 계산의 바운더리를 넓게 계산함
@@ -225,7 +222,6 @@ class GameLayer(cocos.layer.Layer):
         # 딜레이 시간 초기화
         self.count = 0     
     
-    
     # AI 파트
     # 놓을 수 있는 위치에 대한 정보값을 다 저장함.
     def getMoves(self, turn, board):
@@ -248,7 +244,6 @@ class GameLayer(cocos.layer.Layer):
                 if len(revList) > 0:
                     count += 1
         return count
-
 
     def check_coner_occupancy(self):
         my_tile = opp_tile = 0
@@ -295,17 +290,11 @@ class GameLayer(cocos.layer.Layer):
         return -12.5 * (my_tiles - opp_tiles)
             
 
-    def check_Mobility(self):
-        return 0
-    
-    
-    def check_heurisitic(self, player):
-        total_weight = 0
+    def check_heurisitic(self):
         c = self.check_coner_occupancy()
         l = self.check_coner_closenss()
-        
-        return 0
-        
+        total_weight = c + l
+        return total_weight
         
     def computer(self):
         # self.check_heurisitic(GameLayer.COMPUTER)
@@ -334,10 +323,10 @@ class GameLayer(cocos.layer.Layer):
             if 1 >= self.levelDepth:
                 scores[i] = self.boardScore(boardCopy)
             else:
-                scores[i] = self.minMove(boardCopy, 2, alpha, beta)
+                scores[i] = self.minMove(boardCopy, 2, alpha, beta)     
+                scores[i] += self.check_heurisitic()
 
         maxIndex = np.argmax(scores) #가장 큰 것에 대한 인덱스 값
-        print(maxIndex)
         return moves[maxIndex]
 
 

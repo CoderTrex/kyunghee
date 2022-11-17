@@ -11,7 +11,7 @@ from OpenGL.GLU import *
 
 class Cube(object):
     sides = ((0,1,2,3), (3,2,7,6), (6,7,5,4),
-             (4,5,1,0), (1,5,7,2), (4,0,3,6))
+            (4,5,1,0), (1,5,7,2), (4,0,3,6))
     
     def __init__(self, position, size, color):
         self.position = position
@@ -109,10 +109,11 @@ class App(object):
         self.blocks = []
         self.light = Light(GL_LIGHT0, (0, 15, -25, 1))
         self.player = Sphere(1, position=(0, 0, 0),
-                             color=(0, 1, 0, 1))
+                                color=(0, 1, 0, 1))
+                            # 플레이어 보다 1작은 위치에 존재하고, y축 크기를 1로 지정한다.
         self.ground = Cube(position=(0, -1, -20),
-                           size=(16, 1, 60),
-                           color=(1, 1, 1, 1))
+                            size=(16, 1, 60),
+                            color=(1, 1, 1, 1))
         
     def start(self):
         pygame.init()
@@ -182,8 +183,8 @@ class App(object):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
         gluLookAt(0, 10, 10,
-                  0, 0, -5,
-                  0, 1, 0)
+                0, -5, -5,
+                0, 1, 0)
         self.light.render()
         for block in self.blocks:
             block.render()
