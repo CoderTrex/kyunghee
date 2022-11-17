@@ -20,6 +20,7 @@ void Swap(ItemType& one, ItemType& two)
   one = two;
   two = temp;
 }  
+
 template<class ItemType>
 void HeapType<ItemType>::ReheapUp(int root, int bottom)
 // Post: Heap property is restored.

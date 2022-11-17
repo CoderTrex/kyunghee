@@ -2,7 +2,7 @@
 class FullPQ{};
 class EmptyPQ{};
 #include "heap.h"
-
+#include "SortedType.h"
 
 
 
@@ -37,9 +37,8 @@ public:
   //       else highest priority element has been removed from queue.
   //       item is a copy of removed element.
 private:
-  HeapType<ItemType> *listData;
+  SortedType<ItemType> *linkedlist;
   int length;
-  HeapType<ItemType> items;
 };
 
 template<class ItemType>
@@ -77,15 +76,33 @@ void PQType<ItemType>::Dequeue(ItemType& item)
   }
 }
 
+
 template<class ItemType>
-void PQType<ItemType>::Enqueue(ItemType newItem)
-// Post: newItem is in the queue.
+void PQType<ItemType>::Dequeue(ItemType& item)
 {
-  if (listData != NULL){
-    if listData->ele
+  if (length == 0)
+    throw EmptyPQLL();
+  else {
+    ItemType get; // iterator를 사용할 준비
+    bool find;
+  
+    linkedlist->RetrieveItem(get, find); //리스트에서 아이템을 얻고
+    linkedlist->DeleteItem(item) ; //해당 아이템 삭제
+    length--;
   }
 }
 
+template<class ItemType>
+void PQType<ItemType>::Enqueue(ItemType newItem)
+{
+  if(linkedlist.IsFull())
+    throw FullPQLL();
+  else
+  {
+    length++;
+    linkedlist->InsertItem(newItem);
+  }
+}
 
 template<class ItemType>
 bool PQType<ItemType>::IsFull() const
