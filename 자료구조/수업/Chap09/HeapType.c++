@@ -59,3 +59,8 @@ void HeapType<Itemtype>::ReheapUp(int root, int bottom)
         }
     }
 }
+
+
+        5
+    4       2
+  1   3   3   4
