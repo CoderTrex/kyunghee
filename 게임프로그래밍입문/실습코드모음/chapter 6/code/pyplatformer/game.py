@@ -53,8 +53,7 @@ class Shooter(Component):
             pos = self.gameobject.position
             shoot = GameObject(pos[0] + 1.5 * direction, pos[1])
             shoot.tag = 'shoot'
-            shoot.add_components(Sphere(0.3, (1, 1, 0, 1)), Shoot(),
-                                 SphereCollider(0.3, mass=0.1, is_static=False))
+            shoot.add_components(Sphere(0.3, (1, 1, 0, 1)), Shoot(), SphereCollider(0.3, mass=0.1, is_static=False))
             shoot.apply_force(20 * direction, 0)
 
     def on_collide(self, other, contacts):
