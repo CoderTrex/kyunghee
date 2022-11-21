@@ -1,6 +1,6 @@
 import pymunk
-import pymunk.pygame_util
 import pygame
+import pymunk.pygame_util
 import sys
 
 pygame.init()
