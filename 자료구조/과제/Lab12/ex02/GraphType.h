@@ -17,7 +17,8 @@ public:
 	int WeightIs(VertexType, VertexType);
 	void GetToVertices(VertexType, QueType<VertexType> &);
 	void DeleteEdge(VertexType, VertexType);
-	bool DepthFirstSearch(VertexType, VertexType);
+	// DeleteEdge는 파라미터로 들어온 간선을 찾아 NULL_EDGE로 변경함
+
 	//  void ClearMarks();
 	//  void MarkVertex(VertexType);
 	//  bool IsMarked(VertexType);
@@ -114,11 +115,9 @@ int GraphType<VertexType>::WeightIs(VertexType fromVertex, VertexType toVertex)
 	col = IndexIs(vertices, toVertex);
 	return edges[row][col];
 }
-
 template <class VertexType>
 void GraphType<VertexType>::GetToVertices(VertexType vertex,
 										  QueType<VertexType> &adjVertices)
-// Post:
 {
 	int fromIndex;
 	int toIndex;
@@ -138,34 +137,4 @@ void GraphType<VertexType>::DeleteEdge(VertexType fromVertex, VertexType toVerte
 	row  = IndexIs(vertices, fromVertex);
 	col  = IndexIs(vertices, toVertex);
 	edges[row][col] = NULL_EDGE;
-}
-
-template <class VertexType>
-bool GraphType<VertexType>::DepthFirstSearch(VertexType startVertex, VertexType endVertex)
-{
-	QueType<VertexType> vertexQ;
-
-	if (vertexQ == endVertex)
-	{
-		cout << endVertex;
-		return true;
-	}
-	GetToVertices(startVertex, vertexQ);
-	while (!vertexQ.IsEmpty())
-	{
-		VertexType vertex;
-
-		vertexQ.Dequeue(vertex);
-		if (vertex != s)
-		{
-			if (DepthFirstSearch(vertex, endVertex))
-			{
-				std::cout << "<-" << vertex;
-				return true;
-			}
-		}
-		else
-			continue;
-	}
-	return false;
 }
