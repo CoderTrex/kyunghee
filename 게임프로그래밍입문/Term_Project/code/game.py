@@ -28,6 +28,8 @@ MAX_LEVEL = 3
 TILE_SIZE = SCREEN_HEIGHT//ROWS
 TILE_TYPE = 21
 
+MAGIC_TYPE = 1
+
 
 screen_scroll = 0
 bg_scroll = 0
@@ -49,10 +51,8 @@ magic_fx = pygame.mixer.Sound("C:\\Coding\\kyunghee\\게임프로그래밍입문
 magic_fx.set_volume(0.5)
 
 
-
-
 # 이미지 로드
-#버튼 이미지
+# 버튼 이미지
 start_img  = pygame.image.load("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\button\\start_btn.png")
 exit_img  = pygame.image.load("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\button\\exit_btn.png")
 restart_img  = pygame.image.load("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\button\\restart_btn.png")
@@ -61,10 +61,10 @@ restart_img  = pygame.image.load("C:\\Coding\\kyunghee\\게임프로그래밍입
 img_list = []
 for x in range(TILE_TYPE):
     img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\level\\img\\tile\\{0}.png'.format(x))
-    img = pygame.transform.scale(img, (TILE_SIZE,TILE_SIZE))
+    img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
     img_list.append(img)
-    
-    
+
+
 # 슬라임 총알
 bullet_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\attack_bullet.png').convert_alpha()
 bullet_img = pygame.transform.scale(bullet_img, (bullet_img.get_width() * 0.03, bullet_img.get_height() * 0.03))
@@ -72,8 +72,8 @@ skeleton_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입
 skeleton_img = pygame.transform.scale(skeleton_img, (skeleton_img.get_width() * 0.09, skeleton_img.get_height() * 0.09))
 
 # 마법 이미지
-magic_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Effect_Water.png').convert_alpha()
-magic_img = pygame.transform.scale(magic_img, (magic_img.get_width() * 0.04, magic_img.get_height() * 0.04))
+magic_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Magic_slime.png').convert_alpha()
+magic_img = pygame.transform.scale(magic_img, (magic_img.get_width() * 0.4, magic_img.get_height() * 0.4))
 
 # 주울 수 있는 아이템
 health_box_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\icon\\heal.png').convert_alpha()
@@ -157,7 +157,6 @@ def reset_level():
     return data
 
 
-
 class Soldier(pygame.sprite.Sprite):
     def __init__(self, char_type, x, y, scale, speed, ammo, magic):
         pygame.sprite.Sprite.__init__(self)
@@ -167,12 +166,13 @@ class Soldier(pygame.sprite.Sprite):
         self.ammo = ammo
         self.start_ammo = ammo
         self.magic = magic
+        self.magic_type = 1
+
         
         # 마법 상태
         self.freeze = False
         self.burn = False
         self.posion = False
-        
         
         if (char_type == 'lich'):
             self.health = 300 # 몬스터에 맞춰서 health 구현하기
@@ -343,7 +343,6 @@ class Soldier(pygame.sprite.Sprite):
             shoot_fx.play()
     
     def ai(self):
-        
         if self.alive and player.alive:
             if self.freeze == True:
                 self.update_action(0)
@@ -525,7 +524,6 @@ class ItemBox(pygame.sprite.Sprite):
             elif self.item_type == "posion":
                 player.magic_type = 3
                 player.magic += 5
-            
             # 아이템 삭제 
             self.kill()
             
@@ -615,7 +613,7 @@ class Spin(pygame.sprite.Sprite):
 
         
 class Magic(pygame.sprite.Sprite):
-    def __init__(self, x, y, direction):
+    def __init__(self, x, y, direction, player):
         pygame.sprite.Sprite.__init__(self)
         self.timer = 100
         self.vel_y = -8
@@ -626,7 +624,6 @@ class Magic(pygame.sprite.Sprite):
         self.width = self.image.get_width()
         self.height = self.image.get_height()
         self.direction = direction
-        self.magic_type = 1
 
     def update(self):
         self.vel_y += GRAVITY
@@ -656,29 +653,37 @@ class Magic(pygame.sprite.Sprite):
         if self.timer <= 0:
             self.kill()
             magic_fx.play()
-            explosion = Explosion(self.rect.x, self.rect.y, 0.9)
+            print("player magic type : ", player.magic_type)
+            if player.magic_type== 1:
+                explosion = Explosion(self.rect.x, self.rect.y, 0.9)
+            elif player.magic_type == 3:
+                print("hello")
+                explosion = Explosion_Posion(self.rect.x, self.rect.y, 1.0)
+
             explosion_group.add(explosion)
             # 근처의 누구에게나 데미지 입히기 
             if abs(self.rect.centerx - player.rect.centerx) < TILE_SIZE * 2 and \
                 abs(self.rect.centery - player.rect.centery) < TILE_SIZE * 2:
                 player.health -= 50
             for enemy in enemy_group:
-                if abs(self.rect.centerx - enemy.rect.centerx) < TILE_SIZE * 2 and \
-                    abs(self.rect.centery - enemy.rect.centery) < TILE_SIZE * 2:
                     # 얼음 마법 진행
-                    if self.magic_type == 1:
-                        freeze = Freeze(enemy.rect.centerx, enemy.rect.centery, 0.5, enemy)
-                        freeze_group.add(freeze)
-                        enemy.health -= 30
+                    if player.magic_type == 1:
+                        if abs(self.rect.centerx - enemy.rect.centerx) < TILE_SIZE * 2 and abs(self.rect.centery - enemy.rect.centery) < TILE_SIZE * 2:
+                            freeze = Freeze(enemy.rect.centerx, enemy.rect.centery, 0.5, enemy)
+                            freeze_group.add(freeze)
+                            enemy.health -= 30  
                     # 화염 마법 진행
-                    elif self.magic_type == 2:
-                        self.get_burn(enemy)
-                        enemy.health -= 100
+                    elif player.magic_type == 2:
+                        if abs(self.rect.centerx - enemy.rect.centerx) < TILE_SIZE * 1.5 and abs(self.rect.centery - enemy.rect.centery) < TILE_SIZE * 1.5:
+                            self.get_burn(enemy)
+                            # fire = Fire(enemy.rect.centerx, enemy.rect.centery, 0.5, enemy)
+                            enemy.health -= 100
                     # 독 마법 진행
-                    elif self.magic_type == 3:
-                        poison = Poison(enemy.rect.centerx, enemy.rect.centery, 0.5)
-                        freeze_group.add(poison)    
-                        enemy.health -= 30
+                    elif player.magic_type == 3:
+                        if abs(self.rect.centerx - enemy.rect.centerx) < TILE_SIZE * 3 and abs(self.rect.centery - enemy.rect.centery) < TILE_SIZE * 3:
+                            poison = Poison(enemy.rect.centerx, enemy.rect.centery, 0.5)
+                            poison_group.add(poison)
+                            enemy.health -= 10
 
 class Freeze(pygame.sprite.Sprite):
     def __init__(self, x, y, scale, freeze_enemy):
@@ -715,7 +720,7 @@ class Poison(pygame.sprite.Sprite):
     def __init__(self, x, y, scale):
         pygame.sprite.Sprite.__init__(self)
         self.images = []
-        for num in range(1, 11):
+        for num in range(1, 11):                                                                            
             img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Explosion_Poison\\Explosion_gas{0}.png'.format(num)).convert_alpha()
             img = pygame.transform.scale(img, (float(img.get_width() * scale), float(img.get_height() * scale)))
             self.images.append(img)
@@ -737,16 +742,40 @@ class Poison(pygame.sprite.Sprite):
                 self.image = self.images[self.frame_index]
 
 
-
-
-
-
 class Explosion(pygame.sprite.Sprite):
     def __init__(self, x, y, scale):
         pygame.sprite.Sprite.__init__(self)
         self.images = []
         for num in range(1, 8):
             img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Explosion_Water\\water{0}.png'.format(num)).convert_alpha()
+            img = pygame.transform.scale(img, (float(img.get_width() * scale), float(img.get_height() * scale)))
+            self.images.append(img)
+        self.frame_index = 0
+        self.image = self.images[self.frame_index]
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y - 100)
+        self.counter = 0
+
+    def update(self):
+        self.rect.x += screen_scroll
+        Explosion_SPEED = 4
+        # 폭발 이미지 업데이트
+        self.counter += 1
+        if self.counter >= Explosion_SPEED:
+            self.counter = 0
+            self.frame_index += 1
+            # 애니메이션이 완성되면 삭제한다.
+            if self.frame_index >= len(self.images):
+                self.kill()
+            else:
+                self.image = self.images[self.frame_index]
+
+class Explosion_Posion(pygame.sprite.Sprite):
+    def __init__(self, x, y, scale):
+        pygame.sprite.Sprite.__init__(self)
+        self.images = []
+        for num in range(1, 10):
+            img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Explosion_Posion\\Explosion_gas{0}.png'.format(num)).convert_alpha()
             img = pygame.transform.scale(img, (float(img.get_width() * scale), float(img.get_height() * scale)))
             self.images.append(img)
         self.frame_index = 0
@@ -810,6 +839,7 @@ magic_slime_group = pygame.sprite.Group()
 
 
 freeze_group = pygame.sprite.Group()
+fire_group = pygame.sprite.Group()
 poison_group = pygame.sprite.Group()
 lava_group = pygame.sprite.Group()
 star_group = pygame.sprite.Group()
@@ -874,7 +904,9 @@ while run:
         magic_group.update()
         explosion_group.update()
         freeze_group.update()
+        fire_group.update()
         poison_group.update()
+        
         Item_box_group.update()
         lava_group.update()
         star_group.update()    
@@ -883,6 +915,7 @@ while run:
         magic_group.draw(screen)
         explosion_group.draw(screen)
         freeze_group.draw(screen)
+        fire_group.draw(screen)
         poison_group.draw(screen)
         Item_box_group.draw(screen)
         lava_group.draw(screen)
@@ -892,8 +925,6 @@ while run:
             if intro_fade.fade():
                 start_intro = False
                 intro_fade.fade_counter = 0
-                
-
         # 플레이어의 액션 상태 업데이트
         if player.alive:
             # 총알 액션 (플레이어의 중심 x, 플레이어 중심 y, 플레이어방향(같은방향))
@@ -901,7 +932,7 @@ while run:
                 player.shoot()
             # 수류탄 투척 액션
             elif magic and magic_thrown == False and player.magic > 0:
-                magic = Magic(player.rect.centerx + (1 * player.rect.size[0]) * player.direction, player.rect.top, player.direction)
+                magic = Magic(player.rect.centerx + (1 * player.rect.size[0]) * player.direction, player.rect.top, player.direction, player)
                 magic_group.add(magic)
                 # 수류탄 수 줄어들기
                 player.magic -= 1
