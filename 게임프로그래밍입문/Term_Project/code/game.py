@@ -20,7 +20,7 @@ clock = pygame.time.Clock()
 FPS = 60
 
 # 게임 변수 설정
-GRAVITY = 0.98
+GRAVITY = 0.6
 SCROLL_THRESH = 200
 ROWS = 16
 COLS = 150
@@ -101,9 +101,6 @@ pine1_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문
 pine2_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\level\\img\\Background\\pine2.png').convert_alpha()
 mountain_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\level\\img\\Background\\mountain.png').convert_alpha()
 
-# 마법 상태
-freeze = False
-
 
 # 배경 형성
 BG = (200, 101, 120)
@@ -160,11 +157,16 @@ class Soldier(pygame.sprite.Sprite):
         self.start_ammo = ammo
         self.magic = magic
         
-        self.burn = False
+        # 마법 상태
         self.freeze = False
-
+        self.burn = False
+        self.posion = False
+        
+        
         if (char_type == 'lich'):
             self.health = 300 # 몬스터에 맞춰서 health 구현하기
+        if (char_type == "goblin"):
+            self.health = 75
         if (char_type == 'player'):
             self.health = 150
 
@@ -173,8 +175,13 @@ class Soldier(pygame.sprite.Sprite):
         self.direction = 1
         self.vel_y = 0
         self.jump = False
-        self.spin = False
         self.in_air = True
+        
+        self.spin_time = 0
+        self.spin = False
+        self.in_spin = False
+        
+        
         self.flip = False
         
         # 애니메이션 인덱스
@@ -242,19 +249,25 @@ class Soldier(pygame.sprite.Sprite):
 
         #jump
         if self.jump == True and self.in_air == False:
-            self.vel_y = -20
+            self.vel_y = -15
             self.jump = False
             self.in_air = True
         
-        #spin
-        if self.spin == True:
-            self.spin = False
-
         # 중력 적용
         self.vel_y += GRAVITY
         if self.vel_y > 10:
             self.vel_y 
         dy += self.vel_y
+        
+        if self.spin == True and self.in_spin == False:
+            self.spin_time = -200
+            self.spin = False
+            self.in_spin = True
+        
+        if (self.spin_time < 0):
+            self.spin_time += 1
+        else:
+            self.in_spin = False
         
         # 바닥과 충돌 처리
         for tile in world.obstacle_list:
@@ -267,7 +280,7 @@ class Soldier(pygame.sprite.Sprite):
                     self.move_counter = 0
             # y축과의 충돌 처리
             if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
-                # 땅에 맡다아 있는지 확인
+                # 땅에 맏닿아 있는지 확인
                 if self.vel_y < 0:
                     self.vel_y = 0
                     dy = tile[1].bottom - self.rect.top
@@ -305,7 +318,6 @@ class Soldier(pygame.sprite.Sprite):
                 
         return screen_scroll, level_complete
         
-        
     # 플레이어의 총알 발사
     def shoot(self):
         if self.shoot_cooldown == 0 and self.ammo > 0:
@@ -319,15 +331,18 @@ class Soldier(pygame.sprite.Sprite):
             self.ammo -= 1
             shoot_fx.play()
     
-    def ai(self, num):
+    def ai(self):
+        
         if self.alive and player.alive:
-            if self.idling == False and random.randint(1, 200) == 3:
+            print(self.freeze)
+            
+            if self.freeze == True:
+                self.update_action(0)
+                self.idling = True
+            elif (self.idling == False and random.randint(1, 200) == 3):
                 self.update_action(0) # 멈춰있는 자세 유지
                 self.idling = True
                 self.idling_counter = 100
-            if num == 1:
-                print("hi")
-                self.update_action(0)
             # ai 근처에 플레이어가 있는 지 확인
             elif self.vision.colliderect(player.rect):
                 # 움직이지 않고 플레이어를 바라본다.
@@ -353,8 +368,6 @@ class Soldier(pygame.sprite.Sprite):
                     self.idling_counter -= 1
                     if self.idling_counter <= 0:
                         self.idling = False
-                        
-                        
         # 스크롤
         self.rect.x += screen_scroll
     
@@ -401,9 +414,7 @@ class World():
     def process_data(self, data):
         self.level_length = len(data[0])
         
-        
-        
-        #iterate through each value in level data file
+        # iterate through each value in level data file
         for y, row in enumerate(data):
             for x, tile in enumerate(row):
                 if tile >= 0:
@@ -433,7 +444,7 @@ class World():
                         enemy = Soldier('lich', x * TILE_SIZE, y * TILE_SIZE, 2, 2, 20, 0)
                         enemy_group.add(enemy)
                     elif tile == 16:
-                        enemy2 = Soldier('goblin', x * TILE_SIZE, y * TILE_SIZE, 2, 2, 20, 0)
+                        enemy2 = Soldier('goblin', x * TILE_SIZE, y * TILE_SIZE, 0.5, 2, 20, 0)
                         enemy_group.add(enemy2)
                     elif tile == 20:
                         star = Star(img, x*TILE_SIZE, y*TILE_SIZE)
@@ -455,6 +466,7 @@ class Lava(pygame.sprite.Sprite):
         self.rect.midtop = (x  + TILE_SIZE // 2, y + (TILE_SIZE - self.image.get_height()))
     def update(self):
         self.rect.x += screen_scroll
+
 class Star(pygame.sprite.Sprite):
     def __init__(self, img, x, y):
         pygame.sprite.Sprite.__init__(self)
@@ -464,7 +476,6 @@ class Star(pygame.sprite.Sprite):
     def update(self):
         self.rect.x += screen_scroll
 
-            
 class ItemBox(pygame.sprite.Sprite):
     def __init__(self, item_type, x, y):
         pygame.sprite.Sprite.__init__(self)
@@ -511,10 +522,13 @@ class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, direction, char_type):
         pygame.sprite.Sprite.__init__(self)
         self.speed = 10
+        self.bullet_type = 0
         if char_type == "player":
             self.image = bullet_img
-        elif char_type == "lich":
+            self.bullet_type = 0
+        elif char_type == "lich" or char_type == "goblin":
             self.image = skeleton_img
+            self.bullet_type = 1
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.direction = direction
@@ -534,11 +548,14 @@ class Bullet(pygame.sprite.Sprite):
         # 캐릭터와 총알 충돌 체크
         if pygame.sprite.spritecollide(player, bullet_group, False):
             if player.alive:
-                player.health -= 5
+                if player.in_spin:
+                    pass
+                else:
+                    player.health -= 5
                 self.kill()
         for enemy in enemy_group:
             if pygame.sprite.spritecollide(enemy, bullet_group, False):
-                if enemy.alive:
+                if enemy.alive and self.bullet_type == 0:
                     enemy.health -= 25
                     self.kill()
 
@@ -573,8 +590,8 @@ class Magic(pygame.sprite.Sprite):
     def __init__(self, x, y, direction):
         pygame.sprite.Sprite.__init__(self)
         self.timer = 100
-        self.vel_y = -11
-        self.speed = 7
+        self.vel_y = -8
+        self.speed = 15
         self.image = magic_img
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
@@ -621,22 +638,23 @@ class Magic(pygame.sprite.Sprite):
                 if abs(self.rect.centerx - enemy.rect.centerx) < TILE_SIZE * 2 and \
                     abs(self.rect.centery - enemy.rect.centery) < TILE_SIZE * 2:
                     enemy.health -= 10
-                # 얼음 마법 진행
-                if self.magic_type == 1:
-                    freeze = Freeze(enemy.rect.centerx, enemy.rect.centery, 0.5)
-                    freeze_group.add(freeze)
-                # 화염 마법 진행
-                elif self.magic_type == 2:
-                    self.get_burn(enemy)
-                # 독 마법 진행
-                elif self.magic_type == 3:
-                    poison = Poison(enemy.rect.centerx, enemy.rect.centery, 0.5)
-                    freeze_group.add(poison)    
+                    # 얼음 마법 진행
+                    if self.magic_type == 1:
+                        freeze = Freeze(enemy.rect.centerx, enemy.rect.centery, 0.5, enemy)
+                        freeze_group.add(freeze)
+                    # 화염 마법 진행
+                    elif self.magic_type == 2:
+                        self.get_burn(enemy)
+                    # 독 마법 진행
+                    elif self.magic_type == 3:
+                        poison = Poison(enemy.rect.centerx, enemy.rect.centery, 0.5)
+                        freeze_group.add(poison)    
 
 class Freeze(pygame.sprite.Sprite):
-    def __init__(self, x, y, scale):
+    def __init__(self, x, y, scale, freeze_enemy):
         pygame.sprite.Sprite.__init__(self)
         self.images = []
+        self.freeze_enemy = freeze_enemy
         for num in range(1, 8):
             img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Explosion_Ice\\{0}.png'.format(num)).convert_alpha()
             img = pygame.transform.scale(img, (float(img.get_width() * scale), float(img.get_height() * scale)))
@@ -650,15 +668,16 @@ class Freeze(pygame.sprite.Sprite):
     def update(self):
         Explosion_SPEED = 200
         if self.counter <= Explosion_SPEED:
-            freeze = True
+            self.freeze_enemy.freeze = True
             self.frame_index += 1
             if self.frame_index >= len(self.images):
                 self.frame_index = len(self.images)
                 self.counter += 1
+            
             else:
                 self.image = self.images[self.frame_index]
         else:
-            freeze = False
+            self.freeze_enemy.freeze = False
             self.kill()
 
 class Poison(pygame.sprite.Sprite):
@@ -715,17 +734,13 @@ class Explosion(pygame.sprite.Sprite):
             else:
                 self.image = self.images[self.frame_index]
 
-
-
 class ScreenFade():
     def __init__(self, direction, color, speed):
         self.direction = direction
         self.color = color
         self.speed = speed
         self.fade_counter = 0
-    
-    
-        
+
     def fade(self):
         fade_complete = False
         self.fade_counter += self.speed
@@ -744,7 +759,6 @@ class ScreenFade():
 
 intro_fade = ScreenFade(1, BLACK, 4)
 death_fade = ScreenFade(2, GREEN, 4)
-
 
 #버튼 생성
 start_button = button.Button(SCREEN_WIDTH // 2 - 130, SCREEN_HEIGHT // 2 - 150, start_img, 1.1)
@@ -790,13 +804,11 @@ while run:
         if exit_button.draw(screen):
             run = False
         
-        
     else:
         # 배경 출력
         draw_bg()
         # 맵 출력
         world.draw()
-        
         # HP 출력
         health_bar.draw(player.health)
         # 총알 수 출력
@@ -815,9 +827,7 @@ while run:
 
         # 적 형성
         for enemy in enemy_group:
-            if freeze == True:
-                enemy.ai(1)
-            enemy.ai(0)
+            enemy.ai()
             enemy.draw()
             enemy.update()
 
@@ -839,7 +849,6 @@ while run:
         Item_box_group.draw(screen)
         lava_group.draw(screen)
         star_group.draw(screen)
-        
         
         if start_intro == True:
             if intro_fade.fade():
@@ -865,8 +874,11 @@ while run:
                 player.update_action(2)#2: jump
             elif moving_left or moving_right:
                 player.update_action(1)#1: run
+            elif player.spin:
+                player.update_action(4)
             else:
                 player.update_action(0)#0: idle
+                
             screen_scroll, level_complete = player.move(moving_left, moving_right)
             bg_scroll -= screen_scroll
             #check if player has completed the level
@@ -918,8 +930,8 @@ while run:
                 shoot = True
             if event.key == pygame.K_a:
                 magic = True
-            if event.key == pygame.K_s:
-                spin = True
+            if event.key == pygame.K_s and player.alive:
+                player.spin = True
             if event.key == pygame.K_ESCAPE:
                 run = False
         
