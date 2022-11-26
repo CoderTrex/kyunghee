@@ -31,7 +31,7 @@ TILE_TYPE = 21
 
 screen_scroll = 0
 bg_scroll = 0
-level = 1
+level = 0
 start_game = False
 start_intro = False
 
@@ -83,10 +83,21 @@ ammo_box_img = pygame.transform.scale(ammo_box_img, (ammo_box_img.get_width() * 
 power_box_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\icon\\power.png').convert_alpha()
 power_box_img = pygame.transform.scale(power_box_img, (power_box_img.get_width() * 3, power_box_img.get_height() * 3))
 
+# 마법 슬라임 생성
+slime_ice_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\icon\\skill_water.png').convert_alpha()
+slime_ice_img = pygame.transform.scale(slime_ice_img, (slime_ice_img.get_width() * 0.9, slime_ice_img.get_height() * 0.9))
+slime_posion_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\icon\\skill_posion.png').convert_alpha()
+slime_posion_img = pygame.transform.scale(slime_posion_img, (slime_posion_img.get_width() * 0.9, slime_posion_img.get_height() * 0.9))
+slime_fire_img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\icon\\skill_fire.png').convert_alpha()
+slime_fire_img = pygame.transform.scale(slime_fire_img, (slime_fire_img.get_width() * 0.9, slime_fire_img.get_height() * 0.9))
+
 item_boxes = {
     'Health': health_box_img,
     'Ammo': ammo_box_img,
-    'Power': power_box_img
+    'Power': power_box_img,
+    'ice' : slime_ice_img,
+    'fire' : slime_fire_img,
+    'posion' : slime_posion_img
 }
 
 # 캐릭터 액션 정의
@@ -334,8 +345,6 @@ class Soldier(pygame.sprite.Sprite):
     def ai(self):
         
         if self.alive and player.alive:
-            print(self.freeze)
-            
             if self.freeze == True:
                 self.update_action(0)
                 self.idling = True
@@ -446,6 +455,15 @@ class World():
                     elif tile == 16:
                         enemy2 = Soldier('goblin', x * TILE_SIZE, y * TILE_SIZE, 0.5, 2, 20, 0)
                         enemy_group.add(enemy2)
+                    elif tile == 17:
+                        Item_box = ItemBox('ice', x * TILE_SIZE, y * TILE_SIZE)
+                        Item_box_group.add(Item_box)
+                    elif tile == 18:
+                        Item_box = ItemBox('fire', x * TILE_SIZE, y * TILE_SIZE)
+                        Item_box_group.add(Item_box)
+                    elif tile == 19:
+                        Item_box = ItemBox('posion', x * TILE_SIZE, y * TILE_SIZE)
+                        Item_box_group.add(Item_box)
                     elif tile == 20:
                         star = Star(img, x*TILE_SIZE, y*TILE_SIZE)
                         star_group.add(star)
@@ -497,7 +515,17 @@ class ItemBox(pygame.sprite.Sprite):
             elif self.item_type == 'Ammo':
                 player.ammo += 15
             elif self.item_type == 'Power':
-                player.magic += 3
+                player.magic += 5
+            elif self.item_type == "Ice":
+                player.magic_type = 1
+                player.magic += 5
+            elif self.item_type == "fire":
+                player.magic_type = 2
+                player.magic += 5
+            elif self.item_type == "posion":
+                player.magic_type = 3
+                player.magic += 5
+            
             # 아이템 삭제 
             self.kill()
             
@@ -637,18 +665,20 @@ class Magic(pygame.sprite.Sprite):
             for enemy in enemy_group:
                 if abs(self.rect.centerx - enemy.rect.centerx) < TILE_SIZE * 2 and \
                     abs(self.rect.centery - enemy.rect.centery) < TILE_SIZE * 2:
-                    enemy.health -= 10
                     # 얼음 마법 진행
                     if self.magic_type == 1:
                         freeze = Freeze(enemy.rect.centerx, enemy.rect.centery, 0.5, enemy)
                         freeze_group.add(freeze)
+                        enemy.health -= 30
                     # 화염 마법 진행
                     elif self.magic_type == 2:
                         self.get_burn(enemy)
+                        enemy.health -= 100
                     # 독 마법 진행
                     elif self.magic_type == 3:
                         poison = Poison(enemy.rect.centerx, enemy.rect.centery, 0.5)
                         freeze_group.add(poison)    
+                        enemy.health -= 30
 
 class Freeze(pygame.sprite.Sprite):
     def __init__(self, x, y, scale, freeze_enemy):
@@ -666,6 +696,7 @@ class Freeze(pygame.sprite.Sprite):
         self.counter = 0
         
     def update(self):
+        self.rect.x += screen_scroll
         Explosion_SPEED = 200
         if self.counter <= Explosion_SPEED:
             self.freeze_enemy.freeze = True
@@ -704,7 +735,11 @@ class Poison(pygame.sprite.Sprite):
                 self.kill()
             else:
                 self.image = self.images[self.frame_index]
-                
+
+
+
+
+
 
 class Explosion(pygame.sprite.Sprite):
     def __init__(self, x, y, scale):
@@ -771,6 +806,9 @@ bullet_group = pygame.sprite.Group()
 magic_group = pygame.sprite.Group()
 explosion_group = pygame.sprite.Group()
 Item_box_group = pygame.sprite.Group()
+magic_slime_group = pygame.sprite.Group()
+
+
 freeze_group = pygame.sprite.Group()
 poison_group = pygame.sprite.Group()
 lava_group = pygame.sprite.Group()
