@@ -1,8 +1,11 @@
 import pygame
+from pygame import mixer
 import random
 import os
 import csv
+import button
 
+mixer.init()
 pygame.init()
 
 #초기 화면 설정
@@ -21,13 +24,39 @@ GRAVITY = 0.98
 SCROLL_THRESH = 200
 ROWS = 16
 COLS = 150
+MAX_LEVEL = 3
 TILE_SIZE = SCREEN_HEIGHT//ROWS
 TILE_TYPE = 21
+
+
 screen_scroll = 0
 bg_scroll = 0
 level = 1
+start_game = False
+start_intro = False
+
+
+
+#음악 및 소리 로드
+pygame.mixer.music.load("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\music\\music2.mp3")
+pygame.mixer.music.set_volume(0.3)
+pygame.mixer.music.play(-1, 0.0, 5000)
+jump_fx = pygame.mixer.Sound("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\music\\jump.wav")
+jump_fx.set_volume(0.5)
+shoot_fx = pygame.mixer.Sound("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\music\\shot.wav")
+shoot_fx.set_volume(0.5)
+magic_fx = pygame.mixer.Sound("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\music\\grenade.wav")
+magic_fx.set_volume(0.5)
+
+
+
 
 # 이미지 로드
+#버튼 이미지
+start_img  = pygame.image.load("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\button\\start_btn.png")
+exit_img  = pygame.image.load("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\button\\exit_btn.png")
+restart_img  = pygame.image.load("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\button\\restart_btn.png")
+
 # 리스트로 타일 저장
 img_list = []
 for x in range(TILE_TYPE):
@@ -100,7 +129,27 @@ def draw_bg():
         screen.blit(pine1_img, ((x * width - bg_scroll) * 0.5 - bg_scroll, SCREEN_HEIGHT - pine1_img.get_height() - 150))
         screen.blit(pine2_img, ((x * width - bg_scroll) * 0.5 - bg_scroll, SCREEN_HEIGHT - pine2_img.get_height()))
     
+def reset_level():
+    enemy_group.empty()
+    bullet_group.empty()
+    magic_group.empty()
+    explosion_group.empty()
+    Item_box_group.empty()
+    freeze_group.empty()
+    poison_group.empty()
+    lava_group.empty()
+    star_group.empty()
+
+    # create empty tile list
+    data = []
+    for row in range(ROWS):
+        r = [-1]  * COLS
+        data.append(r)
     
+    return data
+
+
+
 class Soldier(pygame.sprite.Sprite):
     def __init__(self, char_type, x, y, scale, speed, ammo, magic):
         pygame.sprite.Sprite.__init__(self)
@@ -223,6 +272,15 @@ class Soldier(pygame.sprite.Sprite):
                     self.in_air = False
                     dy = tile[1].top - self.rect.bottom
 
+        if pygame.sprite.spritecollide(self, lava_group, False):
+            self.health = 0
+        level_complete = False
+        if pygame.sprite.spritecollide(self, star_group,False):
+            level_complete = True
+            
+        # 맵아래로 빠졌는지 확인
+        if self.rect.bottom > SCREEN_HEIGHT:
+            self.health = 0
 
         if self.char_type == 'player':
             if self.rect.left + dx < 0 or self.rect.right + dx > SCREEN_WIDTH:
@@ -240,7 +298,7 @@ class Soldier(pygame.sprite.Sprite):
                 self.rect.x -= dx
                 screen_scroll = -dx 
                 
-        return screen_scroll
+        return screen_scroll, level_complete
         
         
     # 플레이어의 총알 발사
@@ -254,6 +312,7 @@ class Soldier(pygame.sprite.Sprite):
             bullet_group.add(bullet)
             # 총알 감소
             self.ammo -= 1
+            shoot_fx.play()
     
     def ai(self, num):
         if self.alive and player.alive:
@@ -546,6 +605,7 @@ class Magic(pygame.sprite.Sprite):
         self.timer -= 1
         if self.timer <= 0:
             self.kill()
+            magic_fx.play()
             explosion = Explosion(self.rect.x, self.rect.y, 0.9)
             explosion_group.add(explosion)
             # 근처의 누구에게나 데미지 입히기 
@@ -651,17 +711,51 @@ class Explosion(pygame.sprite.Sprite):
                 self.image = self.images[self.frame_index]
 
 
+
+class ScreenFade():
+    def __init__(self, direction, color, speed):
+        self.direction = direction
+        self.color = color
+        self.speed = speed
+        self.fade_counter = 0
+    
+    
+        
+    def fade(self):
+        fade_complete = False
+        self.fade_counter += self.speed
+
+        if self.direction == 1:
+            pygame.draw.rect(screen, self.color, (0 - self.fade_counter, 0, SCREEN_WIDTH // 2, SCREEN_HEIGHT))
+            pygame.draw.rect(screen, self.color, (SCREEN_WIDTH // 2 + self.fade_counter, 0, SCREEN_WIDTH, SCREEN_WIDTH))
+            pygame.draw.rect(screen, self.color, (0, 0 - self.fade_counter, SCREEN_WIDTH, SCREEN_HEIGHT))
+            pygame.draw.rect(screen, self.color, (0, SCREEN_HEIGHT // 2 + self.fade_counter, SCREEN_WIDTH, SCREEN_HEIGHT))
+        if self.direction == 2:
+            pygame.draw.rect(screen, self.color, (0, 0, SCREEN_WIDTH, 0 + self.fade_counter))
+        if  self.fade_counter >= SCREEN_WIDTH:
+            fade_complete = True
+        return fade_complete
+
+
+intro_fade = ScreenFade(1, BLACK, 4)
+death_fade = ScreenFade(2, GREEN, 4)
+
+
+#버튼 생성
+start_button = button.Button(SCREEN_WIDTH // 2 - 130, SCREEN_HEIGHT // 2 - 150, start_img, 1)
+exit_button = button.Button(SCREEN_WIDTH // 2 - 110, SCREEN_HEIGHT // 2 - 20, exit_img, 1)
+restart_button = button.Button(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 - 50, restart_img, 1)
+
 # 스프라이트 그룹을 생성
 enemy_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
 magic_group = pygame.sprite.Group()
 explosion_group = pygame.sprite.Group()
+Item_box_group = pygame.sprite.Group()
 freeze_group = pygame.sprite.Group()
 poison_group = pygame.sprite.Group()
-Item_box_group = pygame.sprite.Group()
 lava_group = pygame.sprite.Group()
 star_group = pygame.sprite.Group()
-
 
 # create empty tile list
 world_data = []
@@ -683,83 +777,129 @@ player, health_bar = world.process_data(world_data)
 run = True
 while run:
     clock.tick(FPS)
-    # 배경 출력
-    draw_bg()
-    # 맵 출력
-    world.draw()
-    
-    # HP 출력
-    health_bar.draw(player.health)
-    # 총알 수 출력
-    draw_text('AMMO:'.format(player.ammo), font, WHITE, 10, 35)
-    for x in range(player.ammo):
-        screen.blit(bullet_img, (90 + (x * 10), 40))
-    # 마법 수 출력
-    draw_text('MAGIC:'.format(player.magic), font, WHITE, 10, 65)
-    for x in range(player.magic):
-        screen.blit(magic_img, (90 + (x * 10), 65))
-
-    # 플레이어 생성
-    player.draw()
-    player.update()
-    player.move(moving_left, moving_right)
-
-    # 적 형성
-    for enemy in enemy_group:
-        if freeze == True:
-            enemy.ai(1)
-        enemy.ai(0)
-        enemy.draw()
-        enemy.update()
-
-    # 총알 및 마법 업데이트 및 생성
-    bullet_group.update()
-    magic_group.update()
-    explosion_group.update()
-    freeze_group.update()
-    poison_group.update()
-    Item_box_group.update()
-    lava_group.update()
-    star_group.update()    
-    
-    bullet_group.draw(screen)
-    magic_group.draw(screen)
-    explosion_group.draw(screen)
-    freeze_group.draw(screen)
-    poison_group.draw(screen)
-    Item_box_group.draw(screen)
-    lava_group.draw(screen)
-    star_group.draw(screen)
-    
-    # 플레이어의 액션 상태 업데이트
-    if player.alive:
-        # 총알 액션 (플레이어의 중심 x, 플레이어 중심 y, 플레이어방향(같은방향))
-        if shoot:
-            player.shoot()
-        # 수류탄 투척 액션
-        elif magic and magic_thrown == False and player.magic > 0:
-            magic = Magic(player.rect.centerx + (1 * player.rect.size[0]) * player.direction, player.rect.top, player.direction)
-            magic_group.add(magic)
-            # 수류탄 수 줄어들기
-            player.magic -= 1
-            magic_thrown = True
-        elif spin:
-            spin = Spin(player.rect.center, player.direction, 1, player.direction)
-        if player.in_air:
-            player.update_action(2)#2: jump
-        elif moving_left or moving_right:
-            player.update_action(1)#1: run
-        else:
-            player.update_action(0)#0: idle
-
-        screen_scroll = player.move(moving_left, moving_right)
-        bg_scroll -= screen_scroll
+    if (start_game == False):
+        screen.fill(BG)
+        if start_button.draw(screen):
+            start_game = True
+            start_intro = True
+        if exit_button.draw(screen):
+            run = False
         
+        
+    else:
+        # 배경 출력
+        draw_bg()
+        # 맵 출력
+        world.draw()
+        
+        # HP 출력
+        health_bar.draw(player.health)
+        # 총알 수 출력
+        draw_text('AMMO:'.format(player.ammo), font, WHITE, 10, 35)
+        for x in range(player.ammo):
+            screen.blit(bullet_img, (90 + (x * 10), 40))
+        # 마법 수 출력
+        draw_text('MAGIC:'.format(player.magic), font, WHITE, 10, 65)
+        for x in range(player.magic):
+            screen.blit(magic_img, (90 + (x * 10), 65))
+
+        # 플레이어 생성
+        player.draw()
+        player.update()
+        player.move(moving_left, moving_right)
+
+        # 적 형성
+        for enemy in enemy_group:
+            if freeze == True:
+                enemy.ai(1)
+            enemy.ai(0)
+            enemy.draw()
+            enemy.update()
+
+        # 총알 및 마법 업데이트 및 생성
+        bullet_group.update()
+        magic_group.update()
+        explosion_group.update()
+        freeze_group.update()
+        poison_group.update()
+        Item_box_group.update()
+        lava_group.update()
+        star_group.update()    
+        
+        bullet_group.draw(screen)
+        magic_group.draw(screen)
+        explosion_group.draw(screen)
+        freeze_group.draw(screen)
+        poison_group.draw(screen)
+        Item_box_group.draw(screen)
+        lava_group.draw(screen)
+        star_group.draw(screen)
+        
+        
+        if start_intro == True:
+            if intro_fade.fade():
+                start_intro = False
+                intro_fade.fade_counter = 0
+                
+
+        # 플레이어의 액션 상태 업데이트
+        if player.alive:
+            # 총알 액션 (플레이어의 중심 x, 플레이어 중심 y, 플레이어방향(같은방향))
+            if shoot:
+                player.shoot()
+            # 수류탄 투척 액션
+            elif magic and magic_thrown == False and player.magic > 0:
+                magic = Magic(player.rect.centerx + (1 * player.rect.size[0]) * player.direction, player.rect.top, player.direction)
+                magic_group.add(magic)
+                # 수류탄 수 줄어들기
+                player.magic -= 1
+                magic_thrown = True
+            elif spin:
+                spin = Spin(player.rect.center, player.direction, 1, player.direction)
+            if player.in_air:
+                player.update_action(2)#2: jump
+            elif moving_left or moving_right:
+                player.update_action(1)#1: run
+            else:
+                player.update_action(0)#0: idle
+            screen_scroll, level_complete = player.move(moving_left, moving_right)
+            bg_scroll -= screen_scroll
+            #check if player has completed the level
+            if level_complete:
+                start_intro = True
+                level += 1
+                bg_scroll = 0
+                world_data = reset_level()
+                if level <= MAX_LEVEL:
+                    with open('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\code\\level{}_data.csv'.format(0), newline='') as csvfile:
+                        reader = csv.reader(csvfile, delimiter=',')
+                        for x, row in enumerate(reader):
+                            for y, tile in enumerate(row):
+                                world_data[x][y] = int(tile)
+                        world = World() 
+                        player, health_bar = world.process_data(world_data)
+        else:
+            screen_scroll = 0
+            if death_fade.fade():
+                if restart_button.draw(screen):
+                    death_fade.fade_counter = 0
+                    start_intro = True
+                    bg_scroll = 0
+                    world_data = reset_level()
+                    with open('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\code\\level{}_data.csv'.format(0), newline='') as csvfile:
+                        reader = csv.reader(csvfile, delimiter=',')
+                        for x, row in enumerate(reader):
+                            for y, tile in enumerate(row):
+                                world_data[x][y] = int(tile)
+                    world = World()
+                    player, health_bar = world.process_data(world_data)
+                    
+                
     for event in pygame.event.get():
         # when quit game
         if event.type == pygame.QUIT:
             run = False
-        
+    
         # 키보드 입력 처리
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
@@ -768,6 +908,7 @@ while run:
                 moving_right = True
             if event.key == pygame.K_UP and player.alive:
                 player.jump = True
+                jump_fx.play()
             if event.key == pygame.K_SPACE:
                 shoot = True
             if event.key == pygame.K_a:
