@@ -173,6 +173,7 @@ class Soldier(pygame.sprite.Sprite):
         self.direction = 1
         self.vel_y = 0
         self.jump = False
+        self.spin = False
         self.in_air = True
         self.flip = False
         
@@ -189,7 +190,7 @@ class Soldier(pygame.sprite.Sprite):
         self.idling = False
         self.idling_counter = 0
         
-        animation_types =['Idle', 'Walk', 'Jump', 'Death']
+        animation_types =['Idle', 'Walk', 'Jump', 'Death', 'Spin']
         for animation in animation_types:
             # 임시 이미지 파일 리스트
             temp_list = []
@@ -244,6 +245,10 @@ class Soldier(pygame.sprite.Sprite):
             self.vel_y = -20
             self.jump = False
             self.in_air = True
+        
+        #spin
+        if self.spin == True:
+            self.spin = False
 
         # 중력 적용
         self.vel_y += GRAVITY
@@ -275,7 +280,7 @@ class Soldier(pygame.sprite.Sprite):
         if pygame.sprite.spritecollide(self, lava_group, False):
             self.health = 0
         level_complete = False
-        if pygame.sprite.spritecollide(self, star_group,False):
+        if pygame.sprite.spritecollide(self, star_group, False):
             level_complete = True
             
         # 맵아래로 빠졌는지 확인
@@ -742,9 +747,9 @@ death_fade = ScreenFade(2, GREEN, 4)
 
 
 #버튼 생성
-start_button = button.Button(SCREEN_WIDTH // 2 - 130, SCREEN_HEIGHT // 2 - 150, start_img, 1)
-exit_button = button.Button(SCREEN_WIDTH // 2 - 110, SCREEN_HEIGHT // 2 - 20, exit_img, 1)
-restart_button = button.Button(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 - 50, restart_img, 1)
+start_button = button.Button(SCREEN_WIDTH // 2 - 130, SCREEN_HEIGHT // 2 - 150, start_img, 1.1)
+exit_button = button.Button(SCREEN_WIDTH // 2 - 110, SCREEN_HEIGHT // 2 - 20, exit_img, 1.1)
+restart_button = button.Button(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 50, restart_img, 3)
 
 # 스프라이트 그룹을 생성
 enemy_group = pygame.sprite.Group()
@@ -854,8 +859,8 @@ while run:
                 # 수류탄 수 줄어들기
                 player.magic -= 1
                 magic_thrown = True
-            elif spin:
-                spin = Spin(player.rect.center, player.direction, 1, player.direction)
+            # elif spin:
+            #     spin = Spin(player.rect.center, player.direction, 1, player.direction)
             if player.in_air:
                 player.update_action(2)#2: jump
             elif moving_left or moving_right:
