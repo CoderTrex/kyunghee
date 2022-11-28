@@ -378,7 +378,7 @@ class Soldier(pygame.sprite.Sprite):
                         self.idling = False
         # 스크롤
         self.rect.x += screen_scroll
-    
+
     def update_animation(self):
         # 애니메이션 업데이트
         ANIMATION_COOLDOWN = 100
@@ -394,7 +394,7 @@ class Soldier(pygame.sprite.Sprite):
                 self.frame_index = len(self.animation_list[self.action]) - 1
             else:
                 self.frame_index = 0
-    
+
     def update_action(self, new_action):
         # 액션이 일전에 햇던 액션과 같은 지 확인함
         if new_action != self.action:
@@ -406,6 +406,7 @@ class Soldier(pygame.sprite.Sprite):
     def check_alive(self):
         if self.health <= 0:
             self.health = 0
+            self.rect.x
             self.speed = 0
             self.alive = False
             self.update_action(3)
@@ -474,7 +475,6 @@ class World():
             tile[1][0] += screen_scroll
             screen.blit(tile[0], tile[1])
 
-            
 class Lava(pygame.sprite.Sprite):
     def __init__(self, img, x, y):
         pygame.sprite.Sprite.__init__(self)
@@ -515,7 +515,7 @@ class ItemBox(pygame.sprite.Sprite):
                 player.ammo += 15
             elif self.item_type == 'Power':
                 player.magic += 5
-            elif self.item_type == "Ice":
+            elif self.item_type == "ice":
                 player.magic_type = 1
                 player.magic += 5
             elif self.item_type == "fire":
@@ -653,12 +653,12 @@ class Magic(pygame.sprite.Sprite):
         if self.timer <= 0:
             self.kill()
             magic_fx.play()
-            print("player magic type : ", player.magic_type)
             if player.magic_type== 1:
-                explosion = Explosion(self.rect.x, self.rect.y, 0.9)
+                explosion = Explosion_Ice(self.rect.x, self.rect.y + 100, 3)
+            elif player.magic_type == 2:
+                explosion = Explosion_Fire(self.rect.x, self.rect.y + 100, 1.0)
             elif player.magic_type == 3:
-                print("hello")
-                explosion = Explosion_Posion(self.rect.x, self.rect.y, 1.0)
+                explosion = Explosion_Posion(self.rect.x, self.rect.y + 70, 1.0)
 
             explosion_group.add(explosion)
             # 근처의 누구에게나 데미지 입히기 
@@ -675,15 +675,15 @@ class Magic(pygame.sprite.Sprite):
                     # 화염 마법 진행
                     elif player.magic_type == 2:
                         if abs(self.rect.centerx - enemy.rect.centerx) < TILE_SIZE * 1.5 and abs(self.rect.centery - enemy.rect.centery) < TILE_SIZE * 1.5:
-                            self.get_burn(enemy)
-                            # fire = Fire(enemy.rect.centerx, enemy.rect.centery, 0.5, enemy)
-                            enemy.health -= 100
+                            fire = Fire(enemy.rect.centerx, enemy.rect.centery, 0.5, enemy)
+                            fire_group.add(fire)
+                            enemy.health -= 75
                     # 독 마법 진행
                     elif player.magic_type == 3:
                         if abs(self.rect.centerx - enemy.rect.centerx) < TILE_SIZE * 3 and abs(self.rect.centery - enemy.rect.centery) < TILE_SIZE * 3:
-                            poison = Poison(enemy.rect.centerx, enemy.rect.centery, 0.5)
+                            poison = Poison(enemy.rect.centerx, enemy.rect.centery, 0.5, enemy)
                             poison_group.add(poison)
-                            enemy.health -= 10
+                            enemy.health -= 20
 
 class Freeze(pygame.sprite.Sprite):
     def __init__(self, x, y, scale, freeze_enemy):
@@ -691,7 +691,7 @@ class Freeze(pygame.sprite.Sprite):
         self.images = []
         self.freeze_enemy = freeze_enemy
         for num in range(1, 8):
-            img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Explosion_Ice\\{0}.png'.format(num)).convert_alpha()
+            img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Freeze\\{0}.png'.format(num)).convert_alpha()
             img = pygame.transform.scale(img, (float(img.get_width() * scale), float(img.get_height() * scale)))
             self.images.append(img)
         self.frame_index = 0
@@ -709,19 +709,49 @@ class Freeze(pygame.sprite.Sprite):
             if self.frame_index >= len(self.images):
                 self.frame_index = len(self.images)
                 self.counter += 1
-            
             else:
                 self.image = self.images[self.frame_index]
         else:
             self.freeze_enemy.freeze = False
             self.kill()
 
-class Poison(pygame.sprite.Sprite):
-    def __init__(self, x, y, scale):
+class Fire(pygame.sprite.Sprite):
+    def __init__(self, x, y, scale, fired_enemy):
         pygame.sprite.Sprite.__init__(self)
         self.images = []
-        for num in range(1, 11):                                                                            
-            img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Explosion_Poison\\Explosion_gas{0}.png'.format(num)).convert_alpha()
+        self.fired_enemy = fired_enemy
+        for num in range(1, 8):
+            img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Explosion_Fire\\frame{:04d}.png'.format(num)).convert_alpha()
+            img = pygame.transform.scale(img, (float(img.get_width() * scale), float(img.get_height() * scale)))
+            self.images.append(img)
+        self.frame_index = 0
+        self.image = self.images[self.frame_index]
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        self.counter = 0
+        
+    def update(self):
+        self.rect.x += screen_scroll
+        Explosion_SPEED = 200
+        if self.counter <= Explosion_SPEED:
+            self.fired_enemy.freeze = True
+            self.frame_index += 1
+            if self.frame_index >= len(self.images):
+                self.frame_index = len(self.images)
+                self.counter += 1
+            else:
+                self.image = self.images[self.frame_index]
+        else:
+            self.fired_enemy.freeze = False
+            self.kill()
+
+class Poison(pygame.sprite.Sprite):
+    def __init__(self, x, y, scale, addicted_enemy):
+        pygame.sprite.Sprite.__init__(self)
+        self.images = []
+        self.addicted_enemy = addicted_enemy
+        for num in range(1, 10):                                                                            
+            img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Explosion_Posion\\Explosion_gas{0}.png'.format(num)).convert_alpha()
             img = pygame.transform.scale(img, (float(img.get_width() * scale), float(img.get_height() * scale)))
             self.images.append(img)
         self.frame_index = 0
@@ -734,6 +764,7 @@ class Poison(pygame.sprite.Sprite):
         Explosion_SPEED = 10
         self.counter += 1
         if self.counter >= Explosion_SPEED:
+            self.addicted_enemy.health -= 2
             self.counter = 0
             self.frame_index += 1
             if self.frame_index >= len(self.images):
@@ -742,12 +773,40 @@ class Poison(pygame.sprite.Sprite):
                 self.image = self.images[self.frame_index]
 
 
-class Explosion(pygame.sprite.Sprite):
+class Explosion_Ice(pygame.sprite.Sprite):
     def __init__(self, x, y, scale):
         pygame.sprite.Sprite.__init__(self)
         self.images = []
-        for num in range(1, 8):
-            img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Explosion_Water\\water{0}.png'.format(num)).convert_alpha()
+        for num in range(1, 73):
+            img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Explosion_Ice\\frame{:04d}.png'.format(num)).convert_alpha()
+            img = pygame.transform.scale(img, (float(img.get_width() * scale), float(img.get_height() * scale)))
+            self.images.append(img)
+        self.frame_index = 0
+        self.image = self.images[self.frame_index]
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y - 100)
+        self.counter = 0
+
+    def update(self):
+        self.rect.x += screen_scroll
+        Explosion_SPEED = 4
+        # 폭발 이미지 업데이트
+        self.counter += 1
+        if self.counter >= Explosion_SPEED:
+            self.counter = 0
+            self.frame_index += 1
+            # 애니메이션이 완성되면 삭제한다.
+            if self.frame_index >= len(self.images):
+                self.kill()
+            else:
+                self.image = self.images[self.frame_index]
+
+class Explosion_Fire(pygame.sprite.Sprite):
+    def __init__(self, x, y, scale):
+        pygame.sprite.Sprite.__init__(self)
+        self.images = []
+        for num in range(1, 64):
+            img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Explosion_Fire\\frame{:04d}.png'.format(num)).convert_alpha()
             img = pygame.transform.scale(img, (float(img.get_width() * scale), float(img.get_height() * scale)))
             self.images.append(img)
         self.frame_index = 0
@@ -886,6 +945,7 @@ while run:
         # 마법 수 출력
         draw_text('MAGIC:'.format(player.magic), font, WHITE, 10, 65)
         for x in range(player.magic):
+            
             screen.blit(magic_img, (90 + (x * 10), 65))
 
         # 플레이어 생성
