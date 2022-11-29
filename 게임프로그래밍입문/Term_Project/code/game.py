@@ -40,9 +40,9 @@ start_intro = False
 
 
 #음악 및 소리 로드
-pygame.mixer.music.load("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\music\\music2.mp3")
-pygame.mixer.music.set_volume(0.3)
-pygame.mixer.music.play(-1, 0.0, 5000)
+# pygame.mixer.music.load("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\music\\music2.mp3")
+# pygame.mixer.music.set_volume(0.3)
+# pygame.mixer.music.play(-1, 0.0, 5000)
 jump_fx = pygame.mixer.Sound("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\music\\jump.wav")
 jump_fx.set_volume(0.5)
 shoot_fx = pygame.mixer.Sound("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\music\\shot.wav")
@@ -467,7 +467,6 @@ class World():
                     elif tile == 20:
                         star = Star(img, x*TILE_SIZE, y*TILE_SIZE)
                         star_group.add(star)
-                        
         return player, health_bar
 
     def draw(self):
@@ -654,9 +653,9 @@ class Magic(pygame.sprite.Sprite):
             self.kill()
             magic_fx.play()
             if player.magic_type== 1:
-                explosion = Explosion_Ice(self.rect.x, self.rect.y + 100, 3)
+                explosion = Explosion_Ice(self.rect.x, self.rect.y + 100, 3.0)
             elif player.magic_type == 2:
-                explosion = Explosion_Fire(self.rect.x, self.rect.y + 100, 1.0)
+                explosion = Explosion_Fire(self.rect.x, self.rect.y + 100, 3.0)
             elif player.magic_type == 3:
                 explosion = Explosion_Posion(self.rect.x, self.rect.y + 70, 1.0)
 
@@ -668,8 +667,8 @@ class Magic(pygame.sprite.Sprite):
             for enemy in enemy_group:
                     # 얼음 마법 진행
                     if player.magic_type == 1:
-                        if abs(self.rect.centerx - enemy.rect.centerx) < TILE_SIZE * 2 and abs(self.rect.centery - enemy.rect.centery) < TILE_SIZE * 2:
-                            freeze = Freeze(enemy.rect.centerx, enemy.rect.centery, 0.5, enemy)
+                        if abs(self.rect.centerx - enemy.rect.centerx) < TILE_SIZE * 2.5 and abs(self.rect.centery - enemy.rect.centery) < TILE_SIZE * 2.5:
+                            freeze = Freeze(enemy.rect.centerx, enemy.rect.centery, 1, enemy)
                             freeze_group.add(freeze)
                             enemy.health -= 30  
                     # 화염 마법 진행
