@@ -75,10 +75,9 @@ void HeapSort ( ItemType values [ ] , int
 numValues )
 {
 int index ;
-    // Convert array values[0..numValues-1] into a heap
     for (index = numValues/2 - 1; index >= 0; index--)
     ReheapDown ( values , index , numValues - 1 ) ;
-    // N개 수
+    // N개 가짓수
     for (index = numValues - 1; index >= 1; index--)
     {
         // logN의 수
