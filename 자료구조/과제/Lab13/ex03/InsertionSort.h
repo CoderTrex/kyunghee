@@ -1,3 +1,4 @@
 #include "Student.h"
 
-void InsertionSort(Student ary[], int numElems);
+
+void InsertionSort(Student values[], int numValues);

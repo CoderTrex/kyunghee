@@ -1,16 +1,8 @@
-#include <iostream>
-#include "Student.h"
 #include "HeapSort.h"
-using namespace std;
+
 
 int main()
 {
-    Student stu[100];
-    stu[0].InitValue(2003200111, (char *)"leewoongjae", 3.0);
-    stu[1].InitValue(2004200121, (char *)"kwonojong", 3.2);
-    stu[2].InitValue(2005200132, (char *)"kimjinli", 2.7);
-
-    HeapSort(stu, 3);
-    Print(cout, stu, 3);
-    return 0;
+	int arr[] = {25, 17, 36, 2, 3, 100, 1, 19, 7};
+	HeapSort(arr, 9);
 }

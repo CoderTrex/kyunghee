@@ -62,6 +62,10 @@ bool Student::operator > (const Student &stu)
 	}
 	return gpa > stu.gpa;
 }
+bool Student::operator == (const Student &stu)
+{
+	return id == stu.id && strcmp(name, stu.name) == 0 && gpa == stu.gpa;
+}
 void PrintByPointer(ostream &out, Student *values[], int numValues)
 {
 	for (int i = 0; i < numValues; i++)

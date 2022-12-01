@@ -1,11 +1,6 @@
 #include <iostream>
-#include "SelectionSort.h"
 #include "Student.h"
-#include <string.h>
-#include <string>
-#include <stdio.h>
-
-using namespace std;
+#include "HeapSort.h"
 
 int main()
 {
@@ -16,7 +11,7 @@ int main()
     stu[3].InitValue(2005200132, (char*)"kikdjinli", 2.7);
     stu[4].InitValue(2005200132, (char*)"dimjinli", 2.7);
 
-    SelectionSort(stu, 5);
+	HeapSort(stu, 5);
     Print(cout, stu, 5);
     return 0;
 }

@@ -1,9 +1,8 @@
 #pragma once
 #include "Student.h"
 
-template<class ItemType>
+template <class ItemType>
 void ReheapDown(ItemType elements[], int root, int bottom)
-// Post: Heap property is restored.
 {
 	int maxChild;
 	int rightChild;
@@ -30,7 +29,7 @@ void ReheapDown(ItemType elements[], int root, int bottom)
 	}
 }
 
-template<class ItemType>
+template <class ItemType>
 void ReheapUp(ItemType elements[], int root, int bottom)
 // Post: Heap property is restored.
 {
@@ -47,17 +46,14 @@ void ReheapUp(ItemType elements[], int root, int bottom)
 	}
 }
 
-template<class ItemType>
-void HeapSort(ItemType values[], int numValues) {
+void HeapSort(Student ary[], int numElems)
+{
 	int index;
-
-	// Convert the array of values into a heap.
-	for (index = numValues/2 - 1; index >= 0; index--)
-		ReheapDown(values, index, numValues-1);
-
-	// Sort the array.
-	for (index = numValues-1; index >=1; index--){
-		Swap(values[0], values[index]);
-		ReheapDown(values, 0, index-1);
+	for (index = numElems/2 - 1; index >= 0; index--)
+		ReheapDown(ary, index, numElems - 1);
+	for (index = numElems - 1; index >= 1; index--)
+	{
+		Swap(ary[0], ary[index]);
+		ReheapDown(ary, 0, index - 1);
 	}
 }

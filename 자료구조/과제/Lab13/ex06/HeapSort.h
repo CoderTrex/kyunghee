@@ -1,5 +1,26 @@
 #pragma once
-#include "Student.h"
+#include <iostream>
+using namespace std;
+
+
+template <class ItemType>
+void Swap(ItemType &item1, ItemType &item2)
+{
+	ItemType tempItem;
+
+	tempItem = item1;
+	item1 = item2;
+	item2 = tempItem;
+}
+
+template <class ItemType>
+void Print_array(ItemType value[], int numValue)
+{
+	for (int i = 0; i < numValue; i++)
+	{
+		cout << value[i] << " ";
+	}
+}
 
 template<class ItemType>
 void ReheapDown(ItemType elements[], int root, int bottom)
@@ -47,33 +68,6 @@ void ReheapUp(ItemType elements[], int root, int bottom)
 	}
 }
 
-template<class ItemType>
-void Print_array(ItemType value[], int numValue)
-{
-	for (int i = 0; i < numValue; i++)
-	{
-		cout << value[i] << " ";
-	}
-}
-
-template<class ItemType>
-void HeapSort(ItemType values[], int numValues) {
-	int index;
-
-	Print_array(values, numValues);
-z	// Convert the array of values into a heap.
-	for (index = numValues/2 - 1; index >= 0; index--)
-		ReheapDown(values, index, numValues-1);
-	Print_array(values, numValues);
-	// Sort the array.
-	for (index = numValues-1; index >=1; index--)
-	{
-		Swap(values[0], values[index]);
-		ReheapDown(values, 0, index-1);
-		Print_array(values, numValues);
-	}
-}
-
 template <class ItemType>
 int GetHeight (ItemType values[ ], int start, int numValues)
 {
@@ -92,4 +86,22 @@ int GetHeightSum (ItemType values[ ], int numValues)
 	for (index = numValues -1; index >= 0; index--)
 		sum += GetHeight (values, index , numValues1);
 	cout << "sum of heights = " << sum << endl;
+}
+
+template<class ItemType>
+void HeapSort(ItemType values[], int numValues) {
+	int index;
+
+	Print_array(values, numValues);
+	// Convert the array of values into a heap.
+	for (index = numValues/2 - 1; index >= 0; index--)
+		ReheapDown(values, index, numValues-1);
+	Print_array(values, numValues);
+	// Sort the array.
+	for (index = numValues-1; index >=1; index--)
+	{
+		Swap(values[0], values[index]);
+		ReheapDown(values, 0, index-1);
+		Print_array(values, numValues);
+	}
 }

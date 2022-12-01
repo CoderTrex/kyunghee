@@ -1,24 +1,20 @@
-template<class ItemType>
-void BubbleUp(ItemType values[], int startIndex, int endIndex)
-// Post: Adjacent pairs that are out of order have been 
-//       switched between values[startIndex]..values[endIndex]
-//       beginning at values[endIndex].
+#include "Student.h"
+
+template <class ItemType>
+void BubbleDown(ItemType values[], int startIndex, int endIndex)
 {
-  for (int index = endIndex; index > startIndex; index--)
-    if (values[index] < values[index-1])
-      Swap(values[index], values[index-1]);
+	for (int index = endIndex; index > startIndex; index--)
+		if (values[index] < values[index - 1])
+			Swap(values[index], values[index - 1]);
 }
 
-template<class ItemType>
-void BubbleSort(ItemType values[], int numValues)
-// Post: The elements in the array values are sorted by key.
+void BubbleSort(Student ary[], int numElems)
 {
-  int current = 0;
+	int current = 0;
 
-  while (current < numValues - 1)
-  {
-    BubbleUp(values, current, numValues-1);
-    current++;
-  }
+	while (current < numElems - 1)
+	{
+		BubbleDown(ary, current, numElems - 1);
+		current++;
+	}
 }
-

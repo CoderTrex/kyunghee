@@ -15,14 +15,13 @@ public :
 	char* getName();
 	void operator = (Student stu);
 	bool operator<(const Student &stu);
-	bool operator>(const Student &s);
+	bool operator>(const Student &stu);
+	bool operator==(const Student &stu);
 private :
 	int id;
 	char name[30];
 	float gpa;
 };
-
-
 
 void Swap(Student& item1, Student& item2);
 void Print(ostream& out, Student stu[], int numelement);
