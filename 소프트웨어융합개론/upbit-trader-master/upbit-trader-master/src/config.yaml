@@ -1,0 +1,20 @@
+LOG:
+  FORMAT: '[%(asctime)s.%(msecs)03d: %(levelname).1s %(filename)s:%(lineno)s] %(message)s'
+  PATH: upbit-trader.log
+  PRINT: true
+  SAVE: false
+MONGO:
+  ID: root
+  IP: 127.0.0.1
+  PASSWORD: qwe123
+  PORT: 27017
+PROGRAM:
+  GUI: true
+SETTINGS:
+  AUTO_TRADING: false
+STRATEGY:
+  MAX_INDIVIDUAL_TRADE_PRICE: 10000
+  TYPE: VolatilityBreakout
+UPBIT:
+  ACCESS_KEY: ''
+  SECRET_KEY: ''
