@@ -20,6 +20,7 @@ void Print_array(ItemType value[], int numValue)
 	{
 		cout << value[i] << " ";
 	}
+	cout << "\n";
 }
 
 template<class ItemType>
