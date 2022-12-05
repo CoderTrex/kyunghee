@@ -293,7 +293,6 @@ class GameLayer(cocos.layer.Layer):
                     beta = scores[i]
                 if beta <= alpha:
                     return scores[i]
-
         return min(scores)
 
     def maxMove(self, board, depth, alpha, beta):
