@@ -15,6 +15,8 @@ def coll_handler(_, arbiter):
         obj2.collide(obj1, arbiter.contacts)
     return True
 
+
+# 절대적인 space라는 공간을 생성함
 space = pymunk.Space()
 space.gravity = 0, -10
 space.add_default_collision_handler(coll_handler)
@@ -42,6 +44,7 @@ class Rigidbody(Component):
         if self.is_static:
             space.add(shape)
         else:
+            # 바디하고 shape 값이 출력함
             space.add(self.gameobject._body, shape)
 
 

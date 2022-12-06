@@ -34,7 +34,9 @@ class GameObject(object):
 
     @position.setter
     def position(self, pos):
+        # 값을 받아와 지정함
         self._body.position = pos[0], pos[1]
+        # 고정된 값을 지정
         self._z = pos[2]
 
     @property
@@ -56,11 +58,13 @@ class GameObject(object):
         self._body.velocity = vel
 
     def move(self, x, y):
+        # 힘을 가해서 움직이게 됨.
         self._body.apply_impulse((x, y))
 
     def apply_force(self, x, y):
         self._body.apply_force((x, y))
 
+    # 여러개의 컴포넌트를 추가하는 코드
     def add_components(self, *components):
         for component in components:
             self.add_component(component)
@@ -79,6 +83,7 @@ class GameObject(object):
         component.stop()
         self.components.remove(component)
 
+    # 렌더가 가능한 
     def render(self):
         for component in self.components:
             if isinstance(component, Renderable):
