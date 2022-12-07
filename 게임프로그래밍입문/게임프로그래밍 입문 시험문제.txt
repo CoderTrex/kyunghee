@@ -37,7 +37,7 @@
 7. 게임 캐릭터의 행동에서 pursuit/evade/wander/obstacle avoidance의 동작과 구현 방법을 설명하라. 
     -> 구현 방법 코드 작성 방법에 대해서  설명 x
     -> 구현하는 순서
-    
+        
 
 
 8. 3D 그래픽에서 Model/View/Projection에 대해 설명하라. 
