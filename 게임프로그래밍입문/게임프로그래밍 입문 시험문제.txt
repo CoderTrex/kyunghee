@@ -1,0 +1,49 @@
+1. 원과 면의 충돌의 검출과 반응에 대해 설명하라. (고정된 직선면과 원의 충돌, 원의 운동 에너지 보존(탄성충돌))
+    수학적인 설명-> 벡터로 설명하는 것을 원함
+    충돌 반응을 진행하기 위해 원과 면의 충돌 지점을 확인해야 한다.
+
+2. 설명: 2-1. callback, 2-2. (r, g, b, a), 2-3. (x, y, z, w), 2-4.(dynamic, kinematic, static)
+    
+2-1.
+    다른 함수가 실행 뒤에 다시 실행하는 코드를 의미함.
+
+2-2. (r, g, b, a)
+    r : red / g : green / b : blue / a : alpha
+    255까지 2의 8승 바이트까지 수치로 밝기를 표현하며, 숫자가 높을 수록 해당 색상의 밝기가 높다.
+    전부 다 (255, 255, 255) 이라면 하얀색을 화면에 보여준다.
+    alpha는 투명도를 나타내며 0~1사이의 값ㅇ르 가진다.
+
+2-3. (x, y, z, w)
+
+
+2-4.
+    dynamic : 게임 안에서 계속해서 움직임을 받음  
+    kinematic : 게임 안에서 명확한 사용자의 제어 안에서만 작동함
+    static : 게임 안에서 계속해서 멈춰있음
+
+
+3. cocos2d에서 collision manager의 기능과 처리 방법을 설명하라.
+
+
+4. cocos2d에서 action(interval/instant)의 정의와 사용법에 대해 설명하라. 
+
+5. Minimax와 alpha-beta pruning에 대해 설명하라.
+
+6. Reversi 게임을 minimax로 구현하는 경우에 설정할 수 있는 evaluation function의 예를 설명하라.
+    1. 얻을 수 있는 코인의 수의 양
+    2. 놓을 수 있는 자리의 수
+    3. 위치의 자리에 가중치의 값에 따라 계산된 값
+
+7. 게임 캐릭터의 행동에서 pursuit/evade/wander/obstacle avoidance의 동작과 구현 방법을 설명하라. 
+    -> 구현 방법 코드 작성 방법에 대해서  설명 x
+    -> 구현하는 순서
+    
+
+
+8. 3D 그래픽에서 Model/View/Projection에 대해 설명하라. 
+
+9. 3D 그래픽의 View matrix를 계산하기 위한 요소에 대해 설명하라.
+
+10. Pymunk에서 space/body/shape/arbiter의 기능과 구성에 대해 설명하라.
+
+11. 물리엔진에서 body에 mass와 moment의 필요성에 대해 설명하라.
