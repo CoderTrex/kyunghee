@@ -80,12 +80,14 @@ class Camera(Component):
     def render(self):
         pos = self.gameobject.position
         glLoadIdentity()
-        gluLookAt(pos[0], self.dy, self.dz,
-                  pos[0], pos[1], pos[2],
-                  0, 1, 0)
+        
+        gluLookAt(pos[0], self.dy, self.dz, # 카메라의 위치 어디에서 볼지 y축과 z축은 고정함 x축만 이동함 만약 플레이어가 움직인다면 아래서 위를 바라보는 방식 (y축을 고정함)
+                    pos[0], pos[1], pos[2], # 어디를 (플레이어) (플레이어만 카메카 컴포넌트를 가지고 있음)
+                    0, 1, 0) # 어디 방향을
 
 
 class Cube(Renderable):
+    
     sides = ((0, 1, 2, 3), (3, 2, 7, 6), (6, 7, 5, 4),
              (4, 5, 1, 0), (1, 5, 7, 2), (4, 0, 3, 6))
 
@@ -104,6 +106,7 @@ class Cube(Renderable):
     def _render(self):
         glBegin(GL_QUADS)
         for i, side in enumerate(Cube.sides):
+            
             glNormal3fv(Cube.normals[i])
             for v in side:
                 glVertex3fv(self.vertices[v])

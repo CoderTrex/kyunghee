@@ -232,7 +232,6 @@ class Soldier(pygame.sprite.Sprite):
         self.rect.center = (x,y)
         self.width = self.image.get_width()
         self.height = self.image.get_height()
-        
 
     def update(self):
         # 애니메이션 업데이트
@@ -343,6 +342,7 @@ class Soldier(pygame.sprite.Sprite):
             shoot_fx.play()
     
     def ai(self):
+        i = 0
         if self.alive and player.alive:
             if self.freeze == True:
                 self.update_action(0)
@@ -353,9 +353,16 @@ class Soldier(pygame.sprite.Sprite):
                 self.idling_counter = 100
             # ai 근처에 플레이어가 있는 지 확인
             elif self.vision.colliderect(player.rect):
+                i += 1
                 # 움직이지 않고 플레이어를 바라본다.
-                self.update_action(0)
-                self.shoot()
+                if i % 10 == 9:
+                    self.update_action()
+                    self.shoot()
+                else:
+                    self.update_action(0)
+                    self.shoot() # 여기서 변주를 주자
+
+            
             else:
                 if self.idling == False:
                     if  self.direction == 1:
@@ -378,6 +385,8 @@ class Soldier(pygame.sprite.Sprite):
                         self.idling = False
         # 스크롤
         self.rect.x += screen_scroll
+
+
 
     def update_animation(self):
         # 애니메이션 업데이트
