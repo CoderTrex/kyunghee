@@ -92,27 +92,11 @@ class FundamentalData(av):
     @av._output_format
     @av._call_api_on_func
     def get_cash_flow_annual(self, symbol):
-        """
-        Returns the annual and quarterly cash flows for the company of interest.
-        Data is generally refreshed on the same day a company reports its latest 
-        earnings and financials.
-
-        Keyword Arguments:
-            symbol:  the symbol for the equity we want to get its data
-        """
         _FUNCTION_KEY = 'CASH_FLOW'
         return _FUNCTION_KEY, 'annualReports', 'symbol'
 
     @av._output_format
     @av._call_api_on_func
     def get_cash_flow_quarterly(self, symbol):
-        """
-        Returns the annual and quarterly cash flows for the company of interest.
-        Data is generally refreshed on the same day a company reports its latest 
-        earnings and financials.
-
-        Keyword Arguments:
-            symbol:  the symbol for the equity we want to get its data
-        """
         _FUNCTION_KEY = 'CASH_FLOW'
         return _FUNCTION_KEY, 'quarterlyReports', 'symbol'
