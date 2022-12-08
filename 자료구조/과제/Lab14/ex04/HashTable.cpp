@@ -50,15 +50,15 @@ void HashTable<ItemType>::RetrieveItem(ItemType &item, bool &found)
     int startLoc;
     bool moreTosearch = true;
 
-    startLoc = Hash(item);
+    startLoc = Hash(item.getkey());
     location = startLoc;
     do {
         if (info[location == item] || info[location] == emptyItem)
             moreTosearch = false;
         else
-            location = Hash(item)
-    }while (moreTosearch || item)
+            location = (location + 1) % MAX_ITEMS
+    }while (moreTosearch || location)
     found = (info[location] == item);
     if (found)
-        item  = Hash(item);
+        item  = info[location];
 }
