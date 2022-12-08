@@ -11,7 +11,7 @@
 **-HardwareTarget 하드웨어**
 
 ▪대상 하드웨어 계층은 게임이 실행될 컴퓨터 시스템 또는 콘솔을 나타냅니다.
-▪일반적인 플랫폼에는 Microsoft Windows, Linux 및 MacOS 기반 PC가 포함됩니다.
+▪일반적인 플랫폼에는 Microsoft Windows, Linux 및 MacOS 기반 PC가 포함됩니다. 
 ▪모바일 플랫폼에는 Apple iPhone, iPad, Android 스마트폰 및 태블릿이 포함됩니다.
 
 **-DriversDevice 드라이버**
