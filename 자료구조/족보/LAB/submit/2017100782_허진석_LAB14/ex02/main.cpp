@@ -1,19 +1,18 @@
-#include "MergeSort.h"
 #include <iostream>
+#include "Student.h"
+#include "MergeSort.h"
 
-int main() {
-	Student s[50];
+using namespace std;
 
-	s[0].InitValue(9, "inadf", 3.8);
-	s[1].InitValue(2, "sa", 3.2);
-	s[2].InitValue(1, "naha", 3.4);
-	s[3].InitValue(8, "john", 4.1);
-	s[4].InitValue(5, "alal", 4.3);
-	s[5].InitValue(0, "fifi", 3.5);
-	s[6].InitValue(7, "phia", 3.1);
+int main()
+{
+    Student stu[10];
+    stu[0].InitValue(2003200100, (char*)"Ford", 3.3);
+    stu[1].InitValue(2004200121, (char*)"smith", 3.0);
+    stu[2].InitValue(2005200132, (char*)"donald", 2.7);
+    
 
-	MergeSort(s, 0, 6);
-	for (int i = 0; i < 6; i++) {
-		s[i].Print(std::cout);
-	}
+    MergeSort(stu, 0, 2);
+    Print(cout, stu, 3);
+    return 0;
 }
