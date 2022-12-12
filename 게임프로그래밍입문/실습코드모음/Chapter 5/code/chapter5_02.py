@@ -91,7 +91,7 @@ class App(object):
         glLoadIdentity()
         gluLookAt(x, 0, z,
                   0, 0, 0,
-                  0, 1, 0)
+                  0, 0, 1)
 
         self.light.render()
         self.sphere1.render()
