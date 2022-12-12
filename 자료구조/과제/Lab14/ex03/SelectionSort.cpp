@@ -21,9 +21,3 @@ void SelectionSort(Student* values[], int numValues)
     Swap(values[current], 
          values[MinIndex(values, current, endIndex)]);
 } 
-
-
-void SelectionSort(student *value, int numValue)
-{
-  
-}

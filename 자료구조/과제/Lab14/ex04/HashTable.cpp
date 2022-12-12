@@ -37,7 +37,7 @@ void HashTable<ItemType>::InsertItem(ItemType item)
 {
     int location;
     location = Hash(item.getKey());
-    while (info[location] != emptyITem)
+    while (info[location] != emptyItem)
         location = (location + 1) % MAX_ITEMS;
     info[location] = item;
     length++;
@@ -57,7 +57,7 @@ void HashTable<ItemType>::RetrieveItem(ItemType &item, bool &found)
             moreTosearch = false;
         else
             location = (location + 1) % MAX_ITEMS
-    }while (moreTosearch || location)
+    } while (moreTosearch && location);
     found = (info[location] == item);
     if (found)
         item  = info[location];

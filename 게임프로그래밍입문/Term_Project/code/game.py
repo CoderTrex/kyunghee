@@ -918,7 +918,7 @@ for row in range(ROWS):
     world_data.append(r)
 
 # load in level data and create world
-with open('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\code\\level{}_data.csv'.format(0), newline='') as csvfile:
+with open('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\code\\level{}_data.csv'.format(level), newline='') as csvfile:
     reader = csv.reader(csvfile, delimiter=',')
     for x, row in enumerate(reader):
         for y, tile in enumerate(row):
@@ -1025,7 +1025,7 @@ while run:
                 bg_scroll = 0
                 world_data = reset_level()
                 if level <= MAX_LEVEL:
-                    with open('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\code\\level{}_data.csv'.format(0), newline='') as csvfile:
+                    with open('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\code\\level{}_data.csv'.format(level), newline='') as csvfile:
                         reader = csv.reader(csvfile, delimiter=',')
                         for x, row in enumerate(reader):
                             for y, tile in enumerate(row):
@@ -1040,7 +1040,7 @@ while run:
                     start_intro = True
                     bg_scroll = 0
                     world_data = reset_level()
-                    with open('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\code\\level{}_data.csv'.format(0), newline='') as csvfile:
+                    with open('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\code\\level{}_data.csv'.format(level), newline='') as csvfile:
                         reader = csv.reader(csvfile, delimiter=',')
                         for x, row in enumerate(reader):
                             for y, tile in enumerate(row):
