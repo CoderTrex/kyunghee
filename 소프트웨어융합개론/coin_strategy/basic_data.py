@@ -50,42 +50,20 @@ class FundamentalData(av):
     @av._output_format
     @av._call_api_on_func
     def get_income_statement_quarterly(self, symbol):
-        """
-        Returns the annual and quarterly income statements for the company of interest. 
-        Data is generally refreshed on the same day a company reports its latest 
-        earnings and financials.
 
-        Keyword Arguments:
-            symbol:  the symbol for the equity we want to get its data
-        """
         _FUNCTION_KEY = 'INCOME_STATEMENT'
         return _FUNCTION_KEY, 'quarterlyReports', 'symbol'
 
     @av._output_format
     @av._call_api_on_func
     def get_balance_sheet_annual(self, symbol):
-        """
-        Returns the annual and quarterly balance sheets for the company of interest.
-        Data is generally refreshed on the same day a company reports its latest 
-        earnings and financials.
-
-        Keyword Arguments:
-            symbol:  the symbol for the equity we want to get its data
-        """
         _FUNCTION_KEY = 'BALANCE_SHEET'
         return _FUNCTION_KEY, 'annualReports', 'symbol'
 
     @av._output_format
     @av._call_api_on_func
     def get_balance_sheet_quarterly(self, symbol):
-        """
-        Returns the annual and quarterly balance sheets for the company of interest.
-        Data is generally refreshed on the same day a company reports its latest 
-        earnings and financials.
 
-        Keyword Arguments:
-            symbol:  the symbol for the equity we want to get its data
-        """
         _FUNCTION_KEY = 'BALANCE_SHEET'
         return _FUNCTION_KEY, 'quarterlyReports', 'symbol'
 
