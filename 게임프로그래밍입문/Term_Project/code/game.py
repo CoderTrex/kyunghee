@@ -207,6 +207,7 @@ class Soldier(pygame.sprite.Sprite):
         self.vision = pygame.Rect(0, 0, 150, 100)
         self.idling = False
         self.idling_counter = 0
+        self.i = 0
         
         animation_types =['Idle', 'Walk', 'Jump', 'Death', 'Spin']
         for animation in animation_types:
@@ -341,8 +342,11 @@ class Soldier(pygame.sprite.Sprite):
             self.ammo -= 1
             shoot_fx.play()
     
+    # def ai_skill():
+    #     self.
+    #     return (0)
+    
     def ai(self):
-        i = 0
         if self.alive and player.alive:
             if self.freeze == True:
                 self.update_action(0)
@@ -353,15 +357,19 @@ class Soldier(pygame.sprite.Sprite):
                 self.idling_counter = 100
             # ai 근처에 플레이어가 있는 지 확인
             elif self.vision.colliderect(player.rect):
-                i += 1
+                print(self.i)
                 # 움직이지 않고 플레이어를 바라본다.
-                if i % 10 == 9:
-                    self.update_action()
+                if self.i % 10 != 0:
+                    self.i += 1
+                    self.update_action(0)
                     self.shoot()
                 else:
-                    self.update_action(0)
-                    self.shoot() # 여기서 변주를 주자
-
+                    self.i += 1
+                    print(self.char_type)
+                    if (self.char_type == 'lich'):
+                        self.update_action(4)
+                        print(self.i)
+                        # self.ai_skill()
             
             else:
                 if self.idling == False:
@@ -737,7 +745,8 @@ class Fire(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.counter = 0
-        
+    
+    
     def update(self):
         self.rect.x += screen_scroll
         Explosion_SPEED = 200
@@ -780,6 +789,32 @@ class Poison(pygame.sprite.Sprite):
             else:
                 self.image = self.images[self.frame_index]
 
+
+class Explosion_cast(pygame.sprite.Sprite):
+    def __init__(self, x, y, scale):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = []
+        for num in range(1, 16):
+            img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Explosion_Cast\\frame{:04d}.png'.format(num)).convert_alpha()
+            img = pygame.transform.scale(img, (float(img.get_width() * scale), float(img.get_height() * scale)))
+            self.image.append(img)
+        self.frame_index = 0
+        self.image = self.image[self.frame_index]
+        self.rect = self.image.get_rect()
+        self.rect.center = (x + 200, y)
+        self.counter = 0
+        
+    def update(self):
+        self.rect.x += screen_scroll
+        Explosion_SPEED = 5
+        self.counter += 1
+        if (self.counter >= Explosion_SPEED):
+            self.counter = 0
+            self.frame_index += 1
+            if (self.frame_index >= len(self.image)):
+                self.kill()
+            else:
+                self.image = self.image[self.frame_index]
 
 class Explosion_Ice(pygame.sprite.Sprite):
     def __init__(self, x, y, scale):
