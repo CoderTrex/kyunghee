@@ -73,12 +73,20 @@ bool StackType::IsFull() const
 void StackType::Copy(StackType& anotherStack)
 {
   StackType copy;
-  int number;
-  while (topPtr != NULL)
+  NodeType *tmpNode;
+  tmpNode = topPtr;
+
+  for (; tmpNode->next != nullptr;)
   {
-    number = topPtr->info;
+    int number = tmpNode->info;
     copy.Push(number);
-    topPtr = topPtr->next;
+    tmpNode = tmpNode->next;
+  }
+  anotherStack.Push(tmpNode->info);
+  while (!copy.IsEmpty())
+  {
+    anotherStack.Push(copy.Top());
+    copy.Pop();
   }
 }
 
