@@ -47,7 +47,7 @@ jump_fx = pygame.mixer.Sound("C:\\Coding\\kyunghee\\게임프로그래밍입문\
 jump_fx.set_volume(0.5)
 shoot_fx = pygame.mixer.Sound("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\music\\shot.wav")
 shoot_fx.set_volume(0.5)
-magic_fx = pygame.mixer.Sound("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\music\\grenade.wav")
+magic_fx = pygame.mixer.Sound("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\music\\magic.wav")
 magic_fx.set_volume(0.5)
 
 
@@ -132,7 +132,7 @@ def draw_text(text, font, text_col, x, y):
 def draw_bg():
     screen.fill(BG)
     width = mountain_img.get_width()
-    for x in range(5):
+    for x in range(100):
         screen.blit(mountain_img, ((x * width - bg_scroll) * 0.6, SCREEN_HEIGHT - mountain_img.get_height() - 300))
         screen.blit(pine1_img, ((x * width - bg_scroll) * 0.5 - bg_scroll, SCREEN_HEIGHT - pine1_img.get_height() - 150))
         screen.blit(pine2_img, ((x * width - bg_scroll) * 0.5 - bg_scroll, SCREEN_HEIGHT - pine2_img.get_height()))
@@ -192,7 +192,6 @@ class Soldier(pygame.sprite.Sprite):
         self.spin = False
         self.in_spin = False
         
-        
         self.flip = False
         
         # 애니메이션 인덱스
@@ -207,7 +206,7 @@ class Soldier(pygame.sprite.Sprite):
         self.vision = pygame.Rect(0, 0, 150, 100)
         self.idling = False
         self.idling_counter = 0
-        self.i = 0
+        self.ai_counter = 0
         
         animation_types =['Idle', 'Walk', 'Jump', 'Death', 'Spin']
         for animation in animation_types:
@@ -230,7 +229,7 @@ class Soldier(pygame.sprite.Sprite):
         self.image = self.animation_list[self.action][self.frame_index]
         #이미지 모양 지정
         self.rect = self.image.get_rect()
-        self.rect.center = (x,y)
+        self.rect.center = (x, y)
         self.width = self.image.get_width()
         self.height = self.image.get_height()
 
@@ -342,10 +341,6 @@ class Soldier(pygame.sprite.Sprite):
             self.ammo -= 1
             shoot_fx.play()
     
-    # def ai_skill():
-    #     self.
-    #     return (0)
-    
     def ai(self):
         if self.alive and player.alive:
             if self.freeze == True:
@@ -357,20 +352,15 @@ class Soldier(pygame.sprite.Sprite):
                 self.idling_counter = 100
             # ai 근처에 플레이어가 있는 지 확인
             elif self.vision.colliderect(player.rect):
-                print(self.i)
-                # 움직이지 않고 플레이어를 바라본다.
-                if self.i % 10 != 0:
-                    self.i += 1
+                if (self.char_type == 'lich'):
+                    if  self.ai_counter % 100 == 17:
+                        self.update_action(4)
+                        explosion = Explosion_cast(self.rect.x, self.rect.y + 100, 3, self.flip)
+                        explosion_group.add(explosion)
+                    self.ai_counter += 1
+                else:
                     self.update_action(0)
                     self.shoot()
-                else:
-                    self.i += 1
-                    print(self.char_type)
-                    if (self.char_type == 'lich'):
-                        self.update_action(4)
-                        print(self.i)
-                        # self.ai_skill()
-            
             else:
                 if self.idling == False:
                     if  self.direction == 1:
@@ -393,8 +383,6 @@ class Soldier(pygame.sprite.Sprite):
                         self.idling = False
         # 스크롤
         self.rect.x += screen_scroll
-
-
 
     def update_animation(self):
         # 애니메이션 업데이트
@@ -683,13 +671,23 @@ class Magic(pygame.sprite.Sprite):
                 player.health -= 50
             for enemy in enemy_group:
                     # 얼음 마법 진행
-                    if player.magic_type == 1:
+                    if player.magic_type == 1: 
                         if abs(self.rect.centerx - enemy.rect.centerx) < TILE_SIZE * 2.5 and abs(self.rect.centery - enemy.rect.centery) < TILE_SIZE * 2.5:
-                            freeze = Freeze(enemy.rect.centerx, enemy.rect.centery, 1, enemy)
+                            print(enemy)
+                            freeze = Freeze(enemy.rect.centerx, enemy.rect.centery, 0.5, enemy)
+                            # if enemy == 'lich':
+                            #     freeze = Freeze(enemy.rect.centerx, enemy.rect.centery, 3, enemy)
+                            # else:
+                            #     freeze = Freeze(enemy.rect.centerx, enemy.rect.centery, 0.5, enemy)
                             freeze_group.add(freeze)
                             enemy.health -= 30  
                     # 화염 마법 진행
                     elif player.magic_type == 2:
+                        x = self.rect.centerx//TILE_SIZE
+                        y = self.rect.centery//TILE_SIZE
+                        for i in range(-1, 2):
+                            lava = Lava(img_list[10], (x + i) * TILE_SIZE, (y + 1) * TILE_SIZE)
+                            lava_group.add(lava)
                         if abs(self.rect.centerx - enemy.rect.centerx) < TILE_SIZE * 1.5 and abs(self.rect.centery - enemy.rect.centery) < TILE_SIZE * 1.5:
                             fire = Fire(enemy.rect.centerx, enemy.rect.centery, 0.5, enemy)
                             fire_group.add(fire)
@@ -746,7 +744,6 @@ class Fire(pygame.sprite.Sprite):
         self.rect.center = (x, y)
         self.counter = 0
     
-    
     def update(self):
         self.rect.x += screen_scroll
         Explosion_SPEED = 200
@@ -791,17 +788,28 @@ class Poison(pygame.sprite.Sprite):
 
 
 class Explosion_cast(pygame.sprite.Sprite):
-    def __init__(self, x, y, scale):
+    def __init__(self, x, y, scale, flip):
         pygame.sprite.Sprite.__init__(self)
-        self.image = []
+        self.images = []
         for num in range(1, 16):
-            img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Explosion_Cast\\frame{:04d}.png'.format(num)).convert_alpha()
+            img = pygame.image.load('C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\effect\\Explosion_Cast\\spell{:02d}.png'.format(num)).convert_alpha()
             img = pygame.transform.scale(img, (float(img.get_width() * scale), float(img.get_height() * scale)))
-            self.image.append(img)
+            self.images.append(img)
         self.frame_index = 0
-        self.image = self.image[self.frame_index]
+        self.image = self.images[self.frame_index]
         self.rect = self.image.get_rect()
-        self.rect.center = (x + 200, y)
+        if flip == False:
+            self.rect.center = (player.rect.x, player.rect.y)
+            # self.rect.center = (x + 200, y)
+            if abs(self.rect.centerx - player.rect.centerx) < TILE_SIZE * 2 and \
+                abs(self.rect.centery - player.rect.centery) < TILE_SIZE * 2:
+                player.health -= 10
+        else:
+            self.rect.center = (player.rect.x, player.rect.y)
+            # self.rect.center = (x - 200, y)
+            if abs(self.rect.centerx - player.rect.centerx) < TILE_SIZE * 2 and \
+                abs(self.rect.centery - player.rect.centery) < TILE_SIZE * 2:
+                player.health -= 10
         self.counter = 0
         
     def update(self):
@@ -811,10 +819,10 @@ class Explosion_cast(pygame.sprite.Sprite):
         if (self.counter >= Explosion_SPEED):
             self.counter = 0
             self.frame_index += 1
-            if (self.frame_index >= len(self.image)):
+            if (self.frame_index >= len(self.images)):
                 self.kill()
             else:
-                self.image = self.image[self.frame_index]
+                self.image = self.images[self.frame_index]
 
 class Explosion_Ice(pygame.sprite.Sprite):
     def __init__(self, x, y, scale):
