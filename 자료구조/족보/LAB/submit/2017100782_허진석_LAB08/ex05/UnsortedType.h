@@ -239,6 +239,22 @@ NodeType<ItemType> *UnsortedType<ItemType>::MinLoc(NodeType<ItemType> *location,
 }
 
 template <class ItemType>
+NodeType<ItemType>* UnsortedType<ItemType>::MinLoc(NodeType<ItemType> *location) {
+if (location == NULL) // base case: 원래 리스트가 empty (listData가 NULL) 일 때
+return NULL;
+else if (location->next == NULL) // another base case : 리스트의 마지막 노드
+return location;
+else { // general case: location != NULL
+NodeType<ItemType> *minPtr = MinLoc(location->next);
+if(location이 가리키는 값 < minPtr가 가리키는 값) // minPtr은 절대 NULL이 아님. Why?
+// minPtr가 location이 되게 함
+return minPtr;
+}
+}
+
+
+
+template <class ItemType>
 void UnsortedType<ItemType>::Sort(NodeType<ItemType> *location)
 {
 	NodeType<ItemType> *minPtr; //최소값을 가리키는 포인터
