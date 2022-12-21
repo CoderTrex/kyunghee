@@ -1,3 +1,18 @@
+# 동영상 강의와 다르게 만든 점
+
+# 1. 해당 동영상에서 사용한 에셋 전부다 바꾸어서 만들기
+# 2. 마법 종류 3가지 이상 구현하기
+# 3. 마법의 폭발 이미지 개별 구현하기
+# 4. 마법의 특성 구현해서 이것도 효과 이미지 구현하기(posion은 ai에게 작게 다시 생김, ice는 얼음 생성, fire는 바닥 마그마로 변경)
+# 5. 마법의 개별 데미지 및 범위 효과 차등 적용하기
+# 5. 보스 ai는 아예 색다른 스킬로 플레이어 공격하기
+# 6. 추가적으로 보스 스킬은 플레이어의 위치 받아와서 실시간 구현하기
+# 7. 플레이어의 스킬을 동영상과 다른 추가 스킬 구현하기
+# 8. 레벨별 ai의 체력 변화로 보스전 만들기
+# 9. ai별 공격 모션 변화
+# 10. 엔딩 구현
+
+
 import pygame
 from pygame import mixer
 import random
@@ -27,7 +42,6 @@ COLS = 150
 MAX_LEVEL = 3
 TILE_SIZE = SCREEN_HEIGHT//ROWS
 TILE_TYPE = 21
-
 MAGIC_TYPE = 1
 
 
@@ -37,12 +51,10 @@ level = 0
 start_game = False
 start_intro = False
 
-
-
 #음악 및 소리 로드
-# pygame.mixer.music.load("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\music\\music2.mp3")
-# pygame.mixer.music.set_volume(0.3)
-# pygame.mixer.music.play(-1, 0.0, 5000)
+pygame.mixer.music.load("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\music\\background.mp3")
+pygame.mixer.music.set_volume(0.5)
+pygame.mixer.music.play(-1, 0.0, 5000)
 jump_fx = pygame.mixer.Sound("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\music\\jump.wav")
 jump_fx.set_volume(0.5)
 shoot_fx = pygame.mixer.Sound("C:\\Coding\\kyunghee\\게임프로그래밍입문\\Term_Project\\asset\\music\\shot.wav")
@@ -175,7 +187,10 @@ class Soldier(pygame.sprite.Sprite):
         self.posion = False
         
         if (char_type == 'lich'):
-            self.health = 300 # 몬스터에 맞춰서 health 구현하기
+            if (level == 2):
+                self.health = 1000
+            else:
+                self.health = 300
         if (char_type == "goblin"):
             self.health = 75
         if (char_type == 'player'):
@@ -284,7 +299,7 @@ class Soldier(pygame.sprite.Sprite):
             # x축과의 충돌 처리
             if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
                 dx = 0
-                # if the ai has hit a wall then make it turn around
+                # ai가 벽에 부딛치면 돌아가는 코드
                 if self.char_type == 'lich' or self.char_type == 'goblin':
                     self.direction *= -1
                     self.move_counter = 0
@@ -415,6 +430,7 @@ class Soldier(pygame.sprite.Sprite):
             self.speed = 0
             self.alive = False
             self.update_action(3)
+            
     
     def draw(self):
         screen.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
@@ -428,7 +444,6 @@ class World():
     def process_data(self, data):
         self.level_length = len(data[0])
         
-        # iterate through each value in level data file
         for y, row in enumerate(data):
             for x, tile in enumerate(row):
                 if tile >= 0:
@@ -455,8 +470,12 @@ class World():
                         player = Soldier('player', x * TILE_SIZE, y * TILE_SIZE, 2, 5, 20, 5)
                         health_bar = HealthBar(10, 10, player.health, player.health)
                     elif tile == 15:
-                        enemy = Soldier('lich', x * TILE_SIZE, y * TILE_SIZE, 2, 2, 20, 0)
-                        enemy_group.add(enemy)
+                        if level == 2:
+                            enemy = Soldier('lich', x * TILE_SIZE, y * TILE_SIZE, 2.1, 2, 20, 0)
+                            enemy_group.add(enemy)
+                        else:
+                            enemy = Soldier('lich', x * TILE_SIZE, y * TILE_SIZE, 1.5, 2, 20, 0)
+                            enemy_group.add(enemy)
                     elif tile == 16:
                         enemy2 = Soldier('goblin', x * TILE_SIZE, y * TILE_SIZE, 0.5, 2, 20, 0)
                         enemy_group.add(enemy2)
@@ -473,7 +492,7 @@ class World():
                         star = Star(img, x*TILE_SIZE, y*TILE_SIZE)
                         star_group.add(star)
         return player, health_bar
-
+    
     def draw(self):
         for tile in self.obstacle_list:
             tile[1][0] += screen_scroll
@@ -617,7 +636,7 @@ class Spin(pygame.sprite.Sprite):
 
         
 class Magic(pygame.sprite.Sprite):
-    def __init__(self, x, y, direction, player):
+    def __init__(self, x, y, direction):
         pygame.sprite.Sprite.__init__(self)
         self.timer = 100
         self.vel_y = -8
@@ -673,12 +692,12 @@ class Magic(pygame.sprite.Sprite):
                     # 얼음 마법 진행
                     if player.magic_type == 1: 
                         if abs(self.rect.centerx - enemy.rect.centerx) < TILE_SIZE * 2.5 and abs(self.rect.centery - enemy.rect.centery) < TILE_SIZE * 2.5:
-                            print(enemy)
-                            freeze = Freeze(enemy.rect.centerx, enemy.rect.centery, 0.5, enemy)
-                            # if enemy == 'lich':
-                            #     freeze = Freeze(enemy.rect.centerx, enemy.rect.centery, 3, enemy)
-                            # else:
-                            #     freeze = Freeze(enemy.rect.centerx, enemy.rect.centery, 0.5, enemy)
+                            if (enemy.rect.width == 84):
+                                freeze = Freeze(enemy.rect.centerx, enemy.rect.centery + 40, 1.1, enemy)
+                            if (enemy.rect.width == 60):
+                                freeze = Freeze(enemy.rect.centerx, enemy.rect.centery + 20, 0.8, enemy)
+                            if (enemy.rect.width == 36):
+                                freeze = Freeze(enemy.rect.centerx, enemy.rect.centery, 0.5, enemy)
                             freeze_group.add(freeze)
                             enemy.health -= 30  
                     # 화염 마법 진행
@@ -1043,7 +1062,7 @@ while run:
                 player.shoot()
             # 수류탄 투척 액션
             elif magic and magic_thrown == False and player.magic > 0:
-                magic = Magic(player.rect.centerx + (1 * player.rect.size[0]) * player.direction, player.rect.top, player.direction, player)
+                magic = Magic(player.rect.centerx + (1 * player.rect.size[0]) * player.direction, player.rect.top, player.direction)
                 magic_group.add(magic)
                 # 수류탄 수 줄어들기
                 player.magic -= 1
