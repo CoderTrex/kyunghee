@@ -1,4 +1,0 @@
-
-[loss, prediction] = logi_regression(base, sync, backstacking, rate, iterations) 
-scaled_rate_profit = minimax(loss, coin_data, lowest(base_ds, coin_data), highest(base_ds, coin_data))
-scaled_predict  = minimax(prediction, coin_data, lowest(base_ds, coin_data), highest(base_ds, coin_data))
