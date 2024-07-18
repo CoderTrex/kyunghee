@@ -57,5 +57,5 @@ PROJECT_DESCRIPTION : This repository contains course materials and assignments 
 PROJECT_URL : 'https://github.com/Tyranno-Rex/Kyunghee_2022_2Grade_Second_Semester.git'
 PROJECT_COMPLETION_STATUS : TRUE
 PROJECT_MULTI : TRUE
-PROJECT_SUBPROJECT : Data Structure, Game Engine Basic, Game Programming Introduction, Introduction to Software Convergence
+PROJECT_SUBPROJECT : data structure, game engine basic, game programming introduction, Introduction to software convergence
 PROJECT_CATEGORY : 'NONE'
