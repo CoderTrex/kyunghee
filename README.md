@@ -54,7 +54,7 @@ This repository contains course materials and assignments for the second semeste
 
 PROJECT_NAME : Kyunghee_2022_2Grade_Second_Semester
 PROJECT_DESCRIPTION : This repository contains course materials and assignments for the second semester of the second grade at Kyunghee University. The courses covered include Data Structure, Game Engine Basic, Game Programming Introduction, and Introduction to Software Convergence.
-PROJECT_URL : https://github.com/Tyranno-Rex/Kyunghee_2022_2Grade_Second_Semester.git 
+PROJECT_URL : 'https://github.com/Tyranno-Rex/Kyunghee_2022_2Grade_Second_Semester.git'
 PROJECT_COMPLETION_STATUS : TRUE
 PROJECT_MULTI : TRUE
 PROJECT_SUBPROJECT : Data Structure, Game Engine Basic, Game Programming Introduction, Introduction to Software Convergence
