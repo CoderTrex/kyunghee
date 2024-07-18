@@ -38,7 +38,7 @@ This directory contains the following Python scripts for developing and testing 
 
 ## Project Crawling
 
-PROJECT_NAME : Introduction to Software Convergence
+PROJECT_NAME : Introduction to software convergence
 PROJECT_DESCRIPTION : 'Developed a coin analysis program that utilizes various financial analysis techniques to provide insights and strategies for cryptocurrency trading.'
 PROJECT_URL : 'https://github.com/Tyranno-Rex/Kyunghee_2022_2Grade_Second_Semester/tree/main/game%20programming%20introduction'
 PROJECT_COMPLETION_STATUS : TRUE

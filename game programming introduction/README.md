@@ -65,7 +65,7 @@ To get started with the assignments and the term project, follow these steps:
 
 ## Project Crawling
 
-PROJECT_NAME : Game Programming Introduction 
+PROJECT_NAME : game programming introduction 
 PROJECT_DESCRIPTION : This repository contains various game programming assignments completed using Python, along with the final term project, "I'm Slimer."
 PROJECT_URL : "https://github.com/Tyranno-Rex/Kyunghee_2022_2Grade_Second_Semester/tree/main/game%20programming%20introduction"
 PROJECT_COMPLETION_STATUS : TRUE
